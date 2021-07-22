@@ -90,6 +90,12 @@ def toggle_drawing ():
         ship.put_pen_down()
         ship.begin_fill(as_moving=True)
 
+def draw_dot ():
+    ship.dot(color="gold")
+
+def draw_stamp ():
+    ship.stamp()
+
 # Bind the functions to keys
 screen.on_key_hold(on_up, "up")
 screen.on_key_hold(on_down, "down")
@@ -97,6 +103,8 @@ screen.on_key_hold(on_left, "left")
 screen.on_key_hold(on_right, "right")
 screen.on_key_hold(esc, "escape")
 screen.on_key_press(toggle_drawing, "space")
+screen.on_key_press(draw_dot, "d")
+screen.on_key_press(draw_stamp, "s")
 
 # Create a "ufo" turtle
 ufo = Sprite("ufo.png")
@@ -115,24 +123,14 @@ def move_ufo ():
 ufo.on_update(move_ufo)
 
 # # Create a turtle to write text to the screen
-# writer = turtle.Turtle()
-# writer.hideturtle()
-# writer.penup()
-# writer.goto(0, -160)
-# writer.color("gold")
+writer = Painter()
+writer.hide()
+writer.pick_pen_up()
+writer.set_position(0, -140)
+writer.set_color("gold")
 
-# # FEATURE: The .write() method has had some features added:
-# #  - `align` is where the turtle writing aligns with the text.
-# #    It is a string containing "left", "right", "center", "top",
-# #    "bottom", "middle" or a combination separated by space
-# #    (e.g. "bottom center")
-# #  - `font` can be the name of a font on the system or a
-# #    True Type Font file (.ttf)
-# #  - `font_size` is the height of the text in pixels
-# #  - `font_style` can be "bold", "italic", "underline" or a 
-# #    combination separated by space (e.g. "bold italic")
-# writer.write("Welcome to Space", align="center", 
-#              font="Freedom.ttf", font_size=36)
+
+writer.write("Welcome to Space", font="Freedom.ttf", font_size=36)
 
 def on_click ():
     print("CLICKED")

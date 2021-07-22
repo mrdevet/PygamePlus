@@ -30,6 +30,7 @@ TODO
 #                               GLOBAL VARIABLES
 ################################################################################
 
+import math
 import pygame
 from pygame import Color
 
@@ -41,6 +42,9 @@ from sprite import *
 ################################################################################
 
 class Painter (Sprite):
+
+    # A cache that stores fonts previously used.
+    _fonts = {}
 
     def __init__ (self, image_file=None):
         Sprite.__init__(self, image_file)
@@ -55,7 +59,7 @@ class Painter (Sprite):
         self._fillcolor = "black"
         self._fillcolor_obj = pygame.Color("black")
         self._fill_canvas = None
-        self._lines_over_fill = None
+        self._drawings_over_fill = None
 
     # Set and get colors
 
@@ -148,7 +152,7 @@ class Painter (Sprite):
         # the point.
         if self._filling:
             self._fillpoly.append(self._pos)
-            self._draw_line(start, self._pos, self._lines_over_fill)
+            self._draw_line(start, self._pos, self._drawings_over_fill)
 
         # Draw the line
         if self._pendown:
@@ -174,14 +178,14 @@ class Painter (Sprite):
             pygame.draw.polygon(canvas, self._fillcolor, points)
 
         # Draw the lines back on top of the canvas
-        canvas.blit(self._lines_over_fill, (0, 0))
+        canvas.blit(self._drawings_over_fill, (0, 0))
 
     def begin_fill (self, as_moving=False):
         self._filling = True
         self._fillpoly = [self._pos]
         self._fill_as_moving = bool(as_moving)
         screen = get_active_screen()
-        self._lines_over_fill = pygame.Surface(screen.get_size(), pygame.SRCALPHA)
+        self._drawings_over_fill = pygame.Surface(screen.get_size(), pygame.SRCALPHA)
 
     def end_fill (self):
         '''
@@ -204,11 +208,188 @@ class Painter (Sprite):
     def is_filling (self):
         return self._filling
 
+    ### Draw circles
+
+    def dot (self, size=None, color=None):
+        '''
+        Draw a dot.
+
+        The dot will be centered at the current position and have diameter
+        `size`.
+
+        If the `color` is not specified, the pen color is used.
+        '''
+
+        # Get the active screen's canvas
+        screen = get_active_screen()
+        if screen is None:
+            return
+        canvas = screen.get_canvas()
+
+        # If no size is given, make the dot a bit bigger than the pen size
+        if size is None:
+            size = max(self._pensize + 4, 2 * self._pensize)
+
+        # If no color is given use the pen color
+        if color is None:
+            color = self._pencolor_obj
+
+        # Draw the dot
+        point = to_pygame_coordinates(self._pos)
+        pygame.draw.circle(canvas, color, point, size / 2)
+
+        if self._filling:
+            pygame.draw.circle(self._drawings_over_fill, color, point, size / 2)
+
+    def circle (self, radius, extent=None):
+        '''
+        Draw a circle counterclockwise.
+
+        The circle will have the given `radius`.  The `extent` is used to
+        draw an arc around a portion of a circle.  If extent is negative,
+        draw the circle clockwise.
+
+        The circle will actually be an approximation.  The turtle will really
+        draw a regular polygon with 360 sides.
+        '''
+
+        # Because the circle is an approximation, we will calculate the
+        # final position and set it after the circle is drawn.
+        if extent % 360 == 0:
+            end = self._pos
+        else:
+            delta = pygame.Vector2(0, -radius)
+            delta.rotate_ip(extent if radius >= 0 else -extent)
+            delta += pygame.Vector2(0, radius)
+            delta.rotate_ip(self._dir)
+            end = self._pos + delta
+
+        # Sanitize extent argument
+        if extent is None:
+            extent = 360
+        else:
+            extent = int(extent)
+
+        # Set up the number of steps and the turn angle needed between
+        # steps.
+        step_size = abs(radius) * 2 * math.pi / 360
+        turn_size = 1 if radius >= 0 else -1
+
+        # Repeatedly move forward and turn to approximate the circle
+        if extent > 0:
+            for _ in range(extent):
+                self.move_forward(step_size)
+                self.turn_left(turn_size)
+        else:
+            for _ in range(-extent):
+                self.turn_right(turn_size)
+                self.move_backward(step_size)
+
+        # Set the position to the one calculated above
+        self._pos = end
+
+    ### Draw a stamp
+
+    def stamp (self):
+        # Get the active screen's canvas
+        screen = get_active_screen()
+        if screen is None:
+            return
+        canvas = screen.get_canvas()
+
+        # Copy the image to the canvas
+        self._clean_image()
+        canvas.blit(self.image, self.rect)
+
+        if self._filling:
+            self._drawings_over_fill.blit(self.image, self.rect)
+
+    ### Write on the screen
+
+    def write (self, text, align="middle center", font="Arial", font_size=8, font_style="normal"):
+        '''
+        Write text to the screen at the turtle's current location.
+
+        The `align` parameter sets where the turtle aligns with the text being
+        written.  It is a string containing "left", "right", "center", "top",
+        "bottom", "middle" or a combination separated by space (e.g. 
+        "bottom center")
+
+        The `font` parameter can be the name of a font on the system or a
+        True Type Font file (.ttf) located in the directory.
+
+        The `font_size` is the height of the text in pixels.
+        
+        The `font_style` argument can be "bold", "italic", "underline" or a 
+        combination separated by space (e.g. "bold italic")
+        '''
+
+        # If font is a Font object, just use that
+        if isinstance(font, pygame.font.Font):
+            font_obj = font
+
+        # If this font and size have been used before, check the _fonts cache
+        if (font, font_size) in Painter._fonts:
+            font_obj = Painter._fonts[font, font_size]
+
+        # If the font ends in ".ttf", then load the font from the file
+        elif font.endswith(".ttf"):
+            font_obj = pygame.font.Font(font, font_size)
+            Painter._fonts[font, font_size] = font_obj
+
+        # Otherwise, use a system font
+        else:
+            font_obj = pygame.font.SysFont(font, font_size)
+            Painter._fonts[font, font_size] = font_obj
+
+        # Apply the styles
+        if isinstance(font_style, str):
+            font_style = font_style.split()
+        font_style = [style.lower() for style in font_style]
+        font_obj.set_bold("bold" in font_style)
+        font_obj.set_italic("italic" in font_style)
+        font_obj.set_underline("underline" in font_style)
+
+        # Render an image of the text
+        image = font_obj.render(str(text), True, self._pencolor)
+        rect = image.get_rect()
+
+        # Set the position of the text from the align parameter
+        if isinstance(align, str):
+            align = align.split()
+        align = [location.lower() for location in align]
+        x, y = to_pygame_coordinates(self._pos)
+        rect.centerx = x
+        rect.centery = y
+        for location in align:
+            if location == "left":
+                rect.left = x
+            elif location == "center":
+                rect.centerx = x
+            elif location == "right":
+                rect.right = x
+            elif location == "top":
+                rect.top = y
+            elif location == "middle":
+                rect.centery = y
+            elif location == "bottom":
+                rect.bottom = y
+
+        # Draw the text on the canvas
+        screen = get_active_screen()
+        if screen is None:
+            return
+        canvas = screen.get_canvas()
+        canvas.blit(image, rect)
+
+        # Return a Font object that can be used for future writing
+        return font_obj
+
 
 
     def update (self, screen=None):
         Sprite.update(self, screen)
-        
+
         if screen is None:
             screen = get_active_screen()
         if screen is not None and self._filling and self._fill_as_moving:
