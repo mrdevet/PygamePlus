@@ -34,17 +34,18 @@ ship.set_image_rotates(True)
 # as the heading
 ship.set_image_tilt(-90)
 
+ship.set_pen_width(5)
 ship.set_fill_color("red")
 ship.set_pen_color("white")
-ship.begin_fill()
-ship.set_position(100, 100)
-ship.set_pen_width(10)
-ship.set_position(200, 0)
-ship.set_position(0, 0)
-ship.set_position(10, -100)
-
-ship.walk_path([(-200, 0), (-100, 100), (0,0)])
-ship.end_fill()
+ship.pick_pen_up()
+# ship.begin_fill()
+# ship.set_position(100, 100)
+# ship.set_pen_width(10)
+# ship.set_position(200, 0)
+# ship.set_position(0, 0)
+# ship.set_position(10, -100)
+# ship.walk_path([(-200, 0), (-100, 100), (0,0)])
+# ship.end_fill()
 
 # Function that ends the program
 def esc ():
@@ -80,12 +81,22 @@ def on_left ():
 def on_right ():
     ship.turn_right(5)
 
+# Function that starts and stops drawing
+def toggle_drawing ():
+    if ship.is_pen_down():
+        ship.end_fill()
+        ship.pick_pen_up()
+    else:
+        ship.put_pen_down()
+        ship.begin_fill(as_moving=True)
+
 # Bind the functions to keys
 screen.on_key_hold(on_up, "up")
 screen.on_key_hold(on_down, "down")
 screen.on_key_hold(on_left, "left")
 screen.on_key_hold(on_right, "right")
 screen.on_key_hold(esc, "escape")
+screen.on_key_press(toggle_drawing, "space")
 
 # Create a "ufo" turtle
 ufo = Sprite("ufo.png")

@@ -54,7 +54,8 @@ class Painter (Sprite):
         self._fillpoly = None
         self._fillcolor = "black"
         self._fillcolor_obj = pygame.Color("black")
-        self._surface_over_fill = None
+        self._fill_canvas = None
+        self._lines_over_fill = None
 
     # Set and get colors
 
@@ -159,6 +160,22 @@ class Painter (Sprite):
 
     ### Creating Filled Shapes
 
+    def _draw_fill (self, canvas=None):
+        if canvas is None:
+            # Get the active screen's canvas
+            screen = get_active_screen()
+            if screen is None:
+                return
+            canvas = screen.get_canvas()
+
+        # Draw the points to the canvas
+        points = [to_pygame_coordinates(p) for p in self._fillpoly]
+        if len(points) >= 3:
+            pygame.draw.polygon(canvas, self._fillcolor, points)
+
+        # Draw the lines back on top of the canvas
+        canvas.blit(self._lines_over_fill, (0, 0))
+
     def begin_fill (self, as_moving=False):
         self._filling = True
         self._fillpoly = [self._pos]
@@ -178,26 +195,24 @@ class Painter (Sprite):
         if not self._filling:
             return
 
-        screen = get_active_screen()
-        if screen is not None:
-            # Get the canvas to draw on
-            canvas = screen.get_canvas()
-
-            # Draw the points to the canvas
-            points = [to_pygame_coordinates(p) for p in self._fillpoly]
-            pygame.draw.polygon(canvas, self._fillcolor, points)
-
-            # Draw the lines back on top of the canvas
-            canvas.blit(self._lines_over_fill, (0, 0))
+        self._draw_fill()
         
         # Reset the filling attributes
         self._filling = False
         self._fillpoly = None
-        self._fill_as_moving = None
-        self._lines_over_fill = None
 
     def is_filling (self):
         return self._filling
+
+
+
+    def update (self, screen=None):
+        Sprite.update(self, screen)
+        
+        if screen is None:
+            screen = get_active_screen()
+        if screen is not None and self._filling and self._fill_as_moving:
+            self._draw_fill(screen._surface)
 
 
         

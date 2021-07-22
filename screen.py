@@ -147,8 +147,8 @@ class Screen (pygame.sprite.Group):
             rect.centerx = self._width / 2
             rect.centery = self._height / 2
             self._surface.blit(self._image, rect)
-        pygame.sprite.Group.update(self, self)
         self._surface.blit(self._canvas, (0, 0))
+        pygame.sprite.Group.update(self, self)
         pygame.sprite.Group.draw(self, self._surface)
         pygame.display.flip()
 
