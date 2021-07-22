@@ -34,7 +34,9 @@ ship.set_image_rotates(True)
 # as the heading
 ship.set_image_tilt(-90)
 
-ship.set_color("white")
+ship.set_fill_color("red")
+ship.set_pen_color("white")
+ship.begin_fill()
 ship.set_position(100, 100)
 ship.set_pen_width(10)
 ship.set_position(200, 0)
@@ -42,6 +44,7 @@ ship.set_position(0, 0)
 ship.set_position(10, -100)
 
 ship.walk_path([(-200, 0), (-100, 100), (0,0)])
+ship.end_fill()
 
 # Function that ends the program
 def esc ():

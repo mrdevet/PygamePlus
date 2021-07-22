@@ -50,9 +50,11 @@ class Painter (Sprite):
         self._pensize = 1
         self._stepsize = 0.1
         self._filling = False
+        self._fill_as_moving = None
         self._fillpoly = None
         self._fillcolor = "black"
         self._fillcolor_obj = pygame.Color("black")
+        self._surface_over_fill = None
 
     # Set and get colors
 
@@ -102,44 +104,100 @@ class Painter (Sprite):
 
     # Draw on movement
 
+    def _draw_line (self, start, end, canvas=None):
+        if canvas is None:
+            # Get the active screen's canvas
+            screen = get_active_screen()
+            if screen is None:
+                return
+            canvas = screen.get_canvas()
+
+        # Convert to pygame coordinates
+        start = to_pygame_coordinates(start)
+        end = to_pygame_coordinates(end)
+
+        # If width is 1, use the pygame function
+        if self._pensize == 1:
+            pygame.draw.line(canvas, self._pencolor_obj, start, end)
+
+        # Otherwise use dots instead
+        else:
+            # Find geometric properties of the line
+            delta = end - start
+            distance, direction = delta.as_polar()
+
+            # Draw dots every 0.1 pixels along the line between the points
+            radius = self._pensize / 2
+            current = start
+            delta = pygame.Vector2(self._stepsize, 0).rotate(direction)
+            for _ in range(int(distance / self._stepsize)):
+                pygame.draw.circle(canvas, self._pencolor_obj, current, radius)
+                current += delta
+            pygame.draw.circle(canvas, self._pencolor_obj, current, radius)
+
     def set_position (self, x, y=None):
         if y is None:
             x, y = x
 
         # Actually move the sprite
-        start = to_pygame_coordinates(self._pos)
-        end = to_pygame_coordinates(x, y)
+        start = self._pos
+        Sprite.set_position(self, x, y)            
 
-        Sprite.set_position(self, x, y)
+        # If the turtle is currently creating a filled shape, store
+        # the point.
+        if self._filling:
+            self._fillpoly.append(self._pos)
+            self._draw_line(start, self._pos, self._lines_over_fill)
 
-        screen = get_active_screen()
-        if self._pendown and screen is not None:
-            # Get the canvas to draw on
-            canvas = screen.get_canvas()
-
-            # If width is 1, use the pygame function
-            if self._pensize == 1:
-                pygame.draw.line(canvas, self._pencolor_obj, start, end)
-
-            # Otherwise use dots instead
-            else:
-                # Find geometric properties of the line
-                delta = end - start
-                distance, direction = delta.as_polar()
-
-                # Draw dots every 0.1 pixels along the line between
-                # the points
-                radius = self._pensize / 2
-                pygame.draw.circle(canvas, self._pencolor_obj, start, radius)
-                current = start
-                delta = pygame.Vector2(self._stepsize, 0).rotate(direction)
-                for _ in range(round(distance / self._stepsize)):
-                    current += delta
-                    pygame.draw.circle(canvas, self._pencolor_obj, current, radius)
+        # Draw the line
+        if self._pendown:
+            self._draw_line(start, self._pos)
 
     def walk_path (self, path):
         for point in path:
             self.set_position(point)
+
+    ### Creating Filled Shapes
+
+    def begin_fill (self, as_moving=False):
+        self._filling = True
+        self._fillpoly = [self._pos]
+        self._fill_as_moving = bool(as_moving)
+        screen = get_active_screen()
+        self._lines_over_fill = pygame.Surface(screen.get_size(), pygame.SRCALPHA)
+
+    def end_fill (self):
+        '''
+        Complete drawing a filled shape.
+
+        This function must be preceded by a call to begin_fill().  When
+        this method is called, a filled shape will be drawn using all of the
+        points visited since begin_fill() was called.
+        '''
+
+        if not self._filling:
+            return
+
+        screen = get_active_screen()
+        if screen is not None:
+            # Get the canvas to draw on
+            canvas = screen.get_canvas()
+
+            # Draw the points to the canvas
+            points = [to_pygame_coordinates(p) for p in self._fillpoly]
+            pygame.draw.polygon(canvas, self._fillcolor, points)
+
+            # Draw the lines back on top of the canvas
+            canvas.blit(self._lines_over_fill, (0, 0))
+        
+        # Reset the filling attributes
+        self._filling = False
+        self._fillpoly = None
+        self._fill_as_moving = None
+        self._lines_over_fill = None
+
+    def is_filling (self):
+        return self._filling
 
 
         
