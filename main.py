@@ -124,12 +124,18 @@ ufo.on_update(move_ufo)
 
 # # Create a turtle to write text to the screen
 writer = Painter()
-writer.hide()
+screen.add(writer)
+writer.pick_pen_up()
+writer.set_pen_width(5)
+writer.set_pen_color("gold")
+writer.set_fill_color((255, 215, 0, 63))
+writer.set_position(-250, -110)
+writer.put_pen_down()
+writer.begin_fill()
+writer.walk_path([(-250, -170), (250, -170), (250, -110), (-250, -110)])
+writer.end_fill()
 writer.pick_pen_up()
 writer.set_position(0, -140)
-writer.set_color("gold")
-
-
 writer.write("Welcome to Space", font="Freedom.ttf", font_size=36)
 
 def on_click ():
