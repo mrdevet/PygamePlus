@@ -18,6 +18,7 @@
 # FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER 
 # DEALINGS IN THE SOFTWARE.
 
+import math
 import pygame
 
 # The provided collision detection functions that are used in the "touching"
@@ -37,3 +38,32 @@ mouse_button_map = {
     "scrollup": 4,
     "scrolldown": 5
 }
+
+# Takes a polygon and draws it on a fitted pygame.Surface
+def polygon_to_surface (polygon, line_color, fill_color=None, width=1):
+    big_x = math.ceil(max([abs(p.x) for p in polygon]))
+    big_y = math.ceil(max([abs(p.y) for p in polygon]))
+    pygame_points = [pygame.Vector2(big_x + x, big_y - y) for x, y in polygon]
+    surface = pygame.Surface((2 * big_x + 1, 2 * big_y + 1), pygame.SRCALPHA)
+    if fill_color:
+        pygame.draw.polygon(surface, fill_color, pygame_points)
+    pygame.draw.polygon(surface, line_color, pygame_points, width)
+    return surface
+
+# The built-in polygon images that can be used for Sprites
+polygon_images = {
+    "turtle": ((16, 0), (14, -2), (10, -1), (7, -4), (9, -7), (8, -9), (5, -6), 
+               (1, -7), (-3, -5), (-6, -8), (-8, -6), (-5, -4), (-7, 0), 
+               (-5, 4), (-8, 6), (-6, 8), (-3, 5), (1, 7), (5, 6), (8, 9), 
+               (9, 7), (7, 4), (10, 1), (14, 2)),
+    "square": ((-10, -10), (10, -10), (10, 10), (-10, 10)),
+    "circle": ((10 * math.cos(math.pi * x / 180), 10 * math.sin(math.pi * x / 180)) 
+               for x in range(360)),
+    "triangle": ((10.0, -5.77), (0.0, 11.55), (-10.0, -5.77)),
+    "arrow": ((0.0, 0.0), (-9.0, -5.0), (-7.0, 0.0), (-9.0, 5.0)),
+    "chevron": ((-7, 10), (2, 10), (7, 0), (2, -10), (-7, -10), (-2, 0))
+}
+
+# Convert the points above the pygame.Vector2 objects
+for shape, points in polygon_images.items():
+    polygon_images[shape] = tuple(pygame.Vector2(p) for p in points)

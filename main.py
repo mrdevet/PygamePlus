@@ -35,18 +35,9 @@ ship.set_image_rotates(True)
 # as the heading
 ship.set_image_tilt(-90)
 
-ship.set_pen_width(5)
+ship.set_line_width(5)
 ship.set_fill_color("red")
-ship.set_pen_color("white")
-ship.pick_pen_up()
-# ship.begin_fill()
-# ship.set_position(100, 100)
-# ship.set_pen_width(10)
-# ship.set_position(200, 0)
-# ship.set_position(0, 0)
-# ship.set_position(10, -100)
-# ship.walk_path([(-200, 0), (-100, 100), (0,0)])
-# ship.end_fill()
+ship.set_line_color("white")
 
 # Function that ends the program
 def esc ():
@@ -84,11 +75,11 @@ def on_right ():
 
 # Function that starts and stops drawing
 def toggle_drawing ():
-    if ship.is_pen_down():
+    if ship.is_drawing_line():
         ship.end_fill()
-        ship.pick_pen_up()
+        ship.end_line()
     else:
-        ship.put_pen_down()
+        ship.begin_line()
         ship.begin_fill(as_moving=True)
 
 def draw_dot ():
@@ -127,16 +118,15 @@ ufo.on_update(move_ufo)
 # # Create a turtle to write text to the screen
 writer = Painter()
 screen.add(writer)
-writer.pick_pen_up()
-writer.set_pen_width(5)
-writer.set_pen_color("gold")
+writer.set_line_width(5)
+writer.set_line_color("gold")
 writer.set_fill_color((255, 215, 0, 63))
 writer.set_position(-250, -110)
-writer.put_pen_down()
+writer.begin_line()
 writer.begin_fill()
 writer.walk_path([(-250, -170), (250, -170), (250, -110), (-250, -110)])
 writer.end_fill()
-writer.pick_pen_up()
+writer.end_line()
 writer.set_position(0, -140)
 writer.write("Welcome to Space", font="Freedom.ttf", font_size=36)
 
@@ -144,6 +134,34 @@ def on_drag ():
     ship.set_position(from_pygame_coordinates(pygame.mouse.get_pos()))
 
 ship.on_drag(on_drag)
+
+turtle = Sprite("turtle")
+screen.add(turtle)
+turtle.set_color("red")
+turtle.set_image_rotates()
+
+# Function that moves the turtle forward
+def on_w ():
+    turtle.move_forward(2)
+    wrap_around()
+
+# Function that moves the turtle backward
+def on_s ():
+    turtle.move_backward(2)
+    wrap_around()
+
+# Function that turns the turtle left
+def on_a ():
+    turtle.turn_left(5)
+
+# Function that turns the turtle right
+def on_d ():
+    turtle.turn_right(5)
+
+screen.on_key_hold(on_w, "w")
+screen.on_key_hold(on_s, "s")
+screen.on_key_hold(on_a, "a")
+screen.on_key_hold(on_d, "d")
 
 screen.update()
 

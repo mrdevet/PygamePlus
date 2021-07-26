@@ -63,17 +63,26 @@ class Sprite (pygame.sprite.Sprite):
 
         # Handle the image
         if image is None:
-            self._original_image = pygame.Surface((1, 1))
+            self._original = pygame.Surface((1, 1), pygame.SRCALPHA)
+        elif isinstance(image, str):
+            if image in pgputils.polygon_images:
+                self._original = pgputils.polygon_images[image]
+            else:
+                self._original = pygame.image.load(image).convert_alpha()
+        elif isinstance(image, tuple) or isinstance(image, list):
+            self._original = tuple([pygame.Vector2(p) for p in image])
         else:
-            self._original_image = pygame.image.load(image).convert_alpha()
-        self._scaled_image = self._original_image
+            raise ValueError("Invalid image!")
 
         # The .image and .rect attributes are needed for drawing sprites
         # in a pygame group
-        self.image = self._original_image
+        if isinstance(self._original, tuple):
+            self.image = pgputils.polygon_to_surface(self._original, "black", "black")
+        else:
+            self.image = self._original
+        self._scaled = self._original
+        self._rotated = self._scaled
         self.rect = self.image.get_rect()
-        self.rect.centerx = 0
-        self.rect.centery = 0
 
         # Positional and directional attributes
         self._pos = pygame.Vector2(0, 0)
@@ -88,6 +97,13 @@ class Sprite (pygame.sprite.Sprite):
         self._tilt = 0
         self._dirty_rotate = False
         self._dirty_mask = True
+
+        # Attributes for lines and fill of polygon images
+        self._linecolor = "black"
+        self._linecolor_obj = pygame.Color("black")
+        self._linesize = 1
+        self._fillcolor = "black"
+        self._fillcolor_obj = pygame.Color("black")
 
         # Attributes that hold any event handlers associated with the sprite
         self._on_update_func = None
@@ -380,30 +396,140 @@ class Sprite (pygame.sprite.Sprite):
         return self._smooth
 
 
+    ### Color and Width Methods for Polygons
+
+    def set_color (self, color):
+        '''
+        Change the line color and fill color.
+
+        The given `color` be one of the following values:
+         - A valid color string.  See https://replit.com/@cjdevet/PygameColors
+           to explore the available color strings.
+         - A set of three numbers between 0 and 255 that represent the
+           amount of red, green, blue to use in the color.  A fourth transparency
+           value can be added.
+         - An HTML color code in the form "#rrggbb" where each character 
+           r, g, b and a are replaced with a hexidecimal digit.  For translucent
+           colors, add another pair of hex digits ("##rrggbbaa").
+         - An integer that, when converted to hexidecimal, gives an HTML color
+           code in the form 0xrrggbbaa.
+         - A pygame Color object.
+        '''
+
+        self._linecolor_obj = pygame.Color(color)
+        self._linecolor = color
+        self._fillcolor_obj = pygame.Color(color)
+        self._fillcolor = color
+
+
+    def get_colors (self):
+        '''
+        Returns a tuple containing the current line color and fill color.
+        '''
+
+        return self._linecolor, self._fillcolor
+
+
+    def set_line_color (self, color):
+        '''
+        Change the line color.
+
+        See `Painter.set_color()` for values of `color`.
+        '''
+
+        self._linecolor_obj = pygame.Color(color)
+        self._linecolor = color
+
+
+    def get_line_color (self):
+        '''
+        Returns the current line color.
+        '''
+
+        return self._linecolor
+
+
+    def set_fill_color (self, color):
+        '''
+        Change the fill color.
+
+        See `Painter.set_color()` for values of `color`.
+        '''
+
+        self._fillcolor_obj = pygame.Color(color)
+        self._fillcolor = color
+
+    
+    def get_fill_color (self):
+        '''
+        Returns the current fill color.
+        '''
+
+        return self._fillcolor
+
+
+    def set_line_width (self, width):
+        '''
+        Sets the width of the lines drawn.
+        '''
+
+        if width < 1:
+            raise ValueError("The width must be a positive integer.")
+        self._linesize = int(width)
+
+
+    def get_line_width (self):
+        '''
+        Returns the current width of the lines drawn.
+        '''
+
+        return self._linesize
+
+
     ### Update Method
 
     # Helper method that scales and/or rotates the image if it is dirty    
     def _clean_image (self):
-        if self._dirty_scale:
-            orig_width, orig_height = self._original_image.get_size()
-            new_width = round(self._scale.x * orig_width)
-            new_height = round(self._scale.y * orig_height)
-            if self._smooth:
-                self._scaled_image = pygame.transform.smoothscale(
-                        self._original_image, (new_width, new_height))
-            else:
-                self._scaled_image = pygame.transform.scale(
-                        self._original_image, (new_width, new_height))
-            self._dirty_rotate = True
-            self._dirty_scale = False
+        # If the image is a polygon, scale and rotate the points before drawing it
+        if isinstance(self._original, tuple):
+            if self._dirty_scale:
+                self._scaled = tuple([self._scale.elementwise() * p for p in 
+                                      self._original])
+                self._dirty_rotate = True
+                self._dirty_scale = False
+            
+            if self._dirty_rotate:
+                angle = self._dir + self._tilt if self._rotates else self._tilt
+                self._rotated = tuple([p.rotate(angle) for p in self._scaled])
+                self._dirty_rotate = False
+                self.image = pgputils.polygon_to_surface(self._rotated, 
+                                                         self._linecolor,
+                                                         self._fillcolor,
+                                                         self._linesize)
 
-        if self._dirty_rotate:
-            angle = self._dir + self._tilt if self._rotates else self._tilt
-            if self._smooth:
-                self.image = pygame.transform.rotozoom(self._scaled_image, angle, 1)
-            else:
-                self.image = pygame.transform.rotate(self._scaled_image, angle)
-            self._dirty_rotate = False
+        # Otherwise, scale and rotate the surfaces
+        else:
+            if self._dirty_scale:
+                orig_width, orig_height = self._original.get_size()
+                new_width = round(self._scale.x * orig_width)
+                new_height = round(self._scale.y * orig_height)
+                if self._smooth:
+                    self._scaled = pygame.transform.smoothscale(
+                            self._original, (new_width, new_height))
+                else:
+                    self._scaled = pygame.transform.scale(
+                            self._original, (new_width, new_height))
+                self._dirty_rotate = True
+                self._dirty_scale = False
+
+            if self._dirty_rotate:
+                angle = self._dir + self._tilt if self._rotates else self._tilt
+                if self._smooth:
+                    self._rotated = pygame.transform.rotozoom(self._scaled, angle, 1)
+                else:
+                    self._rotated = pygame.transform.rotate(self._scaled, angle)
+                self.image = self._rotated
+                self._dirty_rotate = False
 
     # Helper method that determines the image's mask if it is dirty
     def _clean_mask (self):
@@ -426,7 +552,7 @@ class Sprite (pygame.sprite.Sprite):
 
         # Update the sprite's .image and .rect attributes needed for drawing
         self._clean_image()
-        self.rect = self.image.get_rect()
+        self.rect = self.image.get_rect() 
         if screen is None:
             self.rect.center = to_pygame_coordinates(self._pos)
         else:

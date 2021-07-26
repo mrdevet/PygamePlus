@@ -68,114 +68,19 @@ class Painter (Sprite):
 
         Sprite.__init__(self, image)
 
-        # Attributes associate with the painter's pen
-        self._pendown = True
-        self._pencolor = "black"
-        self._pencolor_obj = Color("black")
-        self._pensize = 1
+        # Attributes associate with lines
+        self._drawing = False
         self._stepsize = 0.1
 
         # Attributes associates with fills
         self._filling = False
         self._fill_as_moving = None
         self._fillpoly = None
-        self._fillcolor = "black"
-        self._fillcolor_obj = Color("black")
         self._fill_canvas = None
         self._drawings_over_fill = None
 
 
-    ### Color Methods
-
-    def set_color (self, color):
-        '''
-        Change the pen color and fill color.
-
-        The given `color` be one of the following values:
-         - A valid color string.  See https://replit.com/@cjdevet/PygameColors
-           to explore the available color strings.
-         - A set of three numbers between 0 and 255 that represent the
-           amount of red, green, blue to use in the color.  A fourth transparency
-           value can be added.
-         - An HTML color code in the form "#rrggbb" where each character 
-           r, g, b and a are replaced with a hexidecimal digit.  For translucent
-           colors, add another pair of hex digits ("##rrggbbaa").
-         - An integer that, when converted to hexidecimal, gives an HTML color
-           code in the form 0xrrggbbaa.
-         - A pygame Color object.
-        '''
-
-        self._pencolor_obj = Color(color)
-        self._pencolor = color
-        self._fillcolor_obj = Color(color)
-        self._fillcolor = color
-
-
-    def get_colors (self):
-        '''
-        Returns a tuple containing the current pen color and fill color.
-        '''
-
-        return self._pencolor, self._fillcolor
-
-
-    def set_pen_color (self, color):
-        '''
-        Change the pen color.
-
-        See `Painter.set_color()` for values of `color`.
-        '''
-
-        self._pencolor_obj = Color(color)
-        self._pencolor = color
-
-
-    def get_pen_color (self):
-        '''
-        Returns the current pen color.
-        '''
-
-        return self._pencolor
-
-
-    def set_fill_color (self, color):
-        '''
-        Change the fill color.
-
-        See `Painter.set_color()` for values of `color`.
-        '''
-
-        self._fillcolor_obj = Color(color)
-        self._fillcolor = color
-
-    
-    def get_fill_color (self):
-        '''
-        Returns the current fill color.
-        '''
-
-        return self._fillcolor
-
-
-    ### Drawing Pen Methods
-
-    def set_pen_width (self, width):
-        '''
-        Sets the width of the pen used to draw lines.
-        '''
-
-        if width < 1:
-            raise ValueError("The width must be a positive integer.")
-        self._pensize = int(width)
-
-
-    def get_pen_width (self):
-        '''
-        Returns the current width of the pen used to draw lines.
-        '''
-
-        return self._pensize
-
+    ### Drawing Line Methods
 
     def set_step_size (self, distance):
         '''
@@ -197,28 +102,28 @@ class Painter (Sprite):
         return self._stepsize
 
 
-    def put_pen_down (self):
+    def begin_line (self):
         '''
-        Put the pen on the screen and start drawing.
-        '''
-
-        self._pendown = True
-
-
-    def pick_pen_up (self):
-        '''
-        Pick the pen up off the screen and stop drawing.
+        Start drawing a line from the current position.
         '''
 
-        self._pendown = False
+        self._drawing = True
 
 
-    def is_pen_down (self):
+    def end_line (self):
         '''
-        Return whether or not the pen is on the screen and is drawing.
+        End the line at the current position.
         '''
 
-        return self._pendown
+        self._drawing = False
+
+
+    def is_drawing_line (self):
+        '''
+        Return whether or not a line is currently being drawn.
+        '''
+
+        return self._drawing
 
 
     ### Drawing Methods
@@ -239,8 +144,8 @@ class Painter (Sprite):
         end = to_pygame_coordinates(end)
 
         # If width is 1, use the pygame function
-        if self._pensize == 1:
-            pygame.draw.line(canvas, self._pencolor_obj, start, end)
+        if self._linesize == 1:
+            pygame.draw.line(canvas, self._linecolor_obj, start, end)
 
         # Otherwise use dots instead
         else:
@@ -249,17 +154,19 @@ class Painter (Sprite):
             distance, direction = delta.as_polar()
 
             # Draw dots every 0.1 pixels along the line between the points
-            radius = self._pensize / 2
+            radius = self._linesize / 2
             current = start
             delta = pygame.Vector2(self._stepsize, 0).rotate(direction)
             for _ in range(int(distance / self._stepsize) + 1):
-                pygame.draw.circle(canvas, self._pencolor_obj, current, radius)
+                pygame.draw.circle(canvas, self._linecolor_obj, current, radius)
                 current += delta
 
     def set_position (self, x, y=None):
         '''
-        Move the Sprite to the given coordinates and, is the pen is down, draw a
-        line.
+        Move the Sprite to the given coordinates.
+
+        If a line is currently being drawn, then it will continue from the 
+        current position to the new position.
         '''
 
         # If only on argument is given, expand it into two
@@ -278,13 +185,16 @@ class Painter (Sprite):
             self._draw_line(start, self._pos, self._drawings_over_fill)
 
         # Draw the line
-        if self._pendown:
+        if self._drawing:
             self._draw_line(start, self._pos)
 
 
     def walk_path (self, path):
         '''
-        Move the Sprite along a path and, is the pen is down, draw a line.
+        Move the Sprite along a path.
+
+        If a line is currently being drawn, then it will continue from the 
+        current position and be drawn along the path.
 
         The path should be a list of coordinate pairs
         (e.g. `[(100, 0), (-200, 100), (200, -50)]`)
@@ -379,10 +289,10 @@ class Painter (Sprite):
         Draw a dot.
 
         The dot will be centered at the current position and have diameter
-        `size`.  If no size is given a dot slightly larger than the pen width
+        `size`.  If no size is given a dot slightly larger than the line width
         will be drawn.
 
-        If the `color` is not specified, the pen color is used.
+        If the `color` is not specified, the line color is used.
         '''
 
         # Get the active screen's canvas
@@ -393,13 +303,13 @@ class Painter (Sprite):
             raise RuntimeError("The painter must be on the active screen to draw!")
         canvas = screen.get_canvas()
 
-        # If no size is given, make the dot a bit bigger than the pen size
+        # If no size is given, make the dot a bit bigger than the line size
         if size is None:
-            size = max(self._pensize + 4, 2 * self._pensize)
+            size = max(self._linesize + 4, 2 * self._linesize)
 
-        # If no color is given use the pen color
+        # If no color is given use the line color
         if color is None:
-            color = self._pencolor_obj
+            color = self._linecolor_obj
 
         # Draw the dot
         point = to_pygame_coordinates(self._pos)
@@ -488,7 +398,7 @@ class Painter (Sprite):
 
     ### Write on the screen
 
-    def write (self, text, align="middle center", font="Arial", font_size=12, font_style=None):
+    def write (self, text, align="middle center", font="Arial", font_size=12, font_style=None, color=None):
         '''
         Write text to the screen at the turtle's current location using the pen.
 
@@ -503,7 +413,9 @@ class Painter (Sprite):
         The `font_size` is the height of the text in pixels.
         
         The `font_style` argument can be "bold", "italic", "underline" or a 
-        combination separated by space (e.g. "bold italic")
+        combination separated by space (e.g. "bold italic").
+
+        If the `color` is not specified, the line color is used.
         '''
 
         # If font is a Font object, just use that
@@ -533,8 +445,12 @@ class Painter (Sprite):
             font_obj.set_italic("italic" in font_style)
             font_obj.set_underline("underline" in font_style)
 
+        # Get the color
+        if color is None:
+            color = self._linecolor
+
         # Render an image of the text
-        image = font_obj.render(str(text), True, self._pencolor)
+        image = font_obj.render(str(text), True, self._linecolor)
         rect = image.get_rect()
 
         # Set the position of the text from the align parameter
