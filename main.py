@@ -23,7 +23,8 @@ screen.add(ship)
 
 # We can scale the image of a turtle.  In this example, 
 # the ship's image is scaled by a factor of 0.1 (or 10%)
-ship.scale(0.1, smooth=True)
+ship.use_smoothing()
+ship.scale(0.1)
 
 # The image for a turtle can be rotated.  This function
 # sets that the image should rotate whenever the turtle's
@@ -109,7 +110,8 @@ screen.on_key_press(draw_stamp, "s")
 # Create a "ufo" turtle
 ufo = Sprite("ufo.png")
 screen.add(ufo)
-ufo.scale(0.25, smooth=True)
+ufo.use_smoothing()
+ufo.scale(0.25)
 ufo.set_position(0, 100)
 
 # Function that moves the ufo forward
@@ -138,17 +140,9 @@ writer.pick_pen_up()
 writer.set_position(0, -140)
 writer.write("Welcome to Space", font="Freedom.ttf", font_size=36)
 
-def on_click ():
-    print("CLICKED")
-
-def on_release ():
-    print("RELEASED")
-
 def on_drag ():
     ship.set_position(from_pygame_coordinates(pygame.mouse.get_pos()))
 
-ship.on_click(on_click)
-ship.on_release(on_release)
 ship.on_drag(on_drag)
 
 screen.update()

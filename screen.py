@@ -19,142 +19,371 @@
 # DEALINGS IN THE SOFTWARE.
 
 ################################################################################
-#                              MODULE DESCRIPTION
-################################################################################
-
-"""
-TODO
-"""
-
-################################################################################
 #                               GLOBAL VARIABLES
 ################################################################################
 
 import pygame
 
-class Screen (pygame.sprite.Group):
+import pgputils
 
+################################################################################
+#                                 SCREEN CLASS
+################################################################################
+
+class Screen (pygame.sprite.Group):
+    '''
+    A Screen represents a single game screen visible in the window.
+
+    At any one time there can be only one "active" screen that is visible.
+    If a screen is active and another is opened, then the active screen is 
+    replaced in the window.
+
+    Screen objects store the following information about a screen:
+     - Its dimensions and title
+     - The background color and/or image
+     - Any images that have been drawn on the screen
+
+    Methods are provided to do the following:
+     - Open a screen and make it active
+     - Change the dimensions, title or background
+     - Clear any images that have been drawn on the screen
+     - Add behaviour when the mouse clicks on the screen or when keyboard
+       keys are used when the screen is active
+    '''
+
+    # Stores the screen that is currently visible on the screen
     _active = None
 
     def __init__ (self, width, height, title=""):
+        '''
+        Create a Screen object.
+
+        You must specify the `width` and `height` of the screen.  Optionally, you
+        can set the title of the screen.
+        '''
+
         pygame.sprite.Group.__init__(self)
+
+        # Stores the pygame surface associated with the screen
         self._surface = None
+
+        # Attributes for the dimensions, title and background
         self._width = width
         self._height = height
         self._title = title
         self._color = "white"
+        self._color_obj = pygame.Color("white")
         self._image = None
         self._image_name = None
+        self._image_rect = None
+
+        # Attributes that hold any event handlers associated with the screen
         self._key_press_funcs = {}
         self._key_release_funcs = {}
         self._key_hold_funcs = {}
         self._click_funcs = [None for _ in range(5)]
+
+        # The pygame surface that holds any drawing added to the screen
         self._canvas = pygame.Surface((width, height), pygame.SRCALPHA)
+        self._update_drawings = None
 
 
+    ### Screen Visibility Methods
 
     def open (self):
+        '''
+        Make this screen the active, visible screen in the window.
+        '''
+
+        # Call the close method for any other open screen
         if Screen._active is not None and Screen._active != self:
             self._active._close()
+
+        # Create a new pygame screen surface in the window
         self._surface = pygame.display.set_mode((self._width, self._height))
         pygame.display.set_caption(self._title)
+
+        # Set this as the active screen
         Screen._active = self
 
+
+    # A hidden method that is called when a screen is closed.  Currently this
+    # does nothing.
     def _close (self):
         pass
 
+
     def is_open (self):
+        '''
+        Return whether or not this screen is the active screen.
+        '''
+
         return self == Screen._active
 
 
+    ### Methods for the screen's properties
 
     def set_size (self, width, height):
+        '''
+        Change the dimensions of the screen.
+        '''
+
         self._width = width
         self._height = height
+
+        # If this screen is open, then we need to create a new pygame screen
+        # width this size.
         if self.is_open():
             self._surface = pygame.display.set_mode((self._width, self._height))
             self.update()
+
+        # Create a new canvas with the new size
         old_canvas = self._canvas
         self._canvas = pygame.Surface((width, height), pygame.SRCALPHA)
 
+        # Change the rect for the background image to keep it centered.
+        if self._image_rect is not None:
+            self._image_rect.centerx = width / 2
+            self._image_rect.centery = height / 2
+
+
     def get_size (self):
+        '''
+        Return the current dimensions of the screen.
+        '''
+
         return self._width, self._height
 
+
     def set_width (self, width):
+        '''
+        Change the width of the screen.
+        '''
+
         self.set_size(width, self._height)
 
+
     def get_width (self):
+        '''
+        Return the current width of the screen.
+        '''
+
         return self._width
 
+
     def set_height (self, height):
+        '''
+        Change the height of the screen.
+        '''
+
         self.set_size(self._width, height)
 
+
     def get_height (self):
+        '''
+        Return the current height of the screen.
+        '''
+
         return self._height
 
+
     def set_title (self, title):
+        '''
+        Change the title of the screen.
+        '''
+
         self._title = title
 
+
     def get_title (self):
+        '''
+        Return the current title of the screen.
+        '''
+
         return self._title
 
 
-
     def set_background_color (self, color):
+        '''
+        Change the background color of the screen.
+
+        The given `color` be one of the following values:
+         - A valid color string.  See https://replit.com/@cjdevet/PygameColors
+           to explore the available color strings.
+         - A set of three numbers between 0 and 255 that represent the
+           amount of red, green, blue to use in the color.  A fourth transparency
+           value can be added.
+         - An HTML color code in the form "#rrggbb" where each character 
+           r, g, b and a are replaced with a hexidecimal digit.  For translucent
+           colors, add another pair of hex digits ("##rrggbbaa").
+         - An integer that, when converted to hexidecimal, gives an HTML color
+           code in the form 0xrrggbbaa.
+         - A pygame Color object.
+        '''
+
         self._color = color
+        self._color_obj = pygame.Color(color)
+
 
     def get_background_color (self, color):
+        '''
+        Return the current background color of the screen.
+        '''
         return self._color
 
+
     def set_background_image (self, image):
+        '''
+        Change the background image of the screen.
+
+        This image will be placed in the center of the screen.
+
+        The `image` can be:
+         - The file name of an image file.
+         - `None` to remove any background image.
+        '''
+
+        # If given None, then remove the background image
         if image is None:
             self._image = None
             self._image_name = None
+            self._image_rect = None
+
+        # Otherwise, add the background image provided
         else:
             self._image = pygame.image.load(image)
             self._image_name = image
+            self._image_rect = self._image.get_rect()
+            self._image_rect.centerx = self._width / 2
+            self._image_rect.centery = self._height / 2
+
 
     def get_background_image (self, image):
+        '''
+        Return the current background image of the screen.
+        '''
+
         return self._image_name
 
 
+    ### Methods for the drawing canvas
     
     def get_canvas (self):
+        '''
+        Return the image of any drawings that were drawn on the screen.
+        '''
+
         return self._canvas
 
+
     def clear_canvas (self):
+        '''
+        Clear everything that was drawn on the screen.
+        '''
+
         self._canvas.fill(0)
 
-    def clear_rect (self, remove_sprites=False):
-        pass
 
-    def clear_circle (self, remove_sprites=False):
-        pass
+    def clear_rect (self, corner1, corner2, remove_sprites=False):
+        '''
+        Clear a rectangular part of the screen.
+        '''
 
+        raise NotImplementedError()
+
+
+    def clear_circle (self, center, radius, remove_sprites=False):
+        '''
+        Clear a circular part of the screen.
+        '''
+
+        raise NotImplementedError()
 
 
     def clear (self):
+        '''
+        Clears the screen of all contents, including background images,
+        drawings and sprites.
+        '''
+
+        # Clear the background
         self._color = "white"
+        self._color_obj = pygame.Color("white")
         self._image = None
         self._image_name = None
+
+        # Clear the drawings canvas
         self._canvas.fill(0)
+
+        # Remove the sprites
         self.empty()
 
-    def update (self):
-        self._surface.fill(self._color)
+
+    def update (self, *args, **kwargs):
+        '''
+        Calls the update() method on all Sprites on the screen.
+
+        This method should generally not be called explicitly, but will be called
+        by the event loop if the screen is active.
+
+        This will pass this screen to the sprites' update() methods as
+        the `screen` keyword argument.
+        '''
+
+        # If no screen is provided, add such a keyword argument
+        if "screen" not in kwargs:
+            kwargs["screen"] = self
+
+        # Create a surface to put any drawings that should only be present for
+        # this update
+        self._update_drawings = pygame.Surface((self._width, self._height), 
+                                               pygame.SRCALPHA)
+
+        # Call update() on all of the sprites
+        pygame.sprite.Group.update(self, *args, **kwargs)
+
+
+    def draw (self, surface=None):
+        '''
+        Draw the contents of the screen.
+
+        This method should generally not be called explicitly, but will be called
+        by the event loop if the screen is active.
+
+        By default, this will draw the contents on the pygame Surface associated
+        with this screen.  However, you can draw the screen's contents to another
+        surface using this method by explicitely supplying a `surface` argument.
+        '''
+
+        # If no surface is explicitly given, draw to this screen's surface
+        if surface is None:
+            surface = self._surface
+
+        # Draw the background
+        surface.fill(self._color)
         if self._image is not None:
-            rect = self._image.get_rect()
-            rect.centerx = self._width / 2
-            rect.centery = self._height / 2
-            self._surface.blit(self._image, rect)
-        self._surface.blit(self._canvas, (0, 0))
-        pygame.sprite.Group.update(self, self)
-        pygame.sprite.Group.draw(self, self._surface)
-        pygame.display.flip()
+            surface.blit(self._image, self._image_rect)
+
+        # Draw any drawings
+        surface.blit(self._canvas, (0, 0))
+        surface.blit(self._update_drawings, (0, 0))
+
+        # Draw the sprites
+        pygame.sprite.Group.draw(self, surface)
 
 
+    ### Methods to add event handlers
 
     def on_key_press (self, func, key=None):
+        '''
+        Add a function that will be called when a keyboard key is pressed while
+        this screen is active.
+
+        The `key` is a string specifying which key this function applies to.  If
+        no `key` is given, then this function will apply any key that does not 
+        have a handler.
+        '''
+
         if key is None:
             self._key_press_funcs[None] = func
         elif isinstance(key, str):
@@ -162,15 +391,38 @@ class Screen (pygame.sprite.Group):
         else:
             self._key_press_funcs[key] = func
 
+
     def on_key_release (self, func, key=None):
+        '''
+        Add a function that will be called when a keyboard key is released while
+        this screen is active.
+
+        The `key` is a string specifying which key this function applies to.  If
+        no `key` is given, then this function will apply any key that does not 
+        have a handler.
+        '''
+
         if key is None:
             self._key_release_funcs[None] = func
         elif isinstance(key, str):
             self._key_release_funcs[pygame.key.key_code(key)] = func
         else:
             self._key_release_funcs[key] = func
+
     
     def on_key_hold (self, func, key=None):
+        '''
+        Add a function that will be called when a keyboard key is held down while
+        this screen is active.
+
+        The given function will be called once for every frame of the event loop
+        that passes while the key is held down.
+
+        The `key` is a string specifying which key this function applies to.  If
+        no `key` is given, then this function will apply any key that does not 
+        have a handler.
+        '''
+
         if key is None:
             self._key_hold_funcs[None] = func
         elif isinstance(key, str):
@@ -178,46 +430,97 @@ class Screen (pygame.sprite.Group):
         else:
             self._key_hold_funcs[key] = func
 
+
     def on_click (self, func, button=1):
+        '''
+        Add a function that will be called when the mouse clicks anywhere on
+        this screen while it is active.
+        '''
+
+        # Convert the button string to a button number
+        if isinstance(button, str):
+            try:
+                button = pgputils.mouse_button_map[button]
+            except KeyError:
+                raise ValueError("Invalid button!")
+
+        # If a button is valid, add the function to the appropriate button
         if 1 <= button <= 5:
             self._click_funcs[button - 1] = func
         else:
             raise ValueError("Invalid button!")
 
 
+    ### Methods to convert to and from pygame coordinates
 
     def to_pygame_coordinates (self, x, y=None):
+        '''
+        Convert a point in this screen's coordinate space to the same point 
+        in the pygame coordinate space.
+        '''
+        
+        # If only one argument is given, expand it into x and y
         if y is None:
             x, y = x
+
+        # Calcuate the pygame point and return it as a vector
         pygame_x = x + self._width / 2
         pygame_y = self._height / 2 - y
         return pygame.Vector2(pygame_x, pygame_y)
 
     def from_pygame_coordinates (self, pygame_x, pygame_y=None):
+        '''
+        Convert a point in the pygame coordinate space to the same point in 
+        this screen's coordinate space.
+        '''
+
+        # If only one argument is given, expand it into x and y
         if pygame_y is None:
             pygame_x, pygame_y = pygame_x
+
+        # Calculate the coordinates for this screen and return it as a tuple
         x = pygame_x - self._width / 2
         y = self._height / 2 - pygame_y
         return x, y
 
 
+################################################################################
+#                               GLOBAL FUNCTIONS
+################################################################################
 
 def get_active_screen ():
+    '''
+    Return the currently active screen.
+
+    This will return None if no screen is active.
+    '''
+
     return Screen._active
 
 
 def to_pygame_coordinates (x, y=None):
+    '''
+    Convert a point in the active screen's coordinate space to the same point 
+    in the pygame coordinate space.
+    '''
+
     if Screen._active is None:
         raise RuntimeError("No screen is active!")
     return Screen._active.to_pygame_coordinates(x, y)
 
 
 def from_pygame_coordinates (pygame_x, pygame_y=None):
+    '''
+    Convert a point in the pygame coordinate space to the same point in 
+    the active screen's coordinate space.
+    '''
+
     if Screen._active is None:
         raise RuntimeError("No screen is active!")
     return Screen._active.from_pygame_coordinates(pygame_x, pygame_y)
     
 
+# What is included when importing *
 __all__ = [
     "Screen", 
     "get_active_screen", 

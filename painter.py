@@ -36,7 +36,7 @@ from sprite import *
 from pygame import Color
 
 ################################################################################
-#                                 SPRITE CLASS
+#                                PAINTER CLASS
 ################################################################################
 
 class Painter (Sprite):
@@ -588,7 +588,7 @@ class Painter (Sprite):
             screen = get_active_screen()
         if (screen is not None and self in screen and self._filling and
                 self._fill_as_moving):
-            self._draw_fill(screen._surface)
+            self._draw_fill(screen._update_drawings)
 
 
 # What is included when importing *

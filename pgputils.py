@@ -18,4 +18,22 @@
 # FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER 
 # DEALINGS IN THE SOFTWARE.
 
-# TODO: Create the Turtle class
+import pygame
+
+# The provided collision detection functions that are used in the "touching"
+# methods.
+collision_functions = {
+    "rect": pygame.sprite.collide_rect,
+    "circle": pygame.sprite.collide_circle,
+    "mask": pygame.sprite.collide_mask
+}
+
+# A mapping of string descriptions of the mouse buttons to their associated
+# number.
+mouse_button_map = {
+    "left": 1,
+    "center": 2,
+    "right": 3,
+    "scrollup": 4,
+    "scrolldown": 5
+}
