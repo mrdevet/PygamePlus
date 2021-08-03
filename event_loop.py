@@ -68,6 +68,9 @@ class EventLoop (object):
         # Attribute to hold which sprites are currently being clicked on
         self._clicked_sprites = [None for _ in range(5)]
 
+        # Attribute to hold custom event handlers
+        self._timers = {}
+
 
     def set_frame_rate (self, frame_rate):
         '''
@@ -129,15 +132,9 @@ class EventLoop (object):
             for event in pygame.event.get():
                 # If the close button is clicked, end the loop
                 if event.type == QUIT:
-                    _running = False
-
-                # If a custom event occurs, call its handler.  This is generally
-                # used for timer events.
-                # elif event.type >= USEREVENT:
-                #     try:
-                #         _custom_events[event.type - USEREVENT]()
-                #     except IndexError:
-                #         pass
+                    self._running = False
+                    pygame.display.quit()
+                    return
 
                 # If a key was pressed, call any associated handlers
                 elif event.type == KEYDOWN:
@@ -169,7 +166,6 @@ class EventLoop (object):
 
                 # If a mouse button is released, call any associated handlers
                 elif event.type == MOUSEBUTTONUP:
-                    # TODO: Get Sprite release working
                     button = event.button
                     sprite = self._clicked_sprites[button - 1]
                     if sprite and sprite._release_funcs[button - 1] is not None:
@@ -180,11 +176,15 @@ class EventLoop (object):
                 # If the mouse moves and a button is down, call any associated
                 # drag handlers
                 elif event.type == MOUSEMOTION:
-                    # TODO: Get Sprite drag working
                     for button, sprite in enumerate(self._clicked_sprites, 1):
                         if sprite and sprite._drag_funcs[button - 1] is not None:
                             # TODO: Make this work with mouse position parameters
                             sprite._drag_funcs[button - 1]()
+
+                # If a custom event occurs, call its handler.  This is generally
+                # used for timer events.
+                elif event.type in self._timers:
+                    self._timers[event.type]()
 
             # Get a dictionary containing the state of the keyboard keys
             keys = pygame.key.get_pressed()
@@ -227,6 +227,53 @@ class EventLoop (object):
         '''
 
         raise EventLoopTerminated()
+
+
+    def on_timer (self, func, delay, repeat=False):
+        '''
+        Call a function after a given amount of time (in milliseconds).
+
+        The function `func` will be called after `delay` milliseconds.  `func`
+        must be a function that takes no arguments.  The `delay` must be a 
+        positive number.
+
+        If `repeat` is `True`, then the timer will run repeatedly.  That is,
+        the timer will restart every time that it expires.
+
+        An event ID will be returned that can be used with the `cancel_timer()`
+        method to stop the timer.
+        '''
+
+        # Check that the arguments are valid
+        if not callable(func):
+            raise ValueError("The function is not callable!")
+        if delay <= 0:
+            raise ValueError("The delay must be positive!")
+
+        # Get a custom pygame event type and start the timer
+        event_id = pygame.event.custom_type()
+        self._timers[event_id] = func
+        pygame.time.set_timer(event_id, delay, not repeat)
+
+        # Return the custom event type for cancelling
+        return event_id
+
+
+    def cancel_timer (self, event_id):
+        '''
+        Stop the timer with the given event ID.
+
+        `event_id` must be an event ID that was returned from the `on_timer()`
+        method for this EventLoop.
+        '''
+
+        # Check that the argument is a valid event type
+        if event_id not in self._timers:
+            raise ValueError("There is no global timer with that event ID!")
+
+        # Stop the timer
+        pygame.time.set_timer(event_id, 0)
+        self._timers.pop(event_id)
 
 
 ################################################################################
