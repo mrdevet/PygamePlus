@@ -71,6 +71,8 @@ class Sprite (pygame.sprite.Sprite):
                 self._original = pygame.image.load(image).convert_alpha()
         elif isinstance(image, tuple) or isinstance(image, list):
             self._original = tuple([pygame.Vector2(p) for p in image])
+        elif isinstance(image, pygame.Surface):
+            self._original = image
         else:
             raise ValueError("Invalid image!")
 

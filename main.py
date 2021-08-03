@@ -137,6 +137,7 @@ ship.on_drag(on_drag)
 
 turtle = Sprite("turtle")
 screen.add(turtle)
+turtle.set_position(-200, 0)
 turtle.set_color("red")
 turtle.set_image_rotates()
 
