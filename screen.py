@@ -387,6 +387,9 @@ class Screen (pygame.sprite.Group):
         Add a function that will be called when a keyboard key is pressed while
         this screen is active.
 
+        You can provide the following arguments for the function `func`:
+         - `key` - will provide the name of the key
+
         The `key` is a string specifying which key this function applies to.  If
         no `key` is given, then this function will apply any key that does not 
         have a handler.
@@ -404,6 +407,9 @@ class Screen (pygame.sprite.Group):
         '''
         Add a function that will be called when a keyboard key is released while
         this screen is active.
+
+        You can provide the following arguments for the function `func`:
+         - `key` - will provide the name of the key
 
         The `key` is a string specifying which key this function applies to.  If
         no `key` is given, then this function will apply any key that does not 
@@ -426,6 +432,9 @@ class Screen (pygame.sprite.Group):
         The given function will be called once for every frame of the event loop
         that passes while the key is held down.
 
+        You can provide the following arguments for the function `func`:
+         - `key` - will provide the name of the key
+
         The `key` is a string specifying which key this function applies to.  If
         no `key` is given, then this function will apply any key that does not 
         have a handler.
@@ -443,6 +452,12 @@ class Screen (pygame.sprite.Group):
         '''
         Add a function that will be called when the mouse clicks anywhere on
         this screen while it is active.
+
+        You can provide the following arguments for the function `func`:
+         - `x` - will provide x-coordinate of the click
+         - `y` - will provide y-coordinate of the click
+         - `pos` - will provide a tuple of the coordinates (x and y) of the click
+         - `button` - will provide the name of the mouse button used to click
         '''
 
         # Convert the button string to a button number

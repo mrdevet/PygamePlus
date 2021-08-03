@@ -549,8 +549,7 @@ class Sprite (pygame.sprite.Sprite):
 
         # If a custom update function has been applied, call it
         if self._on_update_func is not None:
-            # TODO: Allow this function to take the sprite as an argument.
-            self._on_update_func()
+            pgputils.call_with_args(self._on_update_func, sprite=self)
 
         # Update the sprite's .image and .rect attributes needed for drawing
         self._clean_image()
@@ -745,6 +744,9 @@ class Sprite (pygame.sprite.Sprite):
         '''
         Add a custom update function that will be called on every iteration of
         the event loop.
+        
+        You can provide the following arguments for the function `func`:
+         - `sprite` - will provide the sprite object being updated
         '''
 
         self._on_update_func = func
@@ -756,6 +758,13 @@ class Sprite (pygame.sprite.Sprite):
         '''
         Add a function that will be called when the mouse is clicked on
         this sprite.
+
+        You can provide the following arguments for the function `func`:
+         - `x` - will provide x-coordinate of the mouse
+         - `y` - will provide y-coordinate of the mouse
+         - `pos` - will provide a tuple of the coordinates (x and y) of the mouse
+         - `button` - will provide the name of the mouse button used
+         - `sprite` - will provide the sprite object involved
 
         You can specify which mouse button needs to be used for the click using
         the `button` parameter.  It's value needs to be one of "left", "center", 
@@ -784,6 +793,13 @@ class Sprite (pygame.sprite.Sprite):
         Add a function that will be called when the mouse is released after 
         clicking on this sprite.
 
+        You can provide the following arguments for the function `func`:
+         - `x` - will provide x-coordinate of the mouse
+         - `y` - will provide y-coordinate of the mouse
+         - `pos` - will provide a tuple of the coordinates (x and y) of the mouse
+         - `button` - will provide the name of the mouse button used
+         - `sprite` - will provide the sprite object involved
+
         You can specify which mouse button needs to be used for the click using
         the `button` parameter.  It's value needs to be one of "left", "center", 
         "right", "scrollup" or "scrolldown".  The left button is the default.
@@ -807,6 +823,13 @@ class Sprite (pygame.sprite.Sprite):
         '''
         Add a function that will be called when the mouse dragged while 
         clicking on this sprite.
+
+        You can provide the following arguments for the function `func`:
+         - `x` - will provide x-coordinate of the mouse
+         - `y` - will provide y-coordinate of the mouse
+         - `pos` - will provide a tuple of the coordinates (x and y) of the mouse
+         - `button` - will provide the name of the mouse button used
+         - `sprite` - will provide the sprite object involved
 
         You can specify which mouse button needs to be used for the click using
         the `button` parameter.  It's value needs to be one of "left", "center", 

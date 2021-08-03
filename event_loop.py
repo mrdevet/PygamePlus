@@ -22,38 +22,11 @@
 #                               GLOBAL VARIABLES
 ################################################################################
 
-import inspect
 import pygame
 from pygame.locals import *
 
+import pgputils
 from screen import get_active_screen
-
-# Helper function that is used to call a function with the keyword arguments
-# given
-def _call_with_args (func, **args):
-    # Loop through the parameters
-    signature = inspect.signature(func)
-    pos_args = []
-    kw_args = {}
-    for name, parameter in signature.parameters.items():
-        # If it's a positional argument, add it to the list
-        if parameter.kind < 2:
-            pos_args.append(args.get(name, None))
-
-        # If it's a keyword argument, add it to the dictionary if given
-        elif parameter.kind == 3:
-            if name in args:
-                kw_args[name] = args[name]
-
-        # If a ** argument is provided, put all of the arguments given as
-        # keyword arguments
-        elif parameter.kind == 4:
-            for arg_name, value in args.items():
-                if arg_name not in signature.parameters:
-                    kw_args[arg_name] = value
-
-    # Call the function
-    func(*pos_args, **kw_args)
 
 
 ################################################################################
@@ -168,48 +141,50 @@ class EventLoop (object):
                 # If a key was pressed, call any associated handlers
                 elif event.type == KEYDOWN:
                     if event.key in screen._key_press_funcs:
-                        _call_with_args(screen._key_press_funcs[event.key],
+                        pgputils.call_with_args(screen._key_press_funcs[event.key],
                                         key=pygame.key.name(event.key))
                     elif None in screen._key_press_funcs:
-                        _call_with_args(screen._key_press_funcs[None],
+                        pgputils.call_with_args(screen._key_press_funcs[None],
                                         key=pygame.key.name(event.key))
 
                 # If a key was released, call any associated handlers
                 elif event.type == KEYUP:
                     if event.key in screen._key_release_funcs:
-                        _call_with_args(screen._key_release_funcs[event.key],
+                        pgputils.call_with_args(screen._key_release_funcs[event.key],
                                         key=pygame.key.name(event.key))
                     elif None in screen._key_release_funcs:
-                        _call_with_args(screen._key_release_funcs[None],
+                        pgputils.call_with_args(screen._key_release_funcs[None],
                                         key=pygame.key.name(event.key))
 
                 # If a mouse button is clicked down, call any associated handlers
                 elif event.type == MOUSEBUTTONDOWN:
                     button = event.button
+                    button_name = pgputils.mouse_button_reverse_map[button]
                     pos = screen.from_pygame_coordinates(event.pos)
                     for sprite in screen:
                         if sprite.rect.collidepoint(event.pos):
                             self._clicked_sprites[button - 1] = sprite
                             # TODO: Make this work with mouse position parameters
                             if sprite._click_funcs[button - 1] is not None:
-                                _call_with_args(sprite._click_funcs[button - 1],
+                                pgputils.call_with_args(sprite._click_funcs[button - 1],
                                                 pos=pos, x=pos[0], y=pos[1], 
                                                 button=button, sprite=sprite)
                             break
                     if screen._click_funcs[button - 1] is not None:
-                        _call_with_args(screen._click_funcs[button - 1],
+                        pgputils.call_with_args(screen._click_funcs[button - 1],
                                         pos=pos, x=pos[0], y=pos[1], 
-                                        button=button)
+                                        button=button_name)
 
                 # If a mouse button is released, call any associated handlers
                 elif event.type == MOUSEBUTTONUP:
                     button = event.button
+                    button_name = pgputils.mouse_button_reverse_map[button]
                     pos = screen.from_pygame_coordinates(event.pos)
                     sprite = self._clicked_sprites[button - 1]
                     if sprite and sprite._release_funcs[button - 1] is not None:
-                        _call_with_args(sprite._release_funcs[button - 1],
+                        pgputils.call_with_args(sprite._release_funcs[button - 1],
                                         pos=pos, x=pos[0], y=pos[1], 
-                                        button=button, sprite=sprite)
+                                        button=button_name, sprite=sprite)
                     self._clicked_sprites[button - 1] = None
 
                 # If the mouse moves and a button is down, call any associated
@@ -217,18 +192,19 @@ class EventLoop (object):
                 elif event.type == MOUSEMOTION:
                     pos = screen.from_pygame_coordinates(event.pos)
                     for button, sprite in enumerate(self._clicked_sprites, 1):
+                        button_name = pgputils.mouse_button_reverse_map[button]
                         if sprite and sprite._drag_funcs[button - 1] is not None:
-                            _call_with_args(sprite._drag_funcs[button - 1],
+                            pgputils.call_with_args(sprite._drag_funcs[button - 1],
                                             pos=pos, x=pos[0], y=pos[1], 
-                                            button=button, sprite=sprite)
+                                            button=button_name, sprite=sprite)
 
                 # If this event type matches a screen timer, call it's handler.
                 elif event.type in screen._timers:
-                    screen._timers[event.type]()
+                    pgputils.call_with_args(screen._timers[event.type])
 
                 # If this event type matches a global timer, call it's handler.
                 elif event.type in self._timers:
-                    self._timers[event.type]()
+                    pgputils.call_with_args(self._timers[event.type])
 
             # Get a dictionary containing the state of the keyboard keys
             keys = pygame.key.get_pressed()
@@ -239,9 +215,9 @@ class EventLoop (object):
             try:
                 for key_code, func in screen._key_hold_funcs.items():
                     if key_code is None and key_count > 0:
-                        _call_with_args(func, keys=keys)
+                        pgputils.call_with_args(func, keys=keys)
                     elif key_code is not None and keys[key_code]:
-                        _call_with_args(func, keys=keys)
+                        pgputils.call_with_args(func, keys=keys)
             except RuntimeError:
                 pass
 

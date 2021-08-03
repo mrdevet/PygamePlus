@@ -18,6 +18,7 @@
 # FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER 
 # DEALINGS IN THE SOFTWARE.
 
+import inspect
 import math
 import pygame
 
@@ -37,6 +38,13 @@ mouse_button_map = {
     "right": 3,
     "scrollup": 4,
     "scrolldown": 5
+}
+mouse_button_reverse_map = {
+    1: "left",
+    2: "center",
+    3: "right",
+    4: "scrollup",
+    5: "scrolldown"
 }
 
 # Takes a polygon and draws it on a fitted pygame.Surface
@@ -67,3 +75,30 @@ polygon_images = {
 # Convert the points above the pygame.Vector2 objects
 for shape, points in polygon_images.items():
     polygon_images[shape] = tuple(pygame.Vector2(p) for p in points)
+
+# Helper function that is used to call a function with the keyword arguments
+# given
+def call_with_args (func, **args):
+    # Loop through the parameters
+    signature = inspect.signature(func)
+    pos_args = []
+    kw_args = {}
+    for name, parameter in signature.parameters.items():
+        # If it's a positional argument, add it to the list
+        if parameter.kind < 2:
+            pos_args.append(args.get(name, None))
+
+        # If it's a keyword argument, add it to the dictionary if given
+        elif parameter.kind == 3:
+            if name in args:
+                kw_args[name] = args[name]
+
+        # If a ** argument is provided, put all of the arguments given as
+        # keyword arguments
+        elif parameter.kind == 4:
+            for arg_name, value in args.items():
+                if arg_name not in signature.parameters:
+                    kw_args[arg_name] = value
+
+    # Call the function
+    func(*pos_args, **kw_args)
