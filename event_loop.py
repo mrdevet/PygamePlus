@@ -68,7 +68,7 @@ class EventLoop (object):
         # Attribute to hold which sprites are currently being clicked on
         self._clicked_sprites = [None for _ in range(5)]
 
-        # Attribute to hold custom event handlers
+        # Attribute to hold timer event handlers
         self._timers = {}
 
 
@@ -181,8 +181,11 @@ class EventLoop (object):
                             # TODO: Make this work with mouse position parameters
                             sprite._drag_funcs[button - 1]()
 
-                # If a custom event occurs, call its handler.  This is generally
-                # used for timer events.
+                # If this event type matches a screen timer, call it's handler.
+                elif event.type in screen._timers:
+                    screen._timers[event.type]()
+
+                # If this event type matches a global timer, call it's handler.
                 elif event.type in self._timers:
                     self._timers[event.type]()
 

@@ -87,6 +87,9 @@ class Screen (pygame.sprite.Group):
         self._canvas = pygame.Surface((width, height), pygame.SRCALPHA)
         self._update_drawings = None
 
+        # Attribute to hold timer event handlers
+        self._timers = {}
+
 
     ### Screen Visibility Methods
 
@@ -110,7 +113,12 @@ class Screen (pygame.sprite.Group):
     # A hidden method that is called when a screen is closed.  Currently this
     # does nothing.
     def _close (self):
-        pass
+        # Stop all timers associated with the screen
+        for event_id in self._timers:
+            pygame.time.set_timer(event_id, 0)
+
+        # Clear the timers dictionary
+        self._timers.clear()
 
 
     def is_open (self):
@@ -449,6 +457,56 @@ class Screen (pygame.sprite.Group):
             self._click_funcs[button - 1] = func
         else:
             raise ValueError("Invalid button!")
+
+
+    def on_timer (self, func, delay, repeat=False):
+        '''
+        Call a function after a given amount of time (in milliseconds).
+
+        The function `func` will be called after `delay` milliseconds.  `func`
+        must be a function that takes no arguments.  The `delay` must be a 
+        positive number.
+
+        If `repeat` is `True`, then the timer will run repeatedly.  That is,
+        the timer will restart every time that it expires.
+
+        An event ID will be returned that can be used with the `cancel_timer()`
+        method to stop the timer.
+
+        If the screen is closed this timer will be closed.  To prevent this
+        behaviour, create a global timer on the event loop.
+        '''
+
+        # Check that the arguments are valid
+        if not callable(func):
+            raise ValueError("The function is not callable!")
+        if delay <= 0:
+            raise ValueError("The delay must be positive!")
+
+        # Get a custom pygame event type and start the timer
+        event_id = pygame.event.custom_type()
+        self._timers[event_id] = func
+        pygame.time.set_timer(event_id, delay, not repeat)
+
+        # Return the custom event type for cancelling
+        return event_id
+
+
+    def cancel_timer (self, event_id):
+        '''
+        Stop the timer with the given event ID.
+
+        `event_id` must be an event ID that was returned from the `on_timer()`
+        method for this EventLoop.
+        '''
+
+        # Check that the argument is a valid event type
+        if event_id not in self._timers:
+            raise ValueError("There is no screen timer with that event ID!")
+
+        # Stop the timer
+        pygame.time.set_timer(event_id, 0)
+        self._timers.pop(event_id)
 
 
     ### Methods to convert to and from pygame coordinates

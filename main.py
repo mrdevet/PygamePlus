@@ -169,11 +169,10 @@ screen.update()
 def wow ():
     print("WOW")
 
-loop = get_event_loop()
-wow_id = loop.on_timer(wow, 1000, True)
+wow_id = screen.on_timer(wow, 1000, True)
 
 def cancel_wow ():
-    loop.cancel_timer(wow_id)
+    screen.cancel_timer(wow_id)
 
 screen.on_key_press(cancel_wow, "c")
 
