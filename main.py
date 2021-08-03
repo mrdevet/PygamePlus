@@ -130,8 +130,8 @@ writer.end_line()
 writer.set_position(0, -140)
 writer.write("Welcome to Space", font="Freedom.ttf", font_size=36)
 
-def on_drag ():
-    ship.set_position(from_pygame_coordinates(pygame.mouse.get_pos()))
+def on_drag (x, y):
+    ship.set_position(x, y)
 
 ship.on_drag(on_drag)
 
