@@ -26,7 +26,7 @@ import math
 import pygame
 
 from screen import *
-from sprite import *
+from sprite import Sprite
 
 ################################################################################
 #                                 COLOR CLASS
@@ -62,6 +62,7 @@ class Painter (Sprite):
 
         An `image` may be provided:
          - The image can be the name of an image file.
+         - It can also be a list of points that create a polygon.
          - If no image is provided, then the Painter will be a 1x1 pixel
            transparent sprite.
         '''
@@ -100,6 +101,24 @@ class Painter (Sprite):
         '''
 
         return self._stepsize
+
+
+    def set_line_width (self, width):
+        '''
+        Sets the width of the lines drawn.
+        '''
+
+        if width < 1:
+            raise ValueError("The width must be a positive integer.")
+        self._linesize = int(width)
+
+
+    def get_line_width (self):
+        '''
+        Returns the current width of the lines drawn.
+        '''
+
+        return self._linesize
 
 
     def begin_line (self):
@@ -160,6 +179,7 @@ class Painter (Sprite):
             for _ in range(int(distance / self._stepsize) + 1):
                 pygame.draw.circle(canvas, self._linecolor_obj, current, radius)
                 current += delta
+                
 
     def set_position (self, x, y=None):
         '''
@@ -169,13 +189,9 @@ class Painter (Sprite):
         current position to the new position.
         '''
 
-        # If only on argument is given, expand it into two
-        if y is None:
-            x, y = x
-
         # Actually move the sprite and get the start and end points
         start = self._pos
-        Sprite.set_position(self, x, y)
+        self._pos = pygame.Vector2(x, y)
 
         # If the turtle is currently creating a filled shape, add the point to the
         # list of filled polygon points and draw the line on the upper layer
@@ -321,7 +337,7 @@ class Painter (Sprite):
             pygame.draw.circle(self._drawings_over_fill, color, point, size / 2)
 
 
-    def circle (self, radius, extent=None):
+    def circle (self, radius, extent=360):
         '''
         Draw a circle counterclockwise.
 

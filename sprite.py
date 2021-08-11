@@ -55,6 +55,7 @@ class Sprite (pygame.sprite.Sprite):
 
         An `image` may be provided:
          - The image can be the name of an image file.
+         - It can also be a list of points that create a polygon.
          - If no image is provided, then the Painter will be a 1x1 pixel
            transparent sprite.
         '''
@@ -145,10 +146,7 @@ class Sprite (pygame.sprite.Sprite):
         used in mathematics.
         '''
 
-        if y is None:
-            self._pos = pygame.Vector2(x)
-        else:
-            self._pos = pygame.Vector2(x, y)
+        self._pos = pygame.Vector2(x, y)
 
 
     def get_position (self):
@@ -470,24 +468,6 @@ class Sprite (pygame.sprite.Sprite):
         return self._fillcolor
 
 
-    def set_line_width (self, width):
-        '''
-        Sets the width of the lines drawn.
-        '''
-
-        if width < 1:
-            raise ValueError("The width must be a positive integer.")
-        self._linesize = int(width)
-
-
-    def get_line_width (self):
-        '''
-        Returns the current width of the lines drawn.
-        '''
-
-        return self._linesize
-
-
     ### Update Method
 
     # Helper method that scales and/or rotates the image if it is dirty    
@@ -506,8 +486,7 @@ class Sprite (pygame.sprite.Sprite):
                 self._dirty_rotate = False
                 self.image = pgputils.polygon_to_surface(self._rotated, 
                                                          self._linecolor,
-                                                         self._fillcolor,
-                                                         self._linesize)
+                                                         self._fillcolor)
 
         # Otherwise, scale and rotate the surfaces
         else:

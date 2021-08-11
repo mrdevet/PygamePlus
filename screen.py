@@ -91,6 +91,32 @@ class Screen (pygame.sprite.Group):
         self._timers = {}
 
 
+    ### Overwritten functions
+
+    def add (self, *sprites):
+        '''
+        Add the sprites to this screen.
+
+        The arguments can be individual sprite objects or a list of sprites.
+        '''
+
+        # The add() method is overwritten so that it calls the add() method
+        # of each sprite that is added.  This allows special functionality to
+        # happen immediately when a sprite is added (e.g. a Turtle will appear
+        # on the screen immediately)
+
+        # Loop through the sprites and if they are pygame Sprite objects, 
+        # call the sprite's add() method
+        for sprite in sprites:
+            if isinstance(sprite, pygame.sprite.Sprite):
+                sprite.add(self)
+
+            # If the object is not a Sprite, then it's probably an iterable, so
+            # recursively add it.
+            else:
+                self.add(sprite)
+
+
     ### Screen Visibility Methods
 
     def open (self):
@@ -108,6 +134,9 @@ class Screen (pygame.sprite.Group):
 
         # Set this as the active screen
         Screen._active = self
+
+        # Draw the screen
+        self.redraw()
 
 
     # A hidden method that is called when a screen is closed.  Currently this
@@ -378,6 +407,12 @@ class Screen (pygame.sprite.Group):
 
         # Draw the sprites
         pygame.sprite.Group.draw(self, surface)
+
+    
+    def redraw (self):
+        self.update()
+        self.draw()
+        pygame.display.flip()
 
 
     ### Methods to add event handlers
