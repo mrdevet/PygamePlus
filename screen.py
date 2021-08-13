@@ -407,7 +407,7 @@ class Screen (pygame.sprite.LayeredUpdates):
         surface.blit(self._update_drawings, (0, 0))
 
         # Draw the sprites
-        pygame.sprite.Group.draw(self, surface)
+        return pygame.sprite.LayeredUpdates.draw(self, surface)
 
     
     def redraw (self):
