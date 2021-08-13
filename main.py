@@ -1,1 +1,4 @@
-from demos.turtle import *
+
+from pygameplus.demos.space import main
+
+main()

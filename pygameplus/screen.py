@@ -24,7 +24,7 @@
 
 import pygame
 
-import pgputils
+from pygameplus import pgputils
 
 ################################################################################
 #                                 SCREEN CLASS

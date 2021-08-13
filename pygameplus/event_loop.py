@@ -25,8 +25,8 @@
 import pygame
 from pygame.locals import *
 
-import pgputils
-from screen import get_active_screen
+from pygameplus import pgputils
+from pygameplus.screen import get_active_screen
 
 
 ################################################################################

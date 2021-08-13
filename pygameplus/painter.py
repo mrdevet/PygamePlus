@@ -25,8 +25,8 @@
 import math
 import pygame
 
-from screen import *
-from sprite import Sprite
+from pygameplus.screen import *
+from pygameplus.sprite import Sprite
 
 ################################################################################
 #                                 COLOR CLASS

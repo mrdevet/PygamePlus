@@ -26,8 +26,8 @@ from functools import wraps
 import math
 import pygame
 
-from painter import *
-from screen import get_active_screen
+from pygameplus.painter import *
+from pygameplus.screen import get_active_screen
 
 ################################################################################
 #                                REDRAWMETACLASS
