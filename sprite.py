@@ -458,6 +458,9 @@ class Sprite (pygame.sprite.Sprite):
         self._fillcolor_obj = pygame.Color(color)
         self._fillcolor = color
 
+        if isinstance(self._original, tuple):
+            self._dirty_rotate = True
+
 
     def get_colors (self):
         '''
@@ -477,6 +480,9 @@ class Sprite (pygame.sprite.Sprite):
         self._linecolor_obj = pygame.Color(color)
         self._linecolor = color
 
+        if isinstance(self._original, tuple):
+            self._dirty_rotate = True
+
 
     def get_line_color (self):
         '''
@@ -495,6 +501,9 @@ class Sprite (pygame.sprite.Sprite):
 
         self._fillcolor_obj = pygame.Color(color)
         self._fillcolor = color
+
+        if isinstance(self._original, tuple):
+            self._dirty_rotate = True
 
     
     def get_fill_color (self):

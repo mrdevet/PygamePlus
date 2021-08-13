@@ -30,7 +30,7 @@ import pgputils
 #                                 SCREEN CLASS
 ################################################################################
 
-class Screen (pygame.sprite.Group):
+class Screen (pygame.sprite.LayeredUpdates):
     '''
     A Screen represents a single game screen visible in the window.
 
@@ -62,7 +62,7 @@ class Screen (pygame.sprite.Group):
         can set the title of the screen.
         '''
 
-        pygame.sprite.Group.__init__(self)
+        pygame.sprite.LayeredUpdates.__init__(self)
 
         # Stores the pygame surface associated with the screen
         self._surface = None
@@ -93,7 +93,7 @@ class Screen (pygame.sprite.Group):
 
     ### Overwritten functions
 
-    def add (self, *sprites):
+    def add (self, *sprites, layer=0):
         '''
         Add the sprites to this screen.
 
@@ -109,6 +109,7 @@ class Screen (pygame.sprite.Group):
         # call the sprite's add() method
         for sprite in sprites:
             if isinstance(sprite, pygame.sprite.Sprite):
+                sprite._layer = layer
                 sprite.add(self)
 
             # If the object is not a Sprite, then it's probably an iterable, so
@@ -377,7 +378,7 @@ class Screen (pygame.sprite.Group):
                                                pygame.SRCALPHA)
 
         # Call update() on all of the sprites
-        pygame.sprite.Group.update(self, *args, **kwargs)
+        pygame.sprite.LayeredUpdates.update(self, *args, **kwargs)
 
 
     def draw (self, surface=None):
