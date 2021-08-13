@@ -3,9 +3,7 @@
 # Purpose: Illustrate new features of the superturtle module
 
 from screen import Screen
-from painter import Painter
-from turtle import Turtle
-from event_loop import *
+from turtle import *
 import pygame
 
 pygame.init()
@@ -29,6 +27,7 @@ michaelangelo.set_speed(480)
 michaelangelo.move_forward(99)
 michaelangelo.turn_left(90)
 
+michaelangelo.set_speed(60)
 michaelangelo.disable_animations()
 michaelangelo.move_forward(99)
 michaelangelo.turn_left(90)
@@ -36,7 +35,6 @@ michaelangelo.move_forward(99)
 michaelangelo.turn_left(180)
 
 michaelangelo.enable_animations()
-michaelangelo.set_speed(60)
 
 michaelangelo.set_fill_color("red")
 michaelangelo.begin_fill()

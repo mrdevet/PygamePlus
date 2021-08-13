@@ -205,7 +205,7 @@ class Painter (Sprite):
             self._draw_line(start, self._pos)
 
 
-    def walk_path (self, path):
+    def walk_path (self, *path, turn=True):
         '''
         Move the Sprite along a path.
 
@@ -214,11 +214,18 @@ class Painter (Sprite):
 
         The path should be a list of coordinate pairs
         (e.g. `[(100, 0), (-200, 100), (200, -50)]`)
+
+        By default, this method will also turn the turtle in the direction 
+        of each of the given positions.  This behaviour can be turned of by
+        setting the `turn` argument to `False`.
         '''
 
-        # Call .set_position() on each point in the path
+        # Call .go_to() on each point in the path
         for point in path:
-            self.set_position(point)
+            if isinstance(point, list):
+                self.walk_path(*point)
+            else:
+                self.go_to(point, turn=turn)
 
 
     ### Creating Filled Shapes

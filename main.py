@@ -1,1 +1,1 @@
-import demos.turtle
+from demos.turtle import *

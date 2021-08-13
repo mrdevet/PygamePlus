@@ -149,6 +149,35 @@ class Sprite (pygame.sprite.Sprite):
         self._pos = pygame.Vector2(x, y)
 
 
+    def go_to (self, x, y=None, turn=True):
+        '''
+        Move the sprite to the given coordinates.
+
+        Unlike set_position(), this method will also turn the sprite in the 
+        direction of the given location.  This behaviour can be turned of by
+        setting the `turn` argument to `False`.
+        '''
+
+        if turn:
+            # Get the distance and direction
+            delta = pygame.Vector2(x, y) - self._pos
+            distance, direction = delta.as_polar()
+
+            # Don't turn if the sprite isn't moving
+            if distance > 0:
+                # Adjust direction to turn in closest direction
+                if direction - self._dir > 180:
+                    direction -= 360
+                if direction - self._dir < -180:
+                    direction += 360
+
+                # Do the turn
+                self.set_direction(direction)
+
+        # Move the sprite
+        self.set_position(x, y)
+
+
     def get_position (self):
         '''
         Return the current the position of the sprite on the screen.
@@ -216,6 +245,14 @@ class Sprite (pygame.sprite.Sprite):
         # If the image rotates, then flag that we need to update the image
         if self._rotates:
             self._dirty_rotate = True
+
+
+    def turn_to (self, direction):
+        '''
+        Alias for set_direction().
+        '''
+
+        self.set_direction(direction)
 
 
     def get_direction (self):
@@ -485,8 +522,9 @@ class Sprite (pygame.sprite.Sprite):
                 self._rotated = tuple([p.rotate(angle) for p in self._scaled])
                 self._dirty_rotate = False
                 self.image = pgputils.polygon_to_surface(self._rotated, 
-                                                         self._linecolor,
-                                                         self._fillcolor)
+                                self._linecolor,
+                                self._fillcolor,
+                                round((self._scale.x + self._scale.y) // 2))
 
         # Otherwise, scale and rotate the surfaces
         else:
@@ -517,6 +555,7 @@ class Sprite (pygame.sprite.Sprite):
         if self._dirty_mask:
             self.mask = pygame.mask.from_surface(self.image)
             self._dirty_mask = False
+
 
     def update (self, screen=None):
         '''
@@ -551,8 +590,8 @@ class Sprite (pygame.sprite.Sprite):
 
     def get_direction_to (self, other):
         '''
-        Return the angle that this sprite must turn be pointing directly at
-        another.
+        Return the angle that this sprite must turn toward to be pointing 
+        directly at another.
         '''
 
         return pygame.Vector2(1, 0).angle_to(other._pos - self._pos)
@@ -827,6 +866,7 @@ class Sprite (pygame.sprite.Sprite):
             self._drag_funcs[button - 1] = func
         else:
             raise ValueError("Invalid button!")
+
 
         
 # What is included when importing *
