@@ -5,183 +5,182 @@
 from importlib import resources
 from pygameplus import *
 
+# def main ():
+# Set up the screen
 screen = Screen(640, 360, "PyGame Plus")
+screen.open()
 
-def main ():
+# We can use image files that are not GIFs
+with resources.path("pygameplus.demos", "space.jpg") as image_path:
+    screen.background_image = image_path
 
-    # Set up the screen
-    screen.open()
+# # Create a "ship" turtle
+with resources.path("pygameplus.demos", "ship.png") as image_path:
+    ship = Painter(image_path)
+screen.add(ship)
 
-    # We can use image files that are not GIFs
-    with resources.path("pygameplus.demos", "space.jpg") as image_path:
-        screen.background_image = image_path
+# We can scale the image of a turtle.  In this example, 
+# the ship's image is scaled by a factor of 0.1 (or 10%)
+ship.smooth = True
+ship.scale = 0.1
 
-    # Create a "ship" turtle
-    with resources.path("pygameplus.demos", "ship.png") as image_path:
-        ship = Painter(image_path)
-    screen.add(ship)
+# The image for a turtle can be rotated.  This function
+# sets that the image should rotate whenever the turtle's
+# heading changes
+ship.rotates = True
 
-    # We can scale the image of a turtle.  In this example, 
-    # the ship's image is scaled by a factor of 0.1 (or 10%)
-    ship.use_smoothing()
-    ship.scale(0.1)
+# Tilt the image so that the ship points in the same direction
+# as the heading
+ship.tilt = -90
 
-    # The image for a turtle can be rotated.  This function
-    # sets that the image should rotate whenever the turtle's
-    # heading changes
-    ship.set_image_rotates(True)
+ship.set_line_width(5)
+# ship.fill_color = "red"
+# ship.line_color = "white"
+ship.colors = "white", "red"
 
-    # Tilt the image so that the ship points in the same direction
-    # as the heading
-    ship.set_image_tilt(-90)
+# Function that ends the program
+def esc ():
+    stop_event_loop()
 
-    ship.set_line_width(5)
-    ship.set_fill_color("red")
-    ship.set_line_color("white")
+# Function that checks if the ship is off the screen and
+# moves it to the other side
+def wrap_around ():
+    if ship.x >= 345:
+        ship.x = -345
+    elif ship.x <= -345:
+        ship.x = 345
+    if ship.y >= 205:
+        ship.y = -205
+    elif ship.y <= -205:
+        ship.y = 205
 
-    # Function that ends the program
-    def esc ():
-        stop_event_loop()
+# Function that moves the ship forward
+def on_up ():
+    ship.move_forward(2)
+    wrap_around()
 
-    # Function that checks if the ship is off the screen and
-    # moves it to the other side
-    def wrap_around ():
-        if ship.get_x() >= 345:
-            ship.set_x(-345)
-        elif ship.get_x() <= -345:
-            ship.set_x(345)
-        if ship.get_y() >= 205:
-            ship.set_y(-205)
-        elif ship.get_y() <= -205:
-            ship.set_y(205)
+# Function that moves the ship backward
+def on_down ():
+    ship.move_backward(2)
+    wrap_around()
 
-    # Function that moves the ship forward
-    def on_up ():
-        ship.move_forward(2)
-        wrap_around()
+# Function that turns the ship left
+def on_left ():
+    ship.turn_left(5)
 
-    # Function that moves the ship backward
-    def on_down ():
-        ship.move_backward(2)
-        wrap_around()
+# Function that turns the ship right
+def on_right ():
+    ship.turn_right(5)
 
-    # Function that turns the ship left
-    def on_left ():
-        ship.turn_left(5)
+# Function that starts and stops drawing
+def toggle_drawing ():
+    if ship.is_drawing_line():
+        ship.end_fill()
+        ship.end_line()
+    else:
+        ship.begin_line()
+        ship.begin_fill(as_moving=True)
 
-    # Function that turns the ship right
-    def on_right ():
-        ship.turn_right(5)
+def draw_dot ():
+    ship.dot(color="gold")
 
-    # Function that starts and stops drawing
-    def toggle_drawing ():
-        if ship.is_drawing_line():
-            ship.end_fill()
-            ship.end_line()
-        else:
-            ship.begin_line()
-            ship.begin_fill(as_moving=True)
+def draw_stamp ():
+    ship.stamp()
 
-    def draw_dot ():
-        ship.dot(color="gold")
+# Bind the functions to keys
+screen.on_key_hold(on_up, "up")
+screen.on_key_hold(on_down, "down")
+screen.on_key_hold(on_left, "left")
+screen.on_key_hold(on_right, "right")
+screen.on_key_hold(esc, "escape")
+screen.on_key_press(toggle_drawing, "space")
+screen.on_key_press(draw_dot, "d")
+screen.on_key_press(draw_stamp, "s")
 
-    def draw_stamp ():
-        ship.stamp()
+# Create a "ufo" turtle
+with resources.path("pygameplus.demos", "ufo.png") as image_path:
+    ufo = Sprite(image_path)
+screen.add(ufo)
+ufo.smooth = True
+ufo.scale = 0.25
+ufo.position = (0, 100)
 
-    # Bind the functions to keys
-    screen.on_key_hold(on_up, "up")
-    screen.on_key_hold(on_down, "down")
-    screen.on_key_hold(on_left, "left")
-    screen.on_key_hold(on_right, "right")
-    screen.on_key_hold(esc, "escape")
-    screen.on_key_press(toggle_drawing, "space")
-    screen.on_key_press(draw_dot, "d")
-    screen.on_key_press(draw_stamp, "s")
+# Function that moves the ufo forward
+def move_ufo ():
+    ufo.move_forward(1)
+    if ufo.x >= 332:
+        ufo.x = -332
+    if ship.is_touching(ufo, method="mask"):
+        ship.position = (0, 0)
 
-    # Create a "ufo" turtle
-    with resources.path("pygameplus.demos", "ufo.png") as image_path:
-        ufo = Sprite(image_path)
-    screen.add(ufo)
-    ufo.use_smoothing()
-    ufo.scale(0.25)
-    ufo.set_position(0, 100)
+ufo.on_update(move_ufo)
 
-    # Function that moves the ufo forward
-    def move_ufo ():
-        ufo.move_forward(1)
-        if ufo.get_x() >= 332:
-            ufo.set_x(-332)
-        if ship.is_touching(ufo, method="mask"):
-            ship.set_position(0, 0)
+# # Create a turtle to write text to the screen
+writer = Painter()
+screen.add(writer)
+writer.set_line_width(5)
+writer.line_color = "gold"
+writer.fill_color = (255, 215, 0, 63)
+writer.position = (-250, -110)
+writer.begin_line()
+writer.begin_fill()
+writer.walk_path([(-250, -170), (250, -170), (250, -110), (-250, -110)])
+writer.end_fill()
+writer.end_line()
+writer.position = (0, -140)
+with resources.path("pygameplus.demos", "Freedom.ttf") as font_path:
+    writer.write("Welcome to Space", font=font_path, font_size=36)
 
-    ufo.on_update(move_ufo)
+def on_drag (x, y):
+    ship.position = (x, y)
 
-    # # Create a turtle to write text to the screen
-    writer = Painter()
-    screen.add(writer)
-    writer.set_line_width(5)
-    writer.set_line_color("gold")
-    writer.set_fill_color((255, 215, 0, 63))
-    writer.set_position(-250, -110)
-    writer.begin_line()
-    writer.begin_fill()
-    writer.walk_path([(-250, -170), (250, -170), (250, -110), (-250, -110)])
-    writer.end_fill()
-    writer.end_line()
-    writer.set_position(0, -140)
-    with resources.path("pygameplus.demos", "Freedom.ttf") as font_path:
-        writer.write("Welcome to Space", font=font_path, font_size=36)
+ship.on_drag(on_drag)
 
-    def on_drag (x, y):
-        ship.set_position(x, y)
+turtle = Sprite("turtle")
+screen.add(turtle)
+turtle.position = (-200, 0)
+turtle.colors = "red"
+turtle.rotates = True
 
-    ship.on_drag(on_drag)
+# Function that moves the turtle forward
+def on_w ():
+    turtle.move_forward(2)
+    wrap_around()
 
-    turtle = Sprite("turtle")
-    screen.add(turtle)
-    turtle.set_position(-200, 0)
-    turtle.set_color("red")
-    turtle.set_image_rotates()
+# Function that moves the turtle backward
+def on_s ():
+    turtle.move_backward(2)
+    wrap_around()
 
-    # Function that moves the turtle forward
-    def on_w ():
-        turtle.move_forward(2)
-        wrap_around()
+# Function that turns the turtle left
+def on_a ():
+    turtle.turn_left(5)
 
-    # Function that moves the turtle backward
-    def on_s ():
-        turtle.move_backward(2)
-        wrap_around()
+# Function that turns the turtle right
+def on_d ():
+    turtle.turn_right(5)
 
-    # Function that turns the turtle left
-    def on_a ():
-        turtle.turn_left(5)
+screen.on_key_hold(on_w, "w")
+screen.on_key_hold(on_s, "s")
+screen.on_key_hold(on_a, "a")
+screen.on_key_hold(on_d, "d")
 
-    # Function that turns the turtle right
-    def on_d ():
-        turtle.turn_right(5)
+screen.update()
 
-    screen.on_key_hold(on_w, "w")
-    screen.on_key_hold(on_s, "s")
-    screen.on_key_hold(on_a, "a")
-    screen.on_key_hold(on_d, "d")
+def wow ():
+    print("WOW")
 
-    screen.update()
+wow_id = screen.on_timer(wow, 1000, True)
 
-    def wow ():
-        print("WOW")
+def cancel_wow ():
+    screen.cancel_timer(wow_id)
 
-    wow_id = screen.on_timer(wow, 1000, True)
+screen.on_key_press(cancel_wow, "c")
 
-    def cancel_wow ():
-        screen.cancel_timer(wow_id)
-
-    screen.on_key_press(cancel_wow, "c")
-
-    # Start the event loop
-    start_event_loop(50)
+# Start the event loop
+start_event_loop(50)
 
 
-# call the "main" function if running this script
-if __name__ == "__main__":
-    main()
+# # call the "main" function if running this script
+# if __name__ == "__main__":
+#     main()

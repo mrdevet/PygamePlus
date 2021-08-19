@@ -117,26 +117,50 @@ class Sprite (pygame.sprite.Sprite):
 
     ### Visibility Methods
 
+    @property
+    def visible (self):
+        '''
+        Whether or not the sprite is visible on the active screen.
+        '''
+
+        active_screen = get_active_screen()
+        return active_screen is not None and self in active_screen
+
+    @visible.setter
+    def visible (self, new_visibility):
+
+        if bool(new_visibility):
+            self.show()
+        else:
+            self.hide()
+
+
     def show (self):
+        '''
+        Add the sprite to the active screen.
+        '''
+
         active_screen = get_active_screen()
         if active_screen is not None:
             self.add(active_screen)
 
+
     def hide (self):
+        '''
+        Remove the sprite from the active screen.
+        '''
+
         active_screen = get_active_screen()
         if active_screen is not None:
             self.remove(active_screen)
 
-    def is_visible (self):
-        active_screen = get_active_screen()
-        return active_screen is not None and self in active_screen
-
 
     ### Position Methods
 
-    def set_position (self, x, y=None):
+    @property
+    def position (self):
         '''
-        Change the position of the sprite on the screen.
+        The current the position of the sprite on the screen.
 
         The position is a pair of coordinates (x and y) which represent the
         distance that the sprite is from the center of the screen.  That is,
@@ -146,16 +170,24 @@ class Sprite (pygame.sprite.Sprite):
         used in mathematics.
         '''
 
-        self._pos = pygame.Vector2(x, y)
+        return tuple(self._pos)
+
+    @position.setter
+    def position (self, new_position):
+
+        try:
+            self._pos = pygame.Vector2(new_position)
+        except:
+            raise ValueError("Invalid position!") from None
 
 
     def go_to (self, x, y=None, turn=True):
         '''
-        Move the sprite to the given coordinates.
+        Turn the sprite and move the sprite to the given coordinates.
 
-        Unlike set_position(), this method will also turn the sprite in the 
-        direction of the given location.  This behaviour can be turned of by
-        setting the `turn` argument to `False`.
+        Unlike changing the position property, this method will also turn the 
+        sprite in the direction of the given location.  This behaviour can be 
+        turned of by setting the `turn` argument to `False`.
         '''
 
         if turn:
@@ -172,57 +204,51 @@ class Sprite (pygame.sprite.Sprite):
                     direction += 360
 
                 # Do the turn
-                self.set_direction(direction)
+                self.direction = direction
 
         # Move the sprite
-        self.set_position(x, y)
+        self.position = pygame.Vector2(x, y)
 
 
-    def get_position (self):
+    @property
+    def x (self):
         '''
-        Return the current the position of the sprite on the screen.
-        '''
-
-        return tuple(self._pos)
-
-
-    def set_x (self, x):
-        '''
-        Change the x-coordinate of the sprite's position on the screen.
-        '''
-
-        self.set_position(x, self._pos.y)
-
-
-    def get_x (self):
-        '''
-        Returns the current x-coordinate of the sprite's position on the screen.
+        The current x-coordinate of the sprite's position on the screen.
         '''
 
         return self._pos.x
 
+    @x.setter
+    def x (self, new_x):
 
-    def set_y (self, y):
+        try:
+            self.position = new_x, self._pos.y
+        except:
+            raise ValueError("Invalid x-coordinate!") from None
+
+    @property
+    def y (self):
         '''
-        Change the y-coordinate of the sprite's position on the screen.
-        '''
-
-        self.set_position(self._pos.x, y)
-
-
-    def get_y (self):
-        '''
-        Returns the current y-coordinate of the sprite's position on the screen.
+        The current y-coordinate of the sprite's position on the screen.
         '''
 
         return self._pos.y
 
+    @y.setter
+    def y (self, y):
+
+        try:
+            self.position = new_x, self._pos.y
+        except:
+            raise ValueError("Invalid y-coordinate!") from None
+
 
     ### Direction Methods
 
-    def set_direction (self, direction):
+    @property
+    def direction (self):
         '''
-        Change the direction that the sprite is pointing.
+        The current direction that the sprite is pointing.
 
         The direction is an angle (in degrees) counterclockwise from the 
         positive x-axis.  Here are some important directions:
@@ -232,7 +258,16 @@ class Sprite (pygame.sprite.Sprite):
          - 270 degrees is directly down
         '''
 
-        self._dir = direction
+        return self._dir
+
+    @direction.setter
+    def direction (self, new_direction):
+
+        # Ensure that the direction is a number
+        try:
+            self._dir = float(new_direction)
+        except:
+            raise ValueError("The direction must be a number!")
 
         # Ensure that the direction is between 0 and 360
         self._dir %= 360
@@ -249,18 +284,10 @@ class Sprite (pygame.sprite.Sprite):
 
     def turn_to (self, direction):
         '''
-        Alias for set_direction().
+        Change the direction.
         '''
 
-        self.set_direction(direction)
-
-
-    def get_direction (self):
-        '''
-        Return the current direction that the sprite is pointing.
-        '''
-
-        return self._dir
+        self.direction = direction
 
         
     def turn_left (self, angle):
@@ -268,7 +295,7 @@ class Sprite (pygame.sprite.Sprite):
         Turn the sprite left (counterclockwise) by the given `angle`.
         '''
 
-        self.set_direction(self._dir + angle)
+        self.direction += angle
 
 
     def turn_right (self, angle):
@@ -276,7 +303,7 @@ class Sprite (pygame.sprite.Sprite):
         Turn the sprite right (clockwise) by the given `angle`.
         '''
 
-        self.set_direction(self._dir - angle)
+        self.direction -= angle
 
 
     ### Movement Methods
@@ -287,7 +314,7 @@ class Sprite (pygame.sprite.Sprite):
         pointing.
         '''
 
-        self.set_position(self._pos + distance * self._move_ratio)
+        self.position = self._pos + distance * self._move_ratio
 
 
     def move_backward (self, distance):
@@ -296,91 +323,113 @@ class Sprite (pygame.sprite.Sprite):
         direction it is currently pointing.
         '''
 
-        self.set_position(self._pos - distance * self._move_ratio)
+        self.position = self._pos - distance * self._move_ratio
 
     
     ### Scaling and Rotating Image Methods
 
-    def scale (self, factor):
+    @property
+    def scale (self):
         '''
-        Scale the size of the image by the given `factor`.
+        The factors by which the image's width and height are scaled, respectively.
 
-        If `factor` is greater than 1, then the image is enlarged by multiplying
-        its original dimensions by that number.  If `factor` is less than 1, then 
-        the image is shrunk by multiplying its original dimensions by that 
-        number.  If `factor` equals 1, then the image is scaled to its original 
+        If the factor is greater than 1, then the image is enlarged by multiplying
+        its original dimension by that number.  If factor is less than 1, then 
+        the image is shrunk by multiplying its original dimension by that 
+        number.  If factor equals 1, then the image is scaled to its original 
         size.
+
+        If you set this property to a single number, both the width and height
+        will be scaled by that factor.
         '''
 
-        self._scale.x = factor
-        self._scale.y = factor
+        return tuple(self._scale)
+
+    @scale.setter
+    def scale (self, new_factors):
+
+        # If a tuple of length 2 is given, assume two different factors
+        if isinstance(new_factors, tuple) and len(new_factors) == 2:
+            try:
+                self._scale = pygame.Vector2(new_factors)
+            except:
+                raise ValueError("Invalid scale factors!") from None
+
+        # Otherwise, assume just one factor
+        else:
+            try:
+                self._scale = pygame.Vector2(new_factors, new_factors)
+            except:
+                raise ValueError("Invalid scale factor!") from None
 
         # Flag that the image may have been scaled and needs to be updated
         self._dirty_scale = True
         self._dirty_mask = True
 
 
-    def scale_width (self, factor):
+    @property
+    def scale_width (self):
         '''
-        Scale the width of the image by the given `factor`.
+        The factor by which the image's width is scaled.
 
-        This will scale the width of the original image before any rotation is
-        applied.
-        '''
-
-        self._scale.x = factor
-
-        # Flag that the image may have been scaled and needs to be updated
-        self._dirty_scale = True
-        self._dirty_mask = True
-
-
-    def scale_height (self, factor):
-        '''
-        Scale the height of the image by the given `factor`.
-
-        This will scale the height of the original image before any rotation is
-        applied.
+        If the factor is greater than 1, then the image is enlarged by multiplying
+        its original width by that number.  If factor is less than 1, then 
+        the image is shrunk by multiplying its original width by that 
+        number.  If factor equals 1, then the image is scaled to its original 
+        width.
         '''
 
-        self._scale.y = factor
+        return self._scale.x
 
-        # Flag that the image may have been scaled and needs to be updated
-        self._dirty_scale = True
-        self._dirty_mask = True
+    @scale_width.setter
+    def scale_width (self, new_factor):
+
+        self.scale = new_factor, self._scale.y
 
 
-    def set_image_rotates (self, rotates=True):
+    @property
+    def scale_height (self):
         '''
-        Changes whether or not the image rotates when the sprite changes
-        direction.
+        The factor by which the image's height is scaled.
 
-        Calling this method with no argument will turn on image rotation.  You 
-        can also pass a boolean value to explicitly specify whether the image
-        should rotate or not.
+        If the factor is greater than 1, then the image is enlarged by multiplying
+        its original height by that number.  If factor is less than 1, then 
+        the image is shrunk by multiplying its original height by that 
+        number.  If factor equals 1, then the image is scaled to its original 
+        height.
         '''
 
-        self._rotates = rotates
+        return self._scale.x
+
+    @scale_height.setter
+    def scale_height (self, new_factor):
+
+        self.scale = self._scale.x, new_factor
+
+
+    @property
+    def rotates (self):
+        '''
+        Whether or not the image rotates when the sprite changes direction.
+        '''
+
+        return self._rotates
+
+    @rotates.setter
+    def rotates (self, new_rotates):
+
+        self._rotates = bool(new_rotates)
 
         # Flag that the image may have rotated and needs to be updated
         self._dirty_rotate = True
         self._dirty_mask = True
 
 
-    def get_image_rotates (self):
+    @property    
+    def tilt (self):
         '''
-        Returns whether or not the image rotates when the sprite changes
-        direction.
-        '''
-
-        return self._rotates
-
-
-    def set_image_tilt (self, angle):
-        '''
-        Set the angle that the image is tilted.
-
-        The `angle` is a counterclockwise if positive and clockwise if negative.
+        The angle that the image is tilted counterclockwise from its original
+        orientation.
 
         If image rotation is off, then the image will stay tilted at this angle
         no matter what direction the sprite is pointing.  If image rotation is on,
@@ -388,7 +437,16 @@ class Sprite (pygame.sprite.Sprite):
         direction.
         '''
 
-        self._tilt = angle
+        return self._tilt
+
+    @tilt.setter
+    def tilt (self, new_angle):
+
+        # Ensure that the tilt is a number
+        try:
+            self._tilt = float(new_angle)
+        except:
+            raise ValueError("The tilt must be a number!")
 
         # Ensure that the angle is between 0 and 360
         self._tilt %= 360
@@ -397,21 +455,11 @@ class Sprite (pygame.sprite.Sprite):
         self._dirty_rotate = True
         self._dirty_mask = True
 
-    
-    def get_image_tilt (self):
+
+    @property
+    def smooth (self):
         '''
-        Return the angle that the image is tilted.
-        '''
-
-        return self._tilt
-
-
-    def use_smoothing (self, smooth=True):
-        '''
-        Set that images should be smoothed when scaled or rotated.
-
-        Calling this method with no argument will turn on smoothing.  You can
-        also pass a boolean value to explicitly turn on or off smoothing.
+        Whether or not the image is smoothed when scaled or rotated.
 
         By default, a quick and simple scale and rotation is applied.  This can 
         cause images to be pixelated (when enlarged), loose detail (when shrunk),
@@ -422,24 +470,22 @@ class Sprite (pygame.sprite.Sprite):
         image very frequently.
         '''
 
-        self._smooth = smooth
-
-
-    def is_smoothing (self):
-        '''
-        Returns whether or not smoothing is turned on.
-        '''
-
         return self._smooth
+
+    @smooth.setter
+    def smooth (self, new_smooth):
+
+        self._smooth = bool(new_smooth)
 
 
     ### Color and Width Methods for Polygons
 
-    def set_color (self, color):
+    @property
+    def line_color (self):
         '''
-        Change the line color and fill color.
+        The current line color.
 
-        The given `color` be one of the following values:
+        The color can be one of the following values:
          - A valid color string.  See https://replit.com/@cjdevet/PygameColors
            to explore the available color strings.
          - A set of three numbers between 0 and 255 that represent the
@@ -453,65 +499,79 @@ class Sprite (pygame.sprite.Sprite):
          - A pygame Color object.
         '''
 
-        self._linecolor_obj = pygame.Color(color)
-        self._linecolor = color
-        self._fillcolor_obj = pygame.Color(color)
-        self._fillcolor = color
-
-        if isinstance(self._original, tuple):
-            self._dirty_rotate = True
-
-
-    def get_colors (self):
-        '''
-        Returns a tuple containing the current line color and fill color.
-        '''
-
-        return self._linecolor, self._fillcolor
-
-
-    def set_line_color (self, color):
-        '''
-        Change the line color.
-
-        See `Painter.set_color()` for values of `color`.
-        '''
-
-        self._linecolor_obj = pygame.Color(color)
-        self._linecolor = color
-
-        if isinstance(self._original, tuple):
-            self._dirty_rotate = True
-
-
-    def get_line_color (self):
-        '''
-        Returns the current line color.
-        '''
-
         return self._linecolor
 
+    @line_color.setter
+    def line_color (self, new_color):
 
-    def set_fill_color (self, color):
-        '''
-        Change the fill color.
-
-        See `Painter.set_color()` for values of `color`.
-        '''
-
-        self._fillcolor_obj = pygame.Color(color)
-        self._fillcolor = color
+        try:
+            self._linecolor_obj = pygame.Color(new_color)
+        except:
+            raise ValueError(f"Invalid color: {new_color}") from None
+        self._linecolor = new_color
 
         if isinstance(self._original, tuple):
             self._dirty_rotate = True
 
     
-    def get_fill_color (self):
+    @property
+    def fill_color (self):
         '''
-        Returns the current fill color.
+        The current fill color.
+
+        The color can be one of the following values:
+         - A valid color string.  See https://replit.com/@cjdevet/PygameColors
+           to explore the available color strings.
+         - A set of three numbers between 0 and 255 that represent the
+           amount of red, green, blue to use in the color.  A fourth transparency
+           value can be added.
+         - An HTML color code in the form "#rrggbb" where each character 
+           r, g, b and a are replaced with a hexidecimal digit.  For translucent
+           colors, add another pair of hex digits ("##rrggbbaa").
+         - An integer that, when converted to hexidecimal, gives an HTML color
+           code in the form 0xrrggbbaa.
+         - A pygame Color object.
         '''
 
         return self._fillcolor
+
+    @fill_color.setter
+    def fill_color (self, new_color):
+
+        try:
+            self._fillcolor_obj = pygame.Color(new_color)
+        except:
+            raise ValueError(f"Invalid color: {new_color}") from None
+        self._fillcolor = new_color
+
+        if isinstance(self._original, tuple):
+            self._dirty_rotate = True
+
+
+    @property
+    def colors (self):
+        '''
+        A tuple containing the current line color and fill color.
+
+        You can change both the line color and fill color by setting this
+        property to be a 2-tuple containing each respective color.  You
+        can change both the line color and fill color to the same color by
+        providing one color.
+        '''
+
+        return self._linecolor, self._fillcolor
+
+    @colors.setter
+    def colors (self, new_colors):
+
+        # If a tuple of length 2 is given, assume two different colors
+        if isinstance(new_colors, tuple) and len(new_colors) == 2:
+            self.line_color, self.fill_color = new_colors
+
+        # Otherwise, assume just one color
+        else:
+            self.line_color = new_colors
+            self.fill_color = new_colors
 
 
     ### Update Method
@@ -627,7 +687,7 @@ class Sprite (pygame.sprite.Sprite):
         '''
 
         # If this sprite isn't visible, then it can't be in collision
-        if not self.is_visible():
+        if not self.visible:
             return False
 
         # Get the collision detection function for the given method
@@ -663,7 +723,7 @@ class Sprite (pygame.sprite.Sprite):
         '''
 
         # If this sprite isn't visible, then it can't be in collision
-        if not self.is_visible():
+        if not self.visible:
             return False
 
         # Get the collision detection function for the given method
@@ -720,7 +780,7 @@ class Sprite (pygame.sprite.Sprite):
         '''
 
         # If this sprite isn't visible, then it can't be in collision
-        if not self.is_visible():
+        if not self.visible:
             return False
 
         active_screen = get_active_screen()

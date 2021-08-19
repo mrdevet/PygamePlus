@@ -275,7 +275,7 @@ class Screen (pygame.sprite.LayeredUpdates):
         try:
             self._color_obj = pygame.Color(new_color)
         except:
-            raise ValueError("Invalid color! See documentation for valid color formats!") from None
+            raise ValueError("Invalid color!") from None
         self._color = new_color
 
     @property

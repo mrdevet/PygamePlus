@@ -167,7 +167,7 @@ class Turtle (Painter, metaclass=RedrawMetaClass):
         self._animate = True
 
         # Set that the turtle image should rotate when the turtle turns
-        self.set_image_rotates()
+        self.rotates = True
 
         # Attributes that allow the speed to be maintained over multiple calls 
         # to set_position()
