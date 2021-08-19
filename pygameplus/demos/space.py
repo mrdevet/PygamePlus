@@ -41,7 +41,7 @@ def main ():
 
     # Function that ends the program
     def esc ():
-        end_event_loop()
+        stop_event_loop()
 
     # Function that checks if the ship is off the screen and
     # moves it to the other side

@@ -236,12 +236,13 @@ class Screen (pygame.sprite.LayeredUpdates):
         return self._title
 
     @title.setter
-    def set_title (self, title):
+    def title (self, new_title):
 
         try:
-            self._title = str(title)
+            self._title = str(new_title)
         except:
             raise ValueError("The title must be a string!") from None
+        pygame.display.set_caption(self._title)
 
 
     @property
@@ -269,16 +270,16 @@ class Screen (pygame.sprite.LayeredUpdates):
         return self._color
 
     @background_color.setter
-    def background_color (self, color):
+    def background_color (self, new_color):
 
         try:
-            self._color_obj = pygame.Color(color)
+            self._color_obj = pygame.Color(new_color)
         except:
             raise ValueError("Invalid color! See documentation for valid color formats!") from None
-        self._color = color
+        self._color = new_color
 
     @property
-    def background_image (self, image):
+    def background_image (self):
         '''
         The background image of the screen.
 
@@ -296,18 +297,18 @@ class Screen (pygame.sprite.LayeredUpdates):
         return self._image_name
 
     @background_image.setter
-    def background_image (self, image):
+    def background_image (self, new_image):
 
         # If given None, then remove the background image
-        if image is None:
+        if new_image is None:
             self._image = None
             self._image_name = None
             self._image_rect = None
 
         # Otherwise, add the background image provided
         else:
-            self._image = pygame.image.load(image)
-            self._image_name = image
+            self._image = pygame.image.load(new_image)
+            self._image_name = new_image
             self._image_rect = self._image.get_rect()
             self._image_rect.centerx = self._width / 2
             self._image_rect.centery = self._height / 2

@@ -74,26 +74,47 @@ class EventLoop (object):
         self._timers = {}
 
 
-    def set_frame_rate (self, frame_rate):
+    @property
+    def frame_rate (self):
         '''
-        Change the frame rate of the event loop.
+        The frame rate of the event loop.
 
         The frame rate is the number of iterations the event loop should try to
         accomplish in a second.
         '''
 
-        self._frame_rate = frame_rate
-
-
-    def get_frame_rate (self):
-        '''
-        Return the current frame rate of the event loop.
-        '''
-
         return self._frame_rate
 
+    @frame_rate.setter
+    def frame_rate (self, new_frame_rate):
 
-    def set_frame_delay (self, delay):
+        # Ensure the the given frame rate is a number
+        try:
+            new_frame_rate = float(new_frame_rate)
+        except:
+            raise ValueError("The frame rate must be a number!") from None
+
+        # Ensure that the given frame rate is positive
+        if new_frame_rate <= 0:
+            raise ValueError("The frame rate must be positive!")
+
+        self._frame_rate = new_frame_rate
+
+
+    @property
+    def frame_delay (self):
+        '''
+        The frame delay of the event loop.
+
+        The frame delay is the amount of time in milliseconds that the event loop
+        should try to have between the start of each iteration of the loop.  The
+        frame delay is 1000 divided by the frame rate.
+        '''
+
+        return 1000 / self._frame_rate
+
+    @frame_delay.setter
+    def frame_delay (self, new_delay):
         '''
         Change the frame delay of the event loop.
 
@@ -102,15 +123,17 @@ class EventLoop (object):
         frame delay is 1000 divided by the frame rate.
         '''
 
-        self._frame_rate = 1000 / delay
+        # Ensure the the given frame delay is a number
+        try:
+            new_delay = float(new_delay)
+        except:
+            raise ValueError("The frame delay must be a number!") from None
 
-
-    def get_frame_delay (self):
-        '''
-        Return the current frame delay of the event loop.
-        '''
-
-        return 1000 / self._frame_rate
+        # Ensure that the given frame delay is positive
+        if new_delay <= 0:
+            raise ValueError("The frame delay must be positive!")
+        
+        self._frame_rate = 1000 / new_delay
 
 
     def start (self):
@@ -227,9 +250,9 @@ class EventLoop (object):
             pygame.display.flip()
 
 
-    def end (self):
+    def stop (self):
         '''
-        End the event loop.
+        Stop the event loop.
 
         This does not immediately end the event loop, but will end the loop at the end of the current iteration.
         
@@ -312,11 +335,11 @@ def start_event_loop (frame_rate=None):
     '''
 
     if frame_rate is not None:
-        _event_loop.set_frame_rate(frame_rate)
+        _event_loop.frame_rate = frame_rate
     _event_loop.start()
 
 
-def end_event_loop ():
+def stop_event_loop ():
     '''
     End the event loop.
 
@@ -326,7 +349,7 @@ def end_event_loop ():
     This will have no effect if the event loop has not started.
     '''
 
-    _event_loop.end()
+    _event_loop.stop()
 
 
 def get_event_loop ():
@@ -343,6 +366,6 @@ def get_event_loop ():
 # What is included when importing *
 __all__ = [
     "start_event_loop",
-    "end_event_loop",
+    "stop_event_loop",
     "get_event_loop"
 ]
