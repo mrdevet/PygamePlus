@@ -33,10 +33,10 @@ ship.rotates = True
 # as the heading
 ship.tilt = -90
 
-ship.set_line_width(5)
-# ship.fill_color = "red"
-# ship.line_color = "white"
-ship.colors = "white", "red"
+ship.line_width = 5
+ship.fill_color = "red"
+ship.line_color = "white"
+ship.fill_as_moving = True
 
 # Function that ends the program
 def esc ():
@@ -74,12 +74,8 @@ def on_right ():
 
 # Function that starts and stops drawing
 def toggle_drawing ():
-    if ship.is_drawing_line():
-        ship.end_fill()
-        ship.end_line()
-    else:
-        ship.begin_line()
-        ship.begin_fill(as_moving=True)
+    ship.filling = not ship.filling
+    ship.drawing = not ship.drawing
 
 def draw_dot ():
     ship.dot(color="gold")
@@ -118,7 +114,7 @@ ufo.on_update(move_ufo)
 # # Create a turtle to write text to the screen
 writer = Painter()
 screen.add(writer)
-writer.set_line_width(5)
+writer.line_width = 5
 writer.line_color = "gold"
 writer.fill_color = (255, 215, 0, 63)
 writer.position = (-250, -110)

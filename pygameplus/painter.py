@@ -83,42 +83,77 @@ class Painter (Sprite):
 
     ### Drawing Line Methods
 
-    def set_step_size (self, distance):
+    @property
+    def step_size (self):
         '''
-        Change the step size between points drawn on a line.
-
-        By default, the step size is 0.1 pixels.
-        '''
-
-        if distance <= 0:
-            raise ValueError("The step size must be a positive number.")
-        self._stepsize = distance
-
-
-    def get_step_size (self):
-        '''
-        Returns the step size between points drawn on a line.
+        The step size between points drawn on a line.
         '''
 
         return self._stepsize
 
+    @step_size.setter
+    def step_size (self, new_distance):
 
-    def set_line_width (self, width):
+        # Ensure that the distance is a number.
+        try:
+            new_distance = float(new_distance)
+        except:
+            raise ValueError("The step size must be a number!")
+
+        # Ensure that the distance is positive.
+        if new_distance <= 0:
+            raise ValueError("The step size must be positive!")
+
+        self._stepsize = new_distance
+
+
+    @property
+    def line_width (self):
         '''
-        Sets the width of the lines drawn.
-        '''
-
-        if width < 1:
-            raise ValueError("The width must be a positive integer.")
-        self._linesize = int(width)
-
-
-    def get_line_width (self):
-        '''
-        Returns the current width of the lines drawn.
+        The current width of the lines drawn.
         '''
 
         return self._linesize
+
+    @line_width.setter
+    def line_width (self, new_width):
+        '''
+        The width of the lines drawn.
+
+        Note that any decimal widths will be rounded.
+        '''
+
+        try:
+            new_width = round(new_width)
+        except:
+            raise ValueError("The width must be a number!")
+
+        if new_width < 1:
+            raise ValueError("The width must be positive!")
+
+        self._linesize = new_width
+
+
+    @property
+    def drawing (self):
+        '''
+        Whether or not the painter is currently drawing a line.
+        '''
+
+        return self._drawing
+
+    @drawing.setter
+    def drawing (self, is_drawing):
+
+        # Ensure that the argument is boolean
+        is_drawing = bool(is_drawing)
+
+        # Only start/stop drawing if the setting changed
+        if is_drawing != self._drawing:
+            if is_drawing:
+                self.begin_line()
+            else:
+                self.end_line()
 
 
     def begin_line (self):
@@ -135,14 +170,6 @@ class Painter (Sprite):
         '''
 
         self._drawing = False
-
-
-    def is_drawing_line (self):
-        '''
-        Return whether or not a line is currently being drawn.
-        '''
-
-        return self._drawing
 
 
     ### Drawing Methods
@@ -262,7 +289,43 @@ class Painter (Sprite):
         canvas.blit(self._drawings_over_fill, (0, 0))
 
 
-    def begin_fill (self, as_moving=False):
+    @property
+    def filling (self):
+        '''
+        Whether or not the painter is currently creating a filled shape.
+        '''
+
+        return self._filling
+
+    @filling.setter
+    def filling (self, is_filling):
+
+        # Ensure that the argument is boolean
+        is_filling = bool(is_filling)
+
+        # Only start/stop filling if the setting changed
+        if is_filling != self._drawing:
+            if is_filling:
+                self.begin_fill()
+            else:
+                self.end_fill()
+
+
+    @property
+    def fill_as_moving (self):
+        '''
+        Whether or not a fill will be shown on the screen before it is complete.
+        '''
+
+        return self._fill_as_moving
+
+    @fill_as_moving.setter
+    def fill_as_moving (self, as_moving):
+
+        self._fill_as_moving = bool(as_moving)
+
+
+    def begin_fill (self):
         '''
         Start creating a filled shape.
 
@@ -277,7 +340,6 @@ class Painter (Sprite):
         # Set the fill properties
         self._filling = True
         self._fillpoly = [self._pos]
-        self._fill_as_moving = bool(as_moving)
 
         # Create a surface to hold the lines drawn on top of the fill
         screen = get_active_screen()
@@ -307,14 +369,6 @@ class Painter (Sprite):
         # Reset the filling attributes
         self._filling = False
         self._fillpoly = None
-
-
-    def is_filling (self):
-        '''
-        Returns whether or not a filled shape is currently being drawn.
-        '''
-
-        return self._filling
 
 
     ### Draw circles

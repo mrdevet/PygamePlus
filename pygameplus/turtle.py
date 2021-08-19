@@ -166,8 +166,10 @@ class Turtle (Painter, metaclass=RedrawMetaClass):
         self._step_size = 4
         self._animate = True
 
-        # Set that the turtle image should rotate when the turtle turns
+        # Set that the turtle image should rotate when the turtle turns and
+        # draw incomplete fills on the screen.
         self.rotates = True
+        self.fill_as_moving = True
 
         # Attributes that allow the speed to be maintained over multiple calls 
         # to set_position()
@@ -254,23 +256,6 @@ class Turtle (Painter, metaclass=RedrawMetaClass):
                 if active_screen is not None and self in active_screen:
                     active_screen.redraw()
                 self.clock.tick(self._frame_rate)
-
-
-    def begin_fill (self, as_moving=True):
-        '''
-        Start creating a filled shape.
-
-        This function must be followed with a call to end_fill() which
-        will draw the filled shape using all of the points visited
-        from the call of this method.
-
-        If `as_moving` is set to `True`, then the filled shape will be redrawn
-        after each move of the sprite.
-        '''
-
-        # By default, a turtle will show fills as it moves.  This is the
-        # opposite of a Painter which does not show fills as it moves.
-        Painter.begin_fill(self, as_moving)
 
 
     def set_direction (self, direction):
