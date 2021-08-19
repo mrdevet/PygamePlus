@@ -136,6 +136,22 @@ class EventLoop (object):
         self._frame_rate = 1000 / new_delay
 
 
+    @property
+    def running (self):
+        '''
+        Whether or not the event loop is running.  (Read-only)
+
+        Use `start()` and `stop()` to control the loop.
+        '''
+
+        return self._running
+
+    @running.setter
+    def running (self, new_setting):
+
+        raise AttributeError("This property is read-only!  Use start() and stop() to control the event loop.")
+
+
     def start (self):
         '''
         Start the event loop.
