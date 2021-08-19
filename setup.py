@@ -10,7 +10,7 @@ README = (HERE / "README.md").read_text()
 # This call to setup() does all the work
 setup(
     name="pygame-plus",
-    version="0.0.1",
+    version="0.0.3",
     description="Pygame with some added features for beginners",
     long_description=README,
     long_description_content_type="text/markdown",
@@ -21,10 +21,10 @@ setup(
     classifiers=[
         "License :: OSI Approved :: MIT License",
         "Programming Language :: Python :: 3",
-        "Programming Language :: Python :: 3.6"
+        "Programming Language :: Python :: 3.8"
     ],
     packages=["pygameplus", "pygameplus.demos"],
     install_requires=["pygame"],
     include_package_data=True,
-    python_requires=">=3.6"
+    python_requires=">=3.8"
 )

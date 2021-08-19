@@ -2,7 +2,7 @@
 # Date: June 11, 2021
 # Purpose: Illustrate new features of the pygameplus.turtle module
 
-from pygameplus.screen import Screen
+from pygameplus import Screen, start_event_loop
 from pygameplus.turtle import *
 
 def main ():
@@ -38,6 +38,8 @@ def main ():
     michaelangelo.begin_fill()
     michaelangelo.circle(50)
     michaelangelo.end_fill()
+
+    start_event_loop()
 
 
 # call the "main" function if running this script

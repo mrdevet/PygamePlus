@@ -2,7 +2,10 @@
 # Date: June 11, 2021
 # Purpose: Illustrate new features of the superturtle module
 
+from importlib import resources
 from pygameplus import *
+
+# SPACE_BG = resources.path("pygameplus", )
 
 def main ():
 
@@ -11,10 +14,12 @@ def main ():
     screen.open()
 
     # We can use image files that are not GIFs
-    screen.set_background_image("pygameplus/demos/space.jpg")
+    with resources.path("pygameplus.demos", "space.jpg") as image_path:
+        screen.set_background_image(image_path)
 
     # Create a "ship" turtle
-    ship = Painter("pygameplus/demos/ship.png")
+    with resources.path("pygameplus.demos", "ship.png") as image_path:
+        ship = Painter(image_path)
     screen.add(ship)
 
     # We can scale the image of a turtle.  In this example, 
@@ -95,7 +100,8 @@ def main ():
     screen.on_key_press(draw_stamp, "s")
 
     # Create a "ufo" turtle
-    ufo = Sprite("pygameplus/demos/ufo.png")
+    with resources.path("pygameplus.demos", "ufo.png") as image_path:
+        ufo = Sprite(image_path)
     screen.add(ufo)
     ufo.use_smoothing()
     ufo.scale(0.25)
@@ -124,8 +130,8 @@ def main ():
     writer.end_fill()
     writer.end_line()
     writer.set_position(0, -140)
-    writer.write("Welcome to Space", 
-                font="pygameplus/demos/Freedom.ttf", font_size=36)
+    with resources.path("pygameplus.demos", "Freedom.ttf") as font_path:
+        writer.write("Welcome to Space", font=font_path, font_size=36)
 
     def on_drag (x, y):
         ship.set_position(x, y)

@@ -65,17 +65,17 @@ class Sprite (pygame.sprite.Sprite):
         # Handle the image
         if image is None:
             self._original = pygame.Surface((1, 1), pygame.SRCALPHA)
-        elif isinstance(image, str):
-            if image in pgputils.polygon_images:
-                self._original = pgputils.polygon_images[image]
-            else:
-                self._original = pygame.image.load(image).convert_alpha()
         elif isinstance(image, tuple) or isinstance(image, list):
             self._original = tuple([pygame.Vector2(p) for p in image])
         elif isinstance(image, pygame.Surface):
             self._original = image
         else:
-            raise ValueError("Invalid image!")
+            image = str(image)
+            if image in pgputils.polygon_images:
+                self._original = pgputils.polygon_images[image]
+            else:
+                self._original = pygame.image.load(image).convert_alpha()
+            
 
         # The .image and .rect attributes are needed for drawing sprites
         # in a pygame group

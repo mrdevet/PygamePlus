@@ -446,17 +446,22 @@ class Painter (Sprite):
             font_obj = font
 
         # If this font and size have been used before, check the _fonts cache
-        if (font, font_size) in Painter._fonts:
+        elif (font, font_size) in Painter._fonts:
             font_obj = Painter._fonts[font, font_size]
 
-        # If the font ends in ".ttf", then load the font from the file
-        elif font.endswith(".ttf"):
-            font_obj = pygame.font.Font(font, font_size)
-            Painter._fonts[font, font_size] = font_obj
-
-        # Otherwise, use a system font
+        # Otherwise, the font needs to be a string
         else:
-            font_obj = pygame.font.SysFont(font, font_size)
+            font = str(font)
+
+            # If the font ends in ".ttf", then load the font from the file
+            if font.endswith(".ttf"):
+                font_obj = pygame.font.Font(font, font_size)
+
+            # Otherwise, use a system font
+            else:
+                font_obj = pygame.font.SysFont(font, font_size)
+
+            # Add the font to the _fonts cache
             Painter._fonts[font, font_size] = font_obj
 
         # Apply the styles
