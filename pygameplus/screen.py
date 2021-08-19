@@ -68,9 +68,9 @@ class Screen (pygame.sprite.LayeredUpdates):
         self._surface = None
 
         # Attributes for the dimensions, title and background
-        self._width = width
-        self._height = height
-        self._title = title
+        self._width = int(width)
+        self._height = int(height)
+        self._title = str(title)
         self._color = "white"
         self._color_obj = pygame.Color("white")
         self._image = None
@@ -140,8 +140,7 @@ class Screen (pygame.sprite.LayeredUpdates):
         self.redraw()
 
 
-    # A hidden method that is called when a screen is closed.  Currently this
-    # does nothing.
+    # A hidden method that is called when a screen is closed.
     def _close (self):
         # Stop all timers associated with the screen
         for event_id in self._timers:
@@ -161,13 +160,23 @@ class Screen (pygame.sprite.LayeredUpdates):
 
     ### Methods for the screen's properties
 
-    def set_size (self, width, height):
+    @property
+    def size (self):
         '''
-        Change the dimensions of the screen.
+        The size of the screen as a tuple with width and height.
+
+        Changing this property will immediately resize the screen.
         '''
 
-        self._width = width
-        self._height = height
+        return self._width, self._height
+
+    @size.setter
+    def size (self, new_dimensions):
+
+        try:
+            self._width, self._height = [int(d) for d in new_dimensions]
+        except:
+            raise ValueError("The size must be a tuple of two integers!") from None
 
         # If this screen is open, then we need to create a new pygame screen
         # width this size.
@@ -177,7 +186,8 @@ class Screen (pygame.sprite.LayeredUpdates):
 
         # Create a new canvas with the new size
         old_canvas = self._canvas
-        self._canvas = pygame.Surface((width, height), pygame.SRCALPHA)
+        self._canvas = pygame.Surface((self._width, self._height), pygame.SRCALPHA)
+        # TODO: blit the old canvas onto the new canvas
 
         # Change the rect for the background image to keep it centered.
         if self._image_rect is not None:
@@ -185,67 +195,61 @@ class Screen (pygame.sprite.LayeredUpdates):
             self._image_rect.centery = height / 2
 
 
-    def get_size (self):
+    @property
+    def width (self):
         '''
-        Return the current dimensions of the screen.
-        '''
+        The width of the screen.
 
-        return self._width, self._height
-
-
-    def set_width (self, width):
-        '''
-        Change the width of the screen.
-        '''
-
-        self.set_size(width, self._height)
-
-
-    def get_width (self):
-        '''
-        Return the current width of the screen.
+        Changing this property will immediately resize the screen.
         '''
 
         return self._width
 
+    @width.setter
+    def width (self, new_width):
 
-    def set_height (self, height):
+        self.size = new_width, self._height
+
+
+    @property
+    def height (self):
         '''
-        Change the height of the screen.
-        '''
+        The height of the screen.
 
-        self.set_size(self._width, height)
-
-
-    def get_height (self):
-        '''
-        Return the current height of the screen.
+        Changing this property will immediately resize the screen.
         '''
 
         return self._height
 
+    @height.setter
+    def height (self, new_height):
 
-    def set_title (self, title):
+        self.size = self._width, new_height
+
+
+    @property
+    def title (self):
         '''
-        Change the title of the screen.
-        '''
-
-        self._title = title
-
-
-    def get_title (self):
-        '''
-        Return the current title of the screen.
+        The title of the screen that appears at its top.
         '''
 
         return self._title
 
+    @title.setter
+    def set_title (self, title):
 
-    def set_background_color (self, color):
+        try:
+            self._title = str(title)
+        except:
+            raise ValueError("The title must be a string!") from None
+
+
+    @property
+    def background_color (self):
         '''
-        Change the background color of the screen.
+        The background color of the screen.
 
-        The given `color` be one of the following values:
+        The color can be one of the following values:
          - A valid color string.  See https://replit.com/@cjdevet/PygameColors
            to explore the available color strings.
          - A set of three numbers between 0 and 255 that represent the
@@ -257,29 +261,42 @@ class Screen (pygame.sprite.LayeredUpdates):
          - An integer that, when converted to hexidecimal, gives an HTML color
            code in the form 0xrrggbbaa.
          - A pygame Color object.
+
+        If this property is changed, it won't be reflected on the screen until
+        it is redrawn.
         '''
 
-        self._color = color
-        self._color_obj = pygame.Color(color)
-
-
-    def get_background_color (self, color):
-        '''
-        Return the current background color of the screen.
-        '''
         return self._color
 
+    @background_color.setter
+    def background_color (self, color):
 
-    def set_background_image (self, image):
+        try:
+            self._color_obj = pygame.Color(color)
+        except:
+            raise ValueError("Invalid color! See documentation for valid color formats!") from None
+        self._color = color
+
+    @property
+    def background_image (self, image):
         '''
-        Change the background image of the screen.
+        The background image of the screen.
 
         This image will be placed in the center of the screen.
 
-        The `image` can be:
+        The image can be:
          - The file name of an image file.
+         - A Python file-like object created using open().
          - `None` to remove any background image.
+
+        If this property is changed, it won't be reflected on the screen until
+        it is redrawn.
         '''
+
+        return self._image_name
+
+    @background_image.setter
+    def background_image (self, image):
 
         # If given None, then remove the background image
         if image is None:
@@ -296,19 +313,12 @@ class Screen (pygame.sprite.LayeredUpdates):
             self._image_rect.centery = self._height / 2
 
 
-    def get_background_image (self, image):
-        '''
-        Return the current background image of the screen.
-        '''
-
-        return self._image_name
-
-
     ### Methods for the drawing canvas
     
-    def get_canvas (self):
+    @property
+    def canvas (self):
         '''
-        Return the image of any drawings that were drawn on the screen.
+        The image of any drawings that were drawn on the screen.
         '''
 
         return self._canvas

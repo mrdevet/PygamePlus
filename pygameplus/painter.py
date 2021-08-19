@@ -156,7 +156,7 @@ class Painter (Sprite):
                 raise RuntimeError("Can't draw a line on an inactive screen!")
             if self not in screen:
                 raise RuntimeError("The painter must be on the active screen to draw!")
-            canvas = screen.get_canvas()
+            canvas = screen.canvas
 
         # Convert to pygame coordinates
         start = to_pygame_coordinates(start)
@@ -239,7 +239,7 @@ class Painter (Sprite):
                 raise RuntimeError("Can't draw a filled shape on an inactive screen!")
             if self not in screen:
                 raise RuntimeError("The painter must be on the active screen to draw!")
-            canvas = screen.get_canvas()
+            canvas = screen.canvas
 
         # Draw the points to the canvas
         points = [to_pygame_coordinates(p) for p in self._fillpoly]
@@ -273,7 +273,7 @@ class Painter (Sprite):
             raise RuntimeError("Can't draw a filled shape on an inactive screen!")
         if self not in screen:
             raise RuntimeError("The painter must be on the active screen to draw!")
-        self._drawings_over_fill = pygame.Surface(screen.get_size(), pygame.SRCALPHA)
+        self._drawings_over_fill = pygame.Surface(screen.size, pygame.SRCALPHA)
 
 
     def end_fill (self):
@@ -324,7 +324,7 @@ class Painter (Sprite):
             raise RuntimeError("Can't draw a dot on an inactive screen!")
         if self not in screen:
             raise RuntimeError("The painter must be on the active screen to draw!")
-        canvas = screen.get_canvas()
+        canvas = screen.canvas
 
         # If no size is given, make the dot a bit bigger than the line size
         if size is None:
@@ -407,7 +407,7 @@ class Painter (Sprite):
             raise RuntimeError("Can't stamp an image on an inactive screen!")
         if self not in screen:
             raise RuntimeError("The painter must be on the active screen to draw!")
-        canvas = screen.get_canvas()
+        canvas = screen.canvas
 
         # Copy the image to the canvas
         self._clean_image()
@@ -508,7 +508,7 @@ class Painter (Sprite):
             raise RuntimeError("Can't write text on an inactive screen!")
         if self not in screen:
             raise RuntimeError("The painter must be on the active screen to draw!")
-        canvas = screen.get_canvas()
+        canvas = screen.canvas
         canvas.blit(image, rect)
 
         # Return a Font object that can be used for future writing

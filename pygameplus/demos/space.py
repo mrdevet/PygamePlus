@@ -5,17 +5,16 @@
 from importlib import resources
 from pygameplus import *
 
-# SPACE_BG = resources.path("pygameplus", )
+screen = Screen(640, 360, "PyGame Plus")
 
 def main ():
 
     # Set up the screen
-    screen = Screen(640, 360, "PyGame Plus")
     screen.open()
 
     # We can use image files that are not GIFs
     with resources.path("pygameplus.demos", "space.jpg") as image_path:
-        screen.set_background_image(image_path)
+        screen.background_image = image_path
 
     # Create a "ship" turtle
     with resources.path("pygameplus.demos", "ship.png") as image_path:
