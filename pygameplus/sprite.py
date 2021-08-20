@@ -89,6 +89,8 @@ class Sprite (pygame.sprite.Sprite):
 
         # Positional and directional attributes
         self._pos = pygame.Vector2(0, 0)
+        self._anchor = ("center", "center")
+        self._anchor_vec = pygame.Vector2(0, 0)
         self._dir = 0
         self._move_ratio = pygame.Vector2(1, 0)
 
@@ -208,6 +210,51 @@ class Sprite (pygame.sprite.Sprite):
 
         # Move the sprite
         self.position = pygame.Vector2(x, y)
+
+
+    @property
+    def anchor (self):
+
+        return tuple(self._anchor)
+
+    @anchor.setter
+    def anchor (self, new_anchor):
+        
+        # Ensure that the anchor is a 2-tuple
+        try:
+            anchor_x, anchor_y = new_anchor
+        except:
+            raise ValueError("The anchor must be a 2-tuple!")
+
+        # Turn the x value into a number
+        if anchor_x == "left":
+            anchor_x = -self.width / 2
+        elif anchor_x == "right":
+            anchor_x = self.width / 2
+        elif anchor_x in ["center", "middle"]:
+            anchor_x = 0
+        else:
+            try:
+                anchor_x = float(anchor_x)
+            except:
+                raise ValueError("Invalid anchor x value!")
+
+        # Turn the y value into a number
+        if anchor_y == "bottom":
+            anchor_y = -self.height / 2
+        elif anchor_y == "top":
+            anchor_y = self.height / 2
+        elif anchor_y in ["center", "middle"]:
+            anchor_y = 0
+        else:
+            try:
+                anchor_y = float(anchor_y)
+            except:
+                raise ValueError("Invalid anchor y value!")
+
+        # Set the anchor vector
+        self._anchor = new_anchor
+        self._anchor_vec = pygame.Vector2(anchor_x, anchor_y)
 
 
     @property
@@ -460,7 +507,7 @@ class Sprite (pygame.sprite.Sprite):
 
     @bottom_edge_midpoint.setter
     def bottom_edge_midpoint (self, new_coordinates):
-        
+
         try:
             self.center_x, self.bottom_edge = new_coordinates
         except:
@@ -868,9 +915,9 @@ class Sprite (pygame.sprite.Sprite):
         # Update the sprite's .image and .rect attributes needed for drawing
         self._clean_image(screen)
         if screen is None:
-            self.rect.center = to_pygame_coordinates(self._pos)
+            self.rect.center = to_pygame_coordinates(self._pos - self._anchor_vec)
         else:
-            self.rect.center = screen.to_pygame_coordinates(self._pos)
+            self.rect.center = screen.to_pygame_coordinates(self._pos - self._anchor_vec)
 
 
     ### Other Sprite Methods
