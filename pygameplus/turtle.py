@@ -37,29 +37,29 @@ from pygameplus.screen import get_active_screen
 # the method is complete, the active screen will be redraw if the sprite is 
 # on that screen.
 
-def add_redraw (method):
+def add_redraw_to_method (method):
     @wraps(method)
     def wrapper(self, *args, **kwargs):
+        # Get the initial _redraw_on_completion and replace it with False to
+        # suppress redraws on intermediate calls
+        redraw_on_changes = getattr(self, "_redraw_on_completion", True)
+        self._redraw_on_completion = False
+
+        # Call the method.  Before and after, determine if the sprite is on the
+        # active screen.
         active_screen = get_active_screen()
         on_screen_before = active_screen is not None and self in active_screen
         method(self, *args, **kwargs)
         on_screen_after = active_screen is not None and self in active_screen
-        if getattr(self, "_redraw_on_completion", True):
-            if on_screen_before or on_screen_after:
-                active_screen.redraw()
-    return wrapper
 
-# This function adds a wrapper around a method that will make it so that any
-# intermediate calls to functions wrapped with the add_redraw function above
-# don't redraw on completion.
+        # Redraw the screen if this is not an intermediate call and if the 
+        # sprite is on the screen before/after the method call.
+        if redraw_on_changes and (on_screen_before or on_screen_after):
+            active_screen.redraw()
 
-def disable_intermediate_redraw (method):
-    @wraps(method)
-    def wrapper(self, *args, **kwargs):
-        redraw_on_changes = getattr(self, "_redraw_on_completion", True)
-        self._redraw_on_completion = False
-        method(self, *args, **kwargs)
+        # Reset the _redraw_on_completion flag to the initial value
         self._redraw_on_completion = redraw_on_changes
+
     return wrapper
 
 # This metaclass is used to create a class that wraps its methods (and/or its 
@@ -74,33 +74,29 @@ class RedrawMetaClass (type):
     def __new__ (cls, name, bases, class_dict):
         new_class_dict = class_dict.copy()
 
-        # Wrap the methods in disable_intermediate_redraw_methods
-        disable_intermediate_redraw_methods = new_class_dict.pop("disable_intermediate_redraw_methods", [])
-        for method_name in disable_intermediate_redraw_methods:
-            method = None
-            if method_name in new_class_dict:
-                method = new_class_dict[method_name]
-            else:
-                for base in bases:
-                    if hasattr(base, method_name):
-                        method = getattr(base, method_name)
-                        break
-            if method is not None:
-                new_class_dict[method_name] = disable_intermediate_redraw(method)
-
         # Wrap the methods in add_redraw_methods
-        add_redraw_methods = new_class_dict.pop("add_redraw_methods", [])
-        for method_name in add_redraw_methods:
-            method = None
-            if method_name in new_class_dict:
-                method = new_class_dict[method_name]
+        for attr_name in new_class_dict.pop("add_redraw_to", []):
+            # Get the attr from the current class definition or from a base class
+            attr = None
+            if attr_name in new_class_dict:
+                attr = new_class_dict[attr_name]
             else:
                 for base in bases:
-                    if hasattr(base, method_name):
-                        method = getattr(base, method_name)
+                    if hasattr(base, attr_name):
+                        attr = getattr(base, attr_name)
                         break
-            if method is not None:
-                new_class_dict[method_name] = add_redraw(method)
+
+            # If the attr is callable, simply wrap it
+            if callable(attr):
+                new_class_dict[attr_name] = add_redraw_to_method(attr)
+
+            # If the attr is a property, wrap the setter
+            if isinstance(attr, property):
+                setter = add_redraw_to_method(attr.fset)
+                new_class_dict[attr_name] = property(attr.fget, setter)
+
+            # NOTE: Any attr in the list that is not a method or property is
+            # ignored
         
         return type.__new__(cls, name, bases, new_class_dict)
 
@@ -119,37 +115,34 @@ class Turtle (Painter, metaclass=RedrawMetaClass):
     drawing methods of a Painter.
     '''
 
-    # These methods will be changed to disable active screen redraw on any 
-    # intermediate calls they make
-    disable_intermediate_redraw_methods = [
-        "circle",
-        "walk_path",
-        "go_to"
-    ]
-
     # These methods will be changed to redraw the active screen on completion
-    add_redraw_methods = [
+    add_redraw_to = [
         "add",
-        "set_position",
         "go_to",
-        "set_direction",
         "turn_to",
         "circle",
         "walk_path",
         "show",
         "hide",
-        "scale",
-        "scale_width",
-        "scale_height",
-        "set_image_rotates",
-        "set_image_tilt",
-        "set_color",
-        "set_line_color",
-        "set_fill_color",
         "end_fill",
         "dot",
         "stamp",
-        "write"
+        "write",
+        "visible",
+        "position",
+        "x",
+        "y",
+        "direction",
+        "scale",
+        "scale_width",
+        "scale_height",
+        "rotates",
+        "tilt",
+        "smooth",
+        "line_color"
+        "fill_color",
+        "colors",
+        "fill_as_moving"
     ]
 
     def __init__ (self):
@@ -171,68 +164,102 @@ class Turtle (Painter, metaclass=RedrawMetaClass):
         self.rotates = True
         self.fill_as_moving = True
 
-        # Attributes that allow the speed to be maintained over multiple calls 
-        # to set_position()
+        # Attributes that allow the speed to be maintained over multiple changes
+        # to position
         self._pixels_remaining = 4
 
 
-    def set_speed (self, speed):
+    ### Animation properties
+
+    @property
+    def frame_rate (self):
         '''
-        Change the speed that the turtle moves on the screen.
-
-        The speed must be a positive number.  It is the number of pixels that the
-        turtle moves per second.
+        The number of animation frames per second.
         '''
 
-        if speed <= 0:
-            raise ValueError("The speed must be positive!")
-        self._speed = speed
-        self._step_size = speed / self._frame_rate
+        return self._frame_rate
 
-
-    def get_speed (self):
+    @frame_rate.setter
+    def frame_rate (self, new_frame_rate):
         '''
-        Return the current speed that the turtle moves on the screen.
+        '''
+
+        # Ensure that the speed is a number
+        try:
+            new_frame_rate = float(new_frame_rate)
+        except:
+            raise ValueError("The frame rate must be a number!") from None
+
+        # Ensure that the speed is positive
+        if new_frame_rate <= 0:
+            raise ValueError("The frame rate must be positive!")
+
+        # Set the speed and the step size
+        self._frame_rate = new_frame_rate
+        self._step_size = self._speed / new_frame_rate
+
+
+    @property
+    def speed (self):
+        '''
+        The current speed (in pixels per second) that the turtle moves on 
+        the screen.
         '''
 
         return self._speed
 
+    @speed.setter
+    def speed (self, new_speed):
 
-    def enable_animations (self):
+        # Ensure that the speed is a number
+        try:
+            new_speed = float(new_speed)
+        except:
+            raise ValueError("The speed must be a number!") from None
+
+        # Ensure that the speed is positive
+        if new_speed <= 0:
+            raise ValueError("The speed must be positive!")
+
+        # Set the speed and the step size
+        self._speed = new_speed
+        self._step_size = new_speed / self._frame_rate
+
+
+    @property
+    def animate (self):
         '''
-        Enable the turtle's animations.
+        Whether or not the turtle's movements will be animated.
+
+        If set to False, movements will happen instantaneously.
         '''
 
-        self._animate = True
+        return self._animate
+
+    @animate.setter
+    def animate (self, is_animated):
+
+        self._animate = bool(is_animated)
 
 
-    def disable_animations (self):
-        '''
-        Disable the turtle's animations.
-        '''
-
-        self._animate = False
-
-
-    def set_position (self, x, y=None):
-        '''
-        Move the Turtle to the given coordinates.
-
-        If the sprite is currently drawing a line or fill, movement will cause
-        drawings to show up on the screen.
-        '''
+    ### Overwritten properties
+                
+    # This will replace the position setter.  It makes it so that, if
+    # animation is on, then the turtle will only move _step_size pixels each
+    # frame.
+    def _set_position (self, new_position):
 
         # Get the active screen.
         active_screen = get_active_screen()
 
         # If the animations are turned off, just use the parent class method.
         if not self._animate:
-            Painter.set_position(self, x, y)
+            Painter.position.fset(self, new_position)
             return
 
         # Create vectors for the start and end positions
         current = pygame.Vector2(self._pos)
-        end = pygame.Vector2(x, y)
+        end = pygame.Vector2(new_position)
 
         # Calculate the distance and a vector representing each step
         distance = current.distance_to(end)
@@ -242,7 +269,7 @@ class Turtle (Painter, metaclass=RedrawMetaClass):
         while distance > 0:
             # If the distance fits in the current step, do the whole thing
             if distance < self._pixels_remaining:
-                Painter.set_position(self, end)
+                Painter.position.fset(self, end)
                 self._pixels_remaining -= distance
                 distance = 0
 
@@ -250,36 +277,31 @@ class Turtle (Painter, metaclass=RedrawMetaClass):
             # until the next frame
             else:
                 current += self._pixels_remaining * delta_normal
-                Painter.set_position(self, current)
+                Painter.position.fset(self, current)
                 distance -= self._pixels_remaining
                 self._pixels_remaining = self._step_size
                 if active_screen is not None and self in active_screen:
                     active_screen.redraw()
                 self.clock.tick(self._frame_rate)
 
+    # Overwrite the position property with the original getter and the new setter
+    position = property(Painter.position.fget, _set_position)
 
-    def set_direction (self, direction):
-        '''
-        Change the direction that the sprite is pointing.
 
-        The direction is an angle (in degrees) counterclockwise from the 
-        positive x-axis.  Here are some important directions:
-         - 0 degrees is directly to the right
-         - 90 degrees is directly up
-         - 180 degrees is directly to the left
-         - 270 degrees is directly down
-
-        If the given direction is an angle larger than the current direction,
-        the turtle will turn left.  If it is smaller, than the turtle will turn
-        right.
-        '''
+    # This will replace the direction setter.  It makes it so that, if
+    # animation is on, then the turtle will only turn an arc length of 
+    # _step_size pixels each frame.
+    def _set_direction (self, direction):
 
         # Get the active screen.
         active_screen = get_active_screen()
 
+        # Get the Painter direction.setter
+        parent_setter = super(Turtle, Turtle).direction.fset
+
         # If the animations are turned off, just use the parent class method.
         if not self._animate:
-            Painter.set_direction(self, direction)
+            Painter.direction.fset(self, direction)
             return
 
         # Calculate the arc length of the rotation of the turtle's head
@@ -290,7 +312,7 @@ class Turtle (Painter, metaclass=RedrawMetaClass):
         while arc_length != 0:
             # If the arc_length fits in the current step, do the whole thing
             if abs(arc_length) < self._pixels_remaining:
-                Painter.set_direction(self, direction)
+                Painter.direction.fset(self, direction)
                 self._pixels_remaining -= arc_length
                 arc_length = 0
 
@@ -299,15 +321,18 @@ class Turtle (Painter, metaclass=RedrawMetaClass):
             else:
                 turn_arc_length = 3.6 * self._pixels_remaining / self._scale.x
                 if arc_length > 0:
-                    Painter.set_direction(self, self._dir + turn_arc_length)
+                    Painter.direction.fset(self, self._dir + turn_arc_length)
                     arc_length -= self._pixels_remaining
                 else:
-                    Painter.set_direction(self, self._dir - turn_arc_length)
+                    Painter.direction.fset(self, self._dir - turn_arc_length)
                     arc_length += self._pixels_remaining
                 self._pixels_remaining = self._step_size
                 if active_screen is not None and self in active_screen:
                     active_screen.redraw()
                 self.clock.tick(self._frame_rate)
+
+    # Overwrite the direction property with the original getter and the new setter
+    direction = property(Painter.direction.fget, _set_direction)
 
 
 # What is included when importing *

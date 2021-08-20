@@ -206,27 +206,11 @@ class Painter (Sprite):
             for _ in range(int(distance / self._stepsize) + 1):
                 pygame.draw.circle(canvas, self._linecolor_obj, current, radius)
                 current += delta
-
-    @property
-    def position (self):
-        '''
-        The current the position of the sprite on the screen.
-
-        The position is a pair of coordinates (x and y) which represent the
-        distance that the sprite is from the center of the screen.  That is,
-        the center of the screen is (0, 0) and the x-coordinate and y-coordinate 
-        represent respectively how far horizontally and vertically the sprite is 
-        from there.  Think of the screen as the traditional 2D coordinate plane
-        used in mathematics.
-
-        If the position is changed and the sprite is drawing a line or fill, 
-        these will be extended to the new position.
-        '''
-
-        return super().position
                 
-    @position.setter
-    def position (self, new_position):
+    
+    # This will replace the position setter.  It makes it so that, if
+    # drawing or filling is on, that stuff is drawn to the screen's canvas
+    def _set_position (self, new_position):
 
         # Actually move the sprite and get the start and end points
         start = self._pos
@@ -242,6 +226,8 @@ class Painter (Sprite):
         # Draw the line
         if self._drawing:
             self._draw_line(start, self._pos)
+
+    position = property(Sprite.position.fget, _set_position)
 
 
     def walk_path (self, *path, turn=True):

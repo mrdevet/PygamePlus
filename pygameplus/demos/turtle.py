@@ -2,6 +2,7 @@
 # Date: June 11, 2021
 # Purpose: Illustrate new features of the pygameplus.turtle module
 
+import code
 from pygameplus import Screen, start_event_loop
 from pygameplus.turtle import *
 
@@ -15,29 +16,36 @@ def main ():
     screen.add(michaelangelo)
 
     michaelangelo.begin_line()
-    michaelangelo.set_line_color("blue")
-    michaelangelo.set_line_width(5)
+    michaelangelo.line_color = "blue"
+    michaelangelo.line_width = 5
 
     michaelangelo.move_forward(99)
     michaelangelo.turn_left(90)
 
-    michaelangelo.set_speed(480)
+    michaelangelo.speed = 480
     michaelangelo.move_forward(99)
     michaelangelo.turn_left(90)
 
-    michaelangelo.set_speed(60)
-    michaelangelo.disable_animations()
+    michaelangelo.speed = 60
+    michaelangelo.animate = False
     michaelangelo.move_forward(99)
     michaelangelo.turn_left(90)
     michaelangelo.move_forward(99)
     michaelangelo.turn_left(180)
 
-    michaelangelo.enable_animations()
+    michaelangelo.animate = True
 
-    michaelangelo.set_fill_color("red")
+    michaelangelo.fill_color = "red"
     michaelangelo.begin_fill()
     michaelangelo.circle(50)
     michaelangelo.end_fill()
+
+    main_vars = locals()
+
+    def interact ():
+        code.interact(local=main_vars)
+
+    screen.on_key_press(interact, "escape")
 
     start_event_loop()
 
