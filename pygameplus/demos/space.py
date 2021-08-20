@@ -22,7 +22,7 @@ screen.add(ship)
 # We can scale the image of a turtle.  In this example, 
 # the ship's image is scaled by a factor of 0.1 (or 10%)
 ship.smooth = True
-ship.scale = 0.1
+ship.scale_factor = 0.1
 
 # The image for a turtle can be rotated.  This function
 # sets that the image should rotate whenever the turtle's
@@ -98,7 +98,7 @@ with resources.path("pygameplus.demos", "ufo.png") as image_path:
     ufo = Sprite(image_path)
 screen.add(ufo)
 ufo.smooth = True
-ufo.scale = 0.25
+ufo.scale_factor = 0.25
 ufo.position = (0, 100)
 
 # Function that moves the ufo forward

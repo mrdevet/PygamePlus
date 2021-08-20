@@ -93,7 +93,7 @@ class Sprite (pygame.sprite.Sprite):
         self._move_ratio = pygame.Vector2(1, 0)
 
         # Scale and rotation attributes
-        self._scale = pygame.Vector2(1, 1)
+        self._scale = 1
         self._dirty_scale = False
         self._smooth = False
         self._rotates = False
@@ -235,12 +235,166 @@ class Sprite (pygame.sprite.Sprite):
         return self._pos.y
 
     @y.setter
-    def y (self, y):
+    def y (self, new_y):
 
         try:
-            self.position = new_x, self._pos.y
+            self.position = self._pos.x, new_y
         except:
             raise ValueError("Invalid y-coordinate!") from None
+
+
+    @property
+    def center_x (self):
+        return self._pos.x
+
+    @center_x.setter
+    def center_x (self, new_coordinate):
+        self.x = new_coordinate
+
+
+    @property
+    def center_y (self):
+        return self._pos.y
+
+    @center_x.setter
+    def center_y (self, new_coordinate):
+        self.y = new_coordinate
+
+
+    @property
+    def left_edge (self):
+        return self.center_x - self.width / 2
+
+    @left_edge.setter
+    def left_edge (self, new_coordinate):
+        self.center_x = new_coordinate + self.width / 2
+
+
+    @property
+    def right_edge (self):
+        return self.center_x + self.width / 2
+
+    @right_edge.setter
+    def right_edge (self, new_coordinate):
+        self.center_x = new_coordinate - self.width / 2
+
+    
+    @property
+    def top_edge (self):
+        return self.center_y + self.height / 2
+
+    @top_edge.setter
+    def top_edge (self, new_coordinate):
+        self.center_y = new_coordinate - self.height / 2
+
+    
+    @property
+    def bottom_edge (self):
+        return self.center_y - self.height / 2
+
+    @bottom_edge.setter
+    def bottom_edge (self, new_coordinate):
+        self.center_y = new_coordinate + self.height / 2
+
+
+    @property
+    def top_left_corner (self):
+        width, height = self.size
+        return self.center_x - width / 2, self.center_y + height / 2
+
+    @top_left_corner.setter
+    def top_left_corner (self, new_coordinates):
+        try:
+            self.left_edge, self.top_edge = new_coordinates
+        except:
+            raise ValueError("Invalid coordinates!")
+
+
+    @property
+    def bottom_left_corner (self):
+        width, height = self.size
+        return self.center_x - width / 2, self.center_y - height / 2
+
+    @bottom_left_corner.setter
+    def bottom_left_corner (self, new_coordinates):
+        try:
+            self.left_edge, self.bottom_edge = new_coordinates
+        except:
+            raise ValueError("Invalid coordinates!")
+
+
+    @property
+    def top_right_corner (self):
+        width, height = self.size
+        return self.center_x + width / 2, self.center_y + height / 2
+
+    @top_right_corner.setter
+    def top_right_corner (self, new_coordinates):
+        try:
+            self.right_edge, self.top_edge = new_coordinates
+        except:
+            raise ValueError("Invalid coordinates!")
+
+
+    @property
+    def bottom_right_corner (self):
+        width, height = self.size
+        return self.center_x + width / 2, self.center_y - height / 2
+
+    @bottom_right_corner.setter
+    def bottom_right_corner (self, new_coordinates):
+        try:
+            self.right_edge, self.bottom_edge = new_coordinates
+        except:
+            raise ValueError("Invalid coordinates!")
+
+
+    @property
+    def left_edge_midpoint (self):
+        return self.center_x - self.width / 2, self.center_y
+
+    @left_edge_midpoint.setter
+    def left_edge_midpoint (self, new_coordinates):
+        try:
+            self.left_edge, self.center_y = new_coordinates
+        except:
+            raise ValueError("Invalid coordinates!")
+
+
+    @property
+    def right_edge_midpoint (self):
+        return self.center_x + self.width / 2, self.center_y
+
+    @right_edge_midpoint.setter
+    def right_edge_midpoint (self, new_coordinates):
+        try:
+            self.right_edge, self.center_y = new_coordinates
+        except:
+            raise ValueError("Invalid coordinates!")
+
+
+    @property
+    def top_edge_midpoint (self):
+        return self.center_x, self.center_y + self.height / 2
+
+    @top_edge_midpoint.setter
+    def top_edge_midpoint (self, new_coordinates):
+        try:
+            self.center_x, self.top_edge = new_coordinates
+        except:
+            raise ValueError("Invalid coordinates!")
+
+
+    @property
+    def bottom_edge_midpoint (self):
+        return self.center_x, self.center_y - self.height / 2
+
+    @bottom_edge_midpoint.setter
+    def bottom_edge_midpoint (self, new_coordinates):
+        try:
+            self.center_x, self.bottom_edge = new_coordinates
+        except:
+            raise ValueError("Invalid coordinates!")
 
 
     ### Direction Methods
@@ -329,82 +483,84 @@ class Sprite (pygame.sprite.Sprite):
     ### Scaling and Rotating Image Methods
 
     @property
-    def scale (self):
+    def scale_factor (self):
         '''
-        The factors by which the image's width and height are scaled, respectively.
+        The factor by which the image's width and height are scaled.
 
         If the factor is greater than 1, then the image is enlarged by multiplying
         its original dimension by that number.  If factor is less than 1, then 
         the image is shrunk by multiplying its original dimension by that 
         number.  If factor equals 1, then the image is scaled to its original 
         size.
-
-        If you set this property to a single number, both the width and height
-        will be scaled by that factor.
         '''
 
-        return tuple(self._scale)
+        return self._scale
 
-    @scale.setter
-    def scale (self, new_factors):
+    @scale_factor.setter
+    def scale_factor (self, new_factor):
 
-        # If a tuple of length 2 is given, assume two different factors
-        if isinstance(new_factors, tuple) and len(new_factors) == 2:
-            try:
-                self._scale = pygame.Vector2(new_factors)
-            except:
-                raise ValueError("Invalid scale factors!") from None
+        # Ensure that the factor is a number
+        try:
+            new_factor = float(new_factor)
+        except:
+            raise ValueError("The scale factor must be a number!") from None
+
+        # Ensure that the factor is positive
+        if new_factor <= 0:
+            raise ValueError("The scale factor must be positive!") from None
 
         # Otherwise, assume just one factor
-        else:
-            try:
-                self._scale = pygame.Vector2(new_factors, new_factors)
-            except:
-                raise ValueError("Invalid scale factor!") from None
+        self._scale = new_factor
 
         # Flag that the image may have been scaled and needs to be updated
         self._dirty_scale = True
-        self._dirty_mask = True
 
 
     @property
-    def scale_width (self):
+    def width (self):
         '''
-        The factor by which the image's width is scaled.
-
-        If the factor is greater than 1, then the image is enlarged by multiplying
-        its original width by that number.  If factor is less than 1, then 
-        the image is shrunk by multiplying its original width by that 
-        number.  If factor equals 1, then the image is scaled to its original 
-        width.
+        The width of the sprite's image.
         '''
 
-        return self._scale.x
+        diagonal = pygame.Vector2(self._original.get_size()) * self._scale
+        diagonal.rotate_ip(self._dir + self._tilt if self._rotates else self._tilt)
+        return abs(diagonal.x)
 
-    @scale_width.setter
-    def scale_width (self, new_factor):
+    @width.setter
+    def width (self, new_width):
 
-        self.scale = new_factor, self._scale.y
+        diagonal = pygame.Vector2(self._original.get_size())
+        diagonal.rotate_ip(self._dir + self._tilt if self._rotates else self._tilt)
+        self.scale_factor = new_width / abs(diagonal.x)
 
 
     @property
-    def scale_height (self):
+    def height (self):
         '''
-        The factor by which the image's height is scaled.
-
-        If the factor is greater than 1, then the image is enlarged by multiplying
-        its original height by that number.  If factor is less than 1, then 
-        the image is shrunk by multiplying its original height by that 
-        number.  If factor equals 1, then the image is scaled to its original 
-        height.
+        The height of the sprite's image.
         '''
 
-        return self._scale.x
+        diagonal = pygame.Vector2(self._original.get_size()) * self._scale
+        diagonal.rotate_ip(self._dir + self._tilt if self._rotates else self._tilt)
+        return abs(diagonal.y)
 
-    @scale_height.setter
-    def scale_height (self, new_factor):
+    @height.setter
+    def height (self, new_height):
 
-        self.scale = self._scale.x, new_factor
+        diagonal = pygame.Vector2(self._original.get_size())
+        diagonal.rotate_ip(self._dir + self._tilt if self._rotates else self._tilt)
+        self.scale_factor = new_height / abs(diagonal.y)
+
+
+    @property
+    def size (self):
+        '''
+        The dimensions (width and height) of the sprite's image
+        '''
+
+        diagonal = pygame.Vector2(self._original.get_size()) * self._scale
+        diagonal.rotate_ip(self._dir + self._tilt if self._rotates else self._tilt)
+        return abs(diagonal.x), abs(diagonal.y)
 
 
     @property
@@ -577,12 +733,11 @@ class Sprite (pygame.sprite.Sprite):
     ### Update Method
 
     # Helper method that scales and/or rotates the image if it is dirty    
-    def _clean_image (self):
+    def _clean_image (self, screen=None):
         # If the image is a polygon, scale and rotate the points before drawing it
         if isinstance(self._original, tuple):
             if self._dirty_scale:
-                self._scaled = tuple([self._scale.elementwise() * p for p in 
-                                      self._original])
+                self._scaled = tuple([self._scale * p for p in self._original])
                 self._dirty_rotate = True
                 self._dirty_scale = False
             
@@ -591,16 +746,14 @@ class Sprite (pygame.sprite.Sprite):
                 self._rotated = tuple([p.rotate(angle) for p in self._scaled])
                 self._dirty_rotate = False
                 self.image = pgputils.polygon_to_surface(self._rotated, 
-                                self._linecolor,
-                                self._fillcolor,
-                                round((self._scale.x + self._scale.y) // 2))
+                                self._linecolor, self._fillcolor, round(self._scale))
 
         # Otherwise, scale and rotate the surfaces
         else:
             if self._dirty_scale:
                 orig_width, orig_height = self._original.get_size()
-                new_width = round(self._scale.x * orig_width)
-                new_height = round(self._scale.y * orig_height)
+                new_width = round(self._scale * orig_width)
+                new_height = round(self._scale * orig_height)
                 if self._smooth:
                     self._scaled = pygame.transform.smoothscale(
                             self._original, (new_width, new_height))
@@ -613,14 +766,18 @@ class Sprite (pygame.sprite.Sprite):
             if self._dirty_rotate:
                 angle = self._dir + self._tilt if self._rotates else self._tilt
                 if self._smooth:
-                    self._rotated = pygame.transform.rotozoom(self._scaled, angle, 1)
+                    self._rotated = pygame.transform.rotozoom(
+                            self._scaled, angle, 1)
                 else:
                     self._rotated = pygame.transform.rotate(self._scaled, angle)
                 self.image = self._rotated
                 self._dirty_rotate = False
 
+        # Update the enclosing rect
+        self.rect.size = self.image.get_size()
+
     # Helper method that determines the image's mask if it is dirty
-    def _clean_mask (self):
+    def _clean_mask (self, screen=None):
         if self._dirty_mask:
             self.mask = pygame.mask.from_surface(self.image)
             self._dirty_mask = False
@@ -639,8 +796,7 @@ class Sprite (pygame.sprite.Sprite):
             pgputils.call_with_args(self._on_update_func, sprite=self)
 
         # Update the sprite's .image and .rect attributes needed for drawing
-        self._clean_image()
-        self.rect = self.image.get_rect() 
+        self._clean_image(screen)
         if screen is None:
             self.rect.center = to_pygame_coordinates(self._pos)
         else:
@@ -935,7 +1091,6 @@ class Sprite (pygame.sprite.Sprite):
             self._drag_funcs[button - 1] = func
         else:
             raise ValueError("Invalid button!")
-
 
         
 # What is included when importing *

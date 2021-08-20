@@ -41,6 +41,7 @@ def main ():
     michaelangelo.end_fill()
 
     main_vars = locals()
+    main_vars["ma"] = michaelangelo
 
     def interact ():
         code.interact(local=main_vars)
