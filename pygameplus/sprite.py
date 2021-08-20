@@ -245,65 +245,100 @@ class Sprite (pygame.sprite.Sprite):
 
     @property
     def center_x (self):
+        '''
+        The x-coordinate of the center of the sprite's image.
+        '''
+
         return self._pos.x
 
     @center_x.setter
     def center_x (self, new_coordinate):
+
         self.x = new_coordinate
 
 
     @property
     def center_y (self):
+        '''
+        The y-coordinate of the center of the sprite's image.
+        '''
+
         return self._pos.y
 
     @center_x.setter
     def center_y (self, new_coordinate):
+
         self.y = new_coordinate
 
 
     @property
     def left_edge (self):
+        '''
+        The x-coordinate of the left edge of the sprite's image.
+        '''
+
         return self.center_x - self.width / 2
 
     @left_edge.setter
     def left_edge (self, new_coordinate):
+
         self.center_x = new_coordinate + self.width / 2
 
 
     @property
     def right_edge (self):
+        '''
+        The x-coordinate of the right edge of the sprite's image.
+        '''
+
         return self.center_x + self.width / 2
 
     @right_edge.setter
     def right_edge (self, new_coordinate):
+
         self.center_x = new_coordinate - self.width / 2
 
     
     @property
     def top_edge (self):
+        '''
+        The y-coordinate of the top edge of the sprite's image.
+        '''
+
         return self.center_y + self.height / 2
 
     @top_edge.setter
     def top_edge (self, new_coordinate):
+
         self.center_y = new_coordinate - self.height / 2
 
     
     @property
     def bottom_edge (self):
+        '''
+        The y-coordinate of the bottom edge of the sprite's image.
+        '''
+
         return self.center_y - self.height / 2
 
     @bottom_edge.setter
     def bottom_edge (self, new_coordinate):
+
         self.center_y = new_coordinate + self.height / 2
 
 
     @property
     def top_left_corner (self):
+        '''
+        The coordinates of the top left corner of the sprite's image.
+        '''
+
         width, height = self.size
         return self.center_x - width / 2, self.center_y + height / 2
 
     @top_left_corner.setter
     def top_left_corner (self, new_coordinates):
+
         try:
             self.left_edge, self.top_edge = new_coordinates
         except:
@@ -312,11 +347,16 @@ class Sprite (pygame.sprite.Sprite):
 
     @property
     def bottom_left_corner (self):
+        '''
+        The coordinates of the bottom left corner of the sprite's image.
+        '''
+
         width, height = self.size
         return self.center_x - width / 2, self.center_y - height / 2
 
     @bottom_left_corner.setter
     def bottom_left_corner (self, new_coordinates):
+
         try:
             self.left_edge, self.bottom_edge = new_coordinates
         except:
@@ -325,11 +365,16 @@ class Sprite (pygame.sprite.Sprite):
 
     @property
     def top_right_corner (self):
+        '''
+        The coordinates of the top right corner of the sprite's image.
+        '''
+
         width, height = self.size
         return self.center_x + width / 2, self.center_y + height / 2
 
     @top_right_corner.setter
     def top_right_corner (self, new_coordinates):
+
         try:
             self.right_edge, self.top_edge = new_coordinates
         except:
@@ -338,11 +383,16 @@ class Sprite (pygame.sprite.Sprite):
 
     @property
     def bottom_right_corner (self):
+        '''
+        The coordinates of the bottom right corner of the sprite's image.
+        '''
+
         width, height = self.size
         return self.center_x + width / 2, self.center_y - height / 2
 
     @bottom_right_corner.setter
     def bottom_right_corner (self, new_coordinates):
+
         try:
             self.right_edge, self.bottom_edge = new_coordinates
         except:
@@ -351,10 +401,15 @@ class Sprite (pygame.sprite.Sprite):
 
     @property
     def left_edge_midpoint (self):
+        '''
+        The coordinates of the midpoint of the left edge of the sprite's image.
+        '''
+
         return self.center_x - self.width / 2, self.center_y
 
     @left_edge_midpoint.setter
     def left_edge_midpoint (self, new_coordinates):
+
         try:
             self.left_edge, self.center_y = new_coordinates
         except:
@@ -363,10 +418,15 @@ class Sprite (pygame.sprite.Sprite):
 
     @property
     def right_edge_midpoint (self):
+        '''
+        The coordinates of the midpoint of the right edge of the sprite's image.
+        '''
+
         return self.center_x + self.width / 2, self.center_y
 
     @right_edge_midpoint.setter
     def right_edge_midpoint (self, new_coordinates):
+
         try:
             self.right_edge, self.center_y = new_coordinates
         except:
@@ -375,10 +435,15 @@ class Sprite (pygame.sprite.Sprite):
 
     @property
     def top_edge_midpoint (self):
+        '''
+        The coordinates of the midpoint of the top edge of the sprite's image.
+        '''
+
         return self.center_x, self.center_y + self.height / 2
 
     @top_edge_midpoint.setter
     def top_edge_midpoint (self, new_coordinates):
+
         try:
             self.center_x, self.top_edge = new_coordinates
         except:
@@ -387,10 +452,15 @@ class Sprite (pygame.sprite.Sprite):
 
     @property
     def bottom_edge_midpoint (self):
+        '''
+        The coordinates of the midpoint of the bottom edge of the sprite's image.
+        '''
+
         return self.center_x, self.center_y - self.height / 2
 
     @bottom_edge_midpoint.setter
     def bottom_edge_midpoint (self, new_coordinates):
+        
         try:
             self.center_x, self.bottom_edge = new_coordinates
         except:

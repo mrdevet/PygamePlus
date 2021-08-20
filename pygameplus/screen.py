@@ -422,6 +422,13 @@ class Screen (pygame.sprite.LayeredUpdates):
 
     
     def redraw (self):
+        '''
+        Update and draw the screen in the open window.
+
+        This method calls update() and draw(), then flips the changes to the 
+        visible screen.
+        '''
+
         self.update()
         self.draw()
         pygame.display.flip()
