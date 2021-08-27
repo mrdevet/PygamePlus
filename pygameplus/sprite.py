@@ -216,6 +216,9 @@ class Sprite (pygame.sprite.Sprite):
         self._dirty_rotate = True
         self._dirty_mask = True
 
+        # Adjust the anchor if necessary
+        self.anchor = self._anchor
+
 
     @property
     def opacity (self):
