@@ -179,6 +179,19 @@ class Sprite (pygame.sprite.Sprite):
 
     @property
     def anchor (self):
+        '''
+        The point on the image that will be placed on the sprite's position
+        and used as the center of gravity for scaling and rotation.
+
+        The anchor point is a 2-tuple that can be:
+         - a point relative to the center of the image (e.g. `(50, -25)`)
+         - position descriptions including "center", "left", "right", "bottom" 
+           and "top" (e.g. `("left", "center")`)
+         - a combination of the two (e.g. `("center", -25)`)
+
+        Note that the anchor is relative to the original image and scaling 
+        and rotation are done after the image is placed at the anchor point.
+        '''
 
         return tuple(self._anchor)
 
