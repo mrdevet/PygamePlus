@@ -453,8 +453,14 @@ class Screen (pygame.sprite.LayeredUpdates):
             self._key_press_funcs[None] = func
         elif isinstance(key, str):
             self._key_press_funcs[pygame.key.key_code(key)] = func
-        else:
+        elif isinstance(key, int):
             self._key_press_funcs[key] = func
+        else:
+            try:
+                for k in key:
+                    self.on_key_press(func, k)
+            except:
+                raise ValueError("Invalid key!") from None
 
 
     def on_key_release (self, func, key=None):
@@ -474,8 +480,14 @@ class Screen (pygame.sprite.LayeredUpdates):
             self._key_release_funcs[None] = func
         elif isinstance(key, str):
             self._key_release_funcs[pygame.key.key_code(key)] = func
-        else:
+        elif isinstance(key, int):
             self._key_release_funcs[key] = func
+        else:
+            try:
+                for k in key:
+                    self.on_key_release(func, k)
+            except:
+                raise ValueError("Invalid key!") from None
 
     
     def on_key_hold (self, func, key=None):
@@ -498,8 +510,14 @@ class Screen (pygame.sprite.LayeredUpdates):
             self._key_hold_funcs[None] = func
         elif isinstance(key, str):
             self._key_hold_funcs[pygame.key.key_code(key)] = func
-        else:
+        elif isinstance(key, int):
             self._key_hold_funcs[key] = func
+        else:
+            try:
+                for k in key:
+                    self.on_key_hold(func, k)
+            except:
+                raise ValueError("Invalid key!") from None
 
 
     def on_click (self, func, button=1):

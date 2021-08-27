@@ -102,3 +102,16 @@ def call_with_args (func, **args):
 
     # Call the function
     func(*pos_args, **kw_args)
+
+
+def load_picture (picture):
+    '''
+    Load a picture into your program.
+
+    This is useful if you will be changing the picture of a Sprite often.
+    You can load the picture once and then change the picture to this
+    object.
+
+    This function returns a pygame Surface.
+    '''
+    return pygame.image.load(picture).convert_alpha()

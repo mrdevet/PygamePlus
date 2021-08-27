@@ -81,6 +81,7 @@ class Sprite (pygame.sprite.Sprite):
         pygame.sprite.Sprite.__init__(self)
 
         # Handle the image
+        self._image = image
         if image is None:
             self._original = pygame.Surface((1, 1), pygame.SRCALPHA)
         elif isinstance(image, tuple) or isinstance(image, list):
@@ -173,6 +174,46 @@ class Sprite (pygame.sprite.Sprite):
         active_screen = get_active_screen()
         if active_screen is not None:
             self.remove(active_screen)
+
+
+    ### Image property
+
+    @property
+    def picture (self):
+        '''
+        The sprite's current picture.
+
+        The picture can be:
+         - The name of an image file.
+         - A list of points that create a polygon.
+         - A pygame Surface image.
+         - A predefined polygon (e.g. "circle", "square", "turtle")
+         - `None`, in which case the sprite will be a 1x1 transparent pixel.
+        '''
+
+        return self._image
+
+    @picture.setter
+    def picture (self, new_image):
+
+        # Handle the image
+        if new_image is None:
+            self._original = pygame.Surface((1, 1), pygame.SRCALPHA)
+        elif isinstance(new_image, tuple) or isinstance(new_image, list):
+            self._original = tuple([pygame.Vector2(p) for p in new_image])
+        elif isinstance(new_image, pygame.Surface):
+            self._original = new_image
+        else:
+            new_image = str(new_image)
+            if new_image in pgputils.polygon_images:
+                self._original = pgputils.polygon_images[new_image]
+            else:
+                self._original = pygame.image.load(new_image).convert_alpha()
+
+        # Set the dirty flags to ensure scaling and rotation
+        self._dirty_scale = True
+        self._dirty_rotate = True
+        self._dirty_mask = True
 
 
     ### Position Methods

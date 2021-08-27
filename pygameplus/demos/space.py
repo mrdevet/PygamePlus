@@ -16,7 +16,11 @@ with resources.path("pygameplus.demos", "space.jpg") as image_path:
 
 # # Create a "ship" turtle
 with resources.path("pygameplus.demos", "ship.png") as image_path:
-    ship = Painter(image_path)
+    ship_still_image = load_picture(image_path)
+with resources.path("pygameplus.demos", "ship2.png") as image_path:
+    ship_moving_image = load_picture(image_path)
+
+ship = Painter(ship_still_image)
 screen.add(ship)
 
 # We can scale the image of a turtle.  In this example, 
@@ -60,11 +64,6 @@ def on_up ():
     ship.move_forward(2)
     wrap_around()
 
-# Function that moves the ship backward
-def on_down ():
-    ship.move_backward(2)
-    wrap_around()
-
 # Function that turns the ship left
 def on_left ():
     ship.turn_left(5)
@@ -75,11 +74,11 @@ def on_right ():
 
 # Function that changes the ship to the moving image
 def start_ship ():
-    pass
+    ship.picture = ship_moving_image
 
 # Function that changes the ship to the stopped image
 def stop_ship ():
-    pass
+    ship.picture = ship_still_image
 
 # Function that starts and stops drawing
 def toggle_drawing ():
@@ -94,10 +93,10 @@ def draw_stamp ():
 
 # Bind the functions to keys
 screen.on_key_hold(on_up, "up")
-screen.on_key_hold(on_down, "down")
 screen.on_key_hold(on_left, "left")
 screen.on_key_hold(on_right, "right")
-# screen.on_key_press(start_ship, ["up", "down", "left", "right"])
+screen.on_key_press(start_ship, "up")
+screen.on_key_release(stop_ship, "up")
 screen.on_key_hold(esc, "escape")
 screen.on_key_press(toggle_drawing, "space")
 screen.on_key_press(draw_dot, "d")
