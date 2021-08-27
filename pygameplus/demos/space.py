@@ -28,6 +28,7 @@ ship.scale_factor = 0.1
 # sets that the image should rotate whenever the turtle's
 # heading changes
 ship.rotates = True
+ship.anchor = 0, -125
 
 # Tilt the image so that the ship points in the same direction
 # as the heading
@@ -72,6 +73,14 @@ def on_left ():
 def on_right ():
     ship.turn_right(5)
 
+# Function that changes the ship to the moving image
+def start_ship ():
+    pass
+
+# Function that changes the ship to the stopped image
+def stop_ship ():
+    pass
+
 # Function that starts and stops drawing
 def toggle_drawing ():
     ship.filling = not ship.filling
@@ -88,6 +97,7 @@ screen.on_key_hold(on_up, "up")
 screen.on_key_hold(on_down, "down")
 screen.on_key_hold(on_left, "left")
 screen.on_key_hold(on_right, "right")
+# screen.on_key_press(start_ship, ["up", "down", "left", "right"])
 screen.on_key_hold(esc, "escape")
 screen.on_key_press(toggle_drawing, "space")
 screen.on_key_press(draw_dot, "d")

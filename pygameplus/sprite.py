@@ -29,6 +29,24 @@ from pygameplus import pgputils
 from pygameplus.screen import get_active_screen, to_pygame_coordinates
 
 ################################################################################
+#                               HELPER FUNCTIONS
+################################################################################
+
+def get_dimensions (obj, tilt, scale, rotation):
+    if isinstance(obj, pygame.Surface):
+        dims = pygame.Vector2(obj.get_size())
+    else:
+        dims = pygame.Vector2(obj)
+    diag_1 = dims * scale
+    diag_2 = diag_1.reflect(pygame.Vector2(1, 0))
+    angle = tilt + rotation
+    diag_1.rotate_ip(angle)
+    diag_2.rotate_ip(angle)
+    width = max(abs(diag_1.x), abs(diag_2.x))
+    height = max(abs(diag_1.y), abs(diag_2.y))
+    return pygame.Vector2(width, height)
+
+################################################################################
 #                                 SPRITE CLASS
 ################################################################################
 
@@ -160,6 +178,51 @@ class Sprite (pygame.sprite.Sprite):
     ### Position Methods
 
     @property
+    def anchor (self):
+
+        return tuple(self._anchor)
+
+    @anchor.setter
+    def anchor (self, new_anchor):
+        
+        # Ensure that the anchor is a 2-tuple
+        try:
+            anchor_x, anchor_y = new_anchor
+        except:
+            raise ValueError("The anchor must be a 2-tuple!")
+
+        # Turn the x value into a number
+        if anchor_x == "left":
+            anchor_x = - self._original.get_width() / 2
+        elif anchor_x == "right":
+            anchor_x = self._original.get_width() / 2
+        elif anchor_x in ["center", "middle"]:
+            anchor_x = 0
+        else:
+            try:
+                anchor_x = float(anchor_x)
+            except:
+                raise ValueError("Invalid anchor x value!")
+
+        # Turn the y value into a number
+        if anchor_y == "bottom":
+            anchor_y = - self._original.get_height() / 2
+        elif anchor_y == "top":
+            anchor_y = self._original.get_height() / 2
+        elif anchor_y in ["center", "middle"]:
+            anchor_y = 0
+        else:
+            try:
+                anchor_y = float(anchor_y)
+            except:
+                raise ValueError("Invalid anchor y value!")
+
+        # Set the anchor vector
+        self._anchor = new_anchor
+        self._anchor_vec = pygame.Vector2(anchor_x, anchor_y)
+
+
+    @property
     def position (self):
         '''
         The current the position of the sprite on the screen.
@@ -210,51 +273,6 @@ class Sprite (pygame.sprite.Sprite):
 
         # Move the sprite
         self.position = pygame.Vector2(x, y)
-
-
-    @property
-    def anchor (self):
-
-        return tuple(self._anchor)
-
-    @anchor.setter
-    def anchor (self, new_anchor):
-        
-        # Ensure that the anchor is a 2-tuple
-        try:
-            anchor_x, anchor_y = new_anchor
-        except:
-            raise ValueError("The anchor must be a 2-tuple!")
-
-        # Turn the x value into a number
-        if anchor_x == "left":
-            anchor_x = -self.width / 2
-        elif anchor_x == "right":
-            anchor_x = self.width / 2
-        elif anchor_x in ["center", "middle"]:
-            anchor_x = 0
-        else:
-            try:
-                anchor_x = float(anchor_x)
-            except:
-                raise ValueError("Invalid anchor x value!")
-
-        # Turn the y value into a number
-        if anchor_y == "bottom":
-            anchor_y = -self.height / 2
-        elif anchor_y == "top":
-            anchor_y = self.height / 2
-        elif anchor_y in ["center", "middle"]:
-            anchor_y = 0
-        else:
-            try:
-                anchor_y = float(anchor_y)
-            except:
-                raise ValueError("Invalid anchor y value!")
-
-        # Set the anchor vector
-        self._anchor = new_anchor
-        self._anchor_vec = pygame.Vector2(anchor_x, anchor_y)
 
 
     @property
@@ -639,16 +657,15 @@ class Sprite (pygame.sprite.Sprite):
         The width of the sprite's image.
         '''
 
-        diagonal = pygame.Vector2(self._original.get_size()) * self._scale
-        diagonal.rotate_ip(self._dir + self._tilt if self._rotates else self._tilt)
-        return abs(diagonal.x)
+        return get_dimensions(self._original, self._tilt, self._scale, 
+                              self._dir if self._rotates else 0).x
 
     @width.setter
     def width (self, new_width):
 
-        diagonal = pygame.Vector2(self._original.get_size())
-        diagonal.rotate_ip(self._dir + self._tilt if self._rotates else self._tilt)
-        self.scale_factor = new_width / abs(diagonal.x)
+        div = get_dimensions(self._original, self._tilt, 1, 
+                             self._dir if self._rotates else 0).x
+        self.scale_factor = new_width / div
 
 
     @property
@@ -657,16 +674,15 @@ class Sprite (pygame.sprite.Sprite):
         The height of the sprite's image.
         '''
 
-        diagonal = pygame.Vector2(self._original.get_size()) * self._scale
-        diagonal.rotate_ip(self._dir + self._tilt if self._rotates else self._tilt)
-        return abs(diagonal.y)
+        return get_dimensions(self._original, self._tilt, self._scale, 
+                              self._dir if self._rotates else 0).y
 
     @height.setter
     def height (self, new_height):
 
-        diagonal = pygame.Vector2(self._original.get_size())
-        diagonal.rotate_ip(self._dir + self._tilt if self._rotates else self._tilt)
-        self.scale_factor = new_height / abs(diagonal.y)
+        div = get_dimensions(self._original, self._tilt, 1, 
+                             self._dir if self._rotates else 0).y
+        self.scale_factor = new_height / div
 
 
     @property
@@ -675,9 +691,8 @@ class Sprite (pygame.sprite.Sprite):
         The dimensions (width and height) of the sprite's image
         '''
 
-        diagonal = pygame.Vector2(self._original.get_size()) * self._scale
-        diagonal.rotate_ip(self._dir + self._tilt if self._rotates else self._tilt)
-        return abs(diagonal.x), abs(diagonal.y)
+        return tuple(get_dimensions(self._original, self._tilt, self._scale, 
+                                    self._dir if self._rotates else 0))
 
 
     @property
@@ -914,10 +929,12 @@ class Sprite (pygame.sprite.Sprite):
 
         # Update the sprite's .image and .rect attributes needed for drawing
         self._clean_image(screen)
+        offset_vec = self._scale * self._anchor_vec
+        offset_vec.rotate_ip(self._dir + self._tilt if self._rotates else self._tilt)
         if screen is None:
-            self.rect.center = to_pygame_coordinates(self._pos - self._anchor_vec)
+            self.rect.center = to_pygame_coordinates(self._pos - offset_vec)
         else:
-            self.rect.center = screen.to_pygame_coordinates(self._pos - self._anchor_vec)
+            self.rect.center = screen.to_pygame_coordinates(self._pos - offset_vec)
 
 
     ### Other Sprite Methods
