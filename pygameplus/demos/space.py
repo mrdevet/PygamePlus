@@ -109,6 +109,7 @@ screen.add(ufo)
 ufo.smooth = True
 ufo.scale_factor = 0.25
 ufo.position = (0, 100)
+ufo.opacity = 0.5
 
 # Function that moves the ufo forward
 def move_ufo ():

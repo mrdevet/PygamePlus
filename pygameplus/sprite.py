@@ -94,6 +94,7 @@ class Sprite (pygame.sprite.Sprite):
                 self._original = pgputils.polygon_images[image]
             else:
                 self._original = pygame.image.load(image).convert_alpha()
+        self._opacity = 1
             
 
         # The .image and .rect attributes are needed for drawing sprites
@@ -214,6 +215,34 @@ class Sprite (pygame.sprite.Sprite):
         self._dirty_scale = True
         self._dirty_rotate = True
         self._dirty_mask = True
+
+
+    @property
+    def opacity (self):
+        '''
+        The opacity of the Sprite's image.
+
+        The opacity is on a scale from 0 to 1.  An opacity of 0 means the 
+        picture is fully transparent.  An opacity of 1 means the picture
+        is fully opaque.
+        '''
+
+        return self._opacity
+
+    @opacity.setter
+    def opacity (self, new_opacity):
+
+        # Ensure that the opacity is a number
+        try:
+            new_opacity = float(new_opacity)
+        except:
+            raise ValueError("The opacity must be a number!")
+
+        # Ensure that the opacity is between 0 and 1
+        if new_opacity < 0 or new_opacity > 1:
+            raise ValueError("The opacity must be a value between 0 and 1!")
+
+        self._opacity = new_opacity
 
 
     ### Position Methods
@@ -983,6 +1012,7 @@ class Sprite (pygame.sprite.Sprite):
 
         # Update the sprite's .image and .rect attributes needed for drawing
         self._clean_image(screen)
+        self.image.set_alpha(int(self._opacity * 255))
         offset_vec = self._scale * self._anchor_vec
         offset_vec.rotate_ip(self._dir + self._tilt if self._rotates else self._tilt)
         if screen is None:
