@@ -1,21 +1,21 @@
 # Copyright 2021 Casey Devet
 #
-# Permission is hereby granted, free of charge, to any person obtaining a 
-# copy of this software and associated documentation files (the "Software"), 
-# to deal in the Software without restriction, including without limitation 
-# the rights to use, copy, modify, merge, publish, distribute, sublicense, 
-# and/or sell copies of the Software, and to permit persons to whom the 
+# Permission is hereby granted, free of charge, to any person obtaining a
+# copy of this software and associated documentation files (the "Software"),
+# to deal in the Software without restriction, including without limitation
+# the rights to use, copy, modify, merge, publish, distribute, sublicense,
+# and/or sell copies of the Software, and to permit persons to whom the
 # Software is furnished to do so, subject to the following conditions:
 #
-# The above copyright notice and this permission notice shall be included 
+# The above copyright notice and this permission notice shall be included
 # in all copies or substantial portions of the Software.
 #
-# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS 
-# OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, 
-# FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL 
-# THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER 
-# LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING 
-# FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER 
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
+# OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+# FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
+# THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+# LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+# FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 # DEALINGS IN THE SOFTWARE.
 
 ################################################################################
@@ -95,7 +95,7 @@ class Sprite (pygame.sprite.Sprite):
             else:
                 self._original = pygame.image.load(image).convert_alpha()
         self._opacity = 1
-            
+
 
         # The .image and .rect attributes are needed for drawing sprites
         # in a pygame group
@@ -229,7 +229,7 @@ class Sprite (pygame.sprite.Sprite):
         '''
         The opacity of the Sprite's image.
 
-        The opacity is on a scale from 0 to 1.  An opacity of 0 means the 
+        The opacity is on a scale from 0 to 1.  An opacity of 0 means the
         picture is fully transparent.  An opacity of 1 means the picture
         is fully opaque.
         '''
@@ -262,11 +262,11 @@ class Sprite (pygame.sprite.Sprite):
 
         The anchor point is a 2-tuple that can be:
          - a point relative to the center of the image (e.g. `(50, -25)`)
-         - position descriptions including "center", "left", "right", "bottom" 
+         - position descriptions including "center", "left", "right", "bottom"
            and "top" (e.g. `("left", "center")`)
          - a combination of the two (e.g. `("center", -25)`)
 
-        Note that the anchor is relative to the original image and scaling 
+        Note that the anchor is relative to the original image and scaling
         and rotation are done after the image is placed at the anchor point.
         '''
 
@@ -274,7 +274,7 @@ class Sprite (pygame.sprite.Sprite):
 
     @anchor.setter
     def anchor (self, new_anchor):
-        
+
         # Ensure that the anchor is a 2-tuple
         try:
             anchor_x, anchor_y = new_anchor
@@ -319,8 +319,8 @@ class Sprite (pygame.sprite.Sprite):
 
         The position is a pair of coordinates (x and y) which represent the
         distance that the sprite is from the center of the screen.  That is,
-        the center of the screen is (0, 0) and the x-coordinate and y-coordinate 
-        represent respectively how far horizontally and vertically the sprite is 
+        the center of the screen is (0, 0) and the x-coordinate and y-coordinate
+        represent respectively how far horizontally and vertically the sprite is
         from there.  Think of the screen as the traditional 2D coordinate plane
         used in mathematics.
         '''
@@ -340,8 +340,8 @@ class Sprite (pygame.sprite.Sprite):
         '''
         Turn the sprite and move the sprite to the given coordinates.
 
-        Unlike changing the position property, this method will also turn the 
-        sprite in the direction of the given location.  This behaviour can be 
+        Unlike changing the position property, this method will also turn the
+        sprite in the direction of the given location.  This behaviour can be
         turned of by setting the `turn` argument to `False`.
         '''
 
@@ -453,7 +453,7 @@ class Sprite (pygame.sprite.Sprite):
 
         self.center_x = new_coordinate - self.width / 2
 
-    
+
     @property
     def top_edge (self):
         '''
@@ -467,7 +467,7 @@ class Sprite (pygame.sprite.Sprite):
 
         self.center_y = new_coordinate - self.height / 2
 
-    
+
     @property
     def bottom_edge (self):
         '''
@@ -629,7 +629,7 @@ class Sprite (pygame.sprite.Sprite):
         '''
         The current direction that the sprite is pointing.
 
-        The direction is an angle (in degrees) counterclockwise from the 
+        The direction is an angle (in degrees) counterclockwise from the
         positive x-axis.  Here are some important directions:
          - 0 degrees is directly to the right
          - 90 degrees is directly up
@@ -651,7 +651,7 @@ class Sprite (pygame.sprite.Sprite):
         # Ensure that the direction is between 0 and 360
         self._dir %= 360
 
-        # Create a 2D vector that contains the amount that the x-coordinate 
+        # Create a 2D vector that contains the amount that the x-coordinate
         # and y-coordinate change if the sprite moves forward 1 pixel in this
         # direction
         self._move_ratio = pygame.Vector2(1, 0).rotate(self._dir)
@@ -668,7 +668,7 @@ class Sprite (pygame.sprite.Sprite):
 
         self.direction = direction
 
-        
+
     def turn_left (self, angle):
         '''
         Turn the sprite left (counterclockwise) by the given `angle`.
@@ -698,13 +698,13 @@ class Sprite (pygame.sprite.Sprite):
 
     def move_backward (self, distance):
         '''
-        Move the sprite by the given `distance` in the opposite of the 
+        Move the sprite by the given `distance` in the opposite of the
         direction it is currently pointing.
         '''
 
         self.position = self._pos - distance * self._move_ratio
 
-    
+
     ### Scaling and Rotating Image Methods
 
     @property
@@ -713,9 +713,9 @@ class Sprite (pygame.sprite.Sprite):
         The factor by which the image's width and height are scaled.
 
         If the factor is greater than 1, then the image is enlarged by multiplying
-        its original dimension by that number.  If factor is less than 1, then 
-        the image is shrunk by multiplying its original dimension by that 
-        number.  If factor equals 1, then the image is scaled to its original 
+        its original dimension by that number.  If factor is less than 1, then
+        the image is shrunk by multiplying its original dimension by that
+        number.  If factor equals 1, then the image is scaled to its original
         size.
         '''
 
@@ -747,13 +747,13 @@ class Sprite (pygame.sprite.Sprite):
         The width of the sprite's image.
         '''
 
-        return get_dimensions(self._original, self._tilt, self._scale, 
+        return get_dimensions(self._original, self._tilt, self._scale,
                               self._dir if self._rotates else 0).x
 
     @width.setter
     def width (self, new_width):
 
-        div = get_dimensions(self._original, self._tilt, 1, 
+        div = get_dimensions(self._original, self._tilt, 1,
                              self._dir if self._rotates else 0).x
         self.scale_factor = new_width / div
 
@@ -764,13 +764,13 @@ class Sprite (pygame.sprite.Sprite):
         The height of the sprite's image.
         '''
 
-        return get_dimensions(self._original, self._tilt, self._scale, 
+        return get_dimensions(self._original, self._tilt, self._scale,
                               self._dir if self._rotates else 0).y
 
     @height.setter
     def height (self, new_height):
 
-        div = get_dimensions(self._original, self._tilt, 1, 
+        div = get_dimensions(self._original, self._tilt, 1,
                              self._dir if self._rotates else 0).y
         self.scale_factor = new_height / div
 
@@ -781,7 +781,7 @@ class Sprite (pygame.sprite.Sprite):
         The dimensions (width and height) of the sprite's image
         '''
 
-        return tuple(get_dimensions(self._original, self._tilt, self._scale, 
+        return tuple(get_dimensions(self._original, self._tilt, self._scale,
                                     self._dir if self._rotates else 0))
 
 
@@ -803,7 +803,7 @@ class Sprite (pygame.sprite.Sprite):
         self._dirty_mask = True
 
 
-    @property    
+    @property
     def tilt (self):
         '''
         The angle that the image is tilted counterclockwise from its original
@@ -839,12 +839,12 @@ class Sprite (pygame.sprite.Sprite):
         '''
         Whether or not the image is smoothed when scaled or rotated.
 
-        By default, a quick and simple scale and rotation is applied.  This can 
+        By default, a quick and simple scale and rotation is applied.  This can
         cause images to be pixelated (when enlarged), loose detail (when shrunk),
-        or be distorted (when rotating).  If you set `smooth` to be `True`, then 
-        each new pixel will be sampled and an average color will be used.  This 
-        makes to scaled and rotated images be more smooth, but takes longer.  You 
-        may want to avoid smooth scaling if you will be scaling or rotating the 
+        or be distorted (when rotating).  If you set `smooth` to be `True`, then
+        each new pixel will be sampled and an average color will be used.  This
+        makes to scaled and rotated images be more smooth, but takes longer.  You
+        may want to avoid smooth scaling if you will be scaling or rotating the
         image very frequently.
         '''
 
@@ -870,7 +870,7 @@ class Sprite (pygame.sprite.Sprite):
         self._horizontal_flip = bool(new_setting)
 
         # Flag that the image may have flipped and needs to be transformed
-        self._dirty_flip
+        self._dirty_flip = True
 
 
     @property
@@ -887,7 +887,7 @@ class Sprite (pygame.sprite.Sprite):
         self._vertical_flip = bool(new_setting)
 
         # Flag that the image may have flipped and needs to be transformed
-        self._dirty_flip
+        self._dirty_flip = True
 
 
     @property
@@ -895,7 +895,7 @@ class Sprite (pygame.sprite.Sprite):
         '''
         Whether or not the original picture is flipped.
 
-        This property is a 2-tuple of booleans that contains whether 
+        This property is a 2-tuple of booleans that contains whether
         the image is flipped horizontally and vertically, respectively.
         '''
 
@@ -911,7 +911,7 @@ class Sprite (pygame.sprite.Sprite):
             raise ValueError("This setting must be a 2-tuple of boolean values!")
 
         # Flag that the image may have flipped and needs to be transformed
-        self._dirty_flip
+        self._dirty_flip = True
 
 
     ### Color and Width Methods for Polygons
@@ -927,7 +927,7 @@ class Sprite (pygame.sprite.Sprite):
          - A set of three numbers between 0 and 255 that represent the
            amount of red, green, blue to use in the color.  A fourth transparency
            value can be added.
-         - An HTML color code in the form "#rrggbb" where each character 
+         - An HTML color code in the form "#rrggbb" where each character
            r, g, b and a are replaced with a hexidecimal digit.  For translucent
            colors, add another pair of hex digits ("##rrggbbaa").
          - An integer that, when converted to hexidecimal, gives an HTML color
@@ -949,7 +949,7 @@ class Sprite (pygame.sprite.Sprite):
         if isinstance(self._original, tuple):
             self._dirty_rotate = True
 
-    
+
     @property
     def fill_color (self):
         '''
@@ -961,7 +961,7 @@ class Sprite (pygame.sprite.Sprite):
          - A set of three numbers between 0 and 255 that represent the
            amount of red, green, blue to use in the color.  A fourth transparency
            value can be added.
-         - An HTML color code in the form "#rrggbb" where each character 
+         - An HTML color code in the form "#rrggbb" where each character
            r, g, b and a are replaced with a hexidecimal digit.  For translucent
            colors, add another pair of hex digits ("##rrggbbaa").
          - An integer that, when converted to hexidecimal, gives an HTML color
@@ -1012,7 +1012,7 @@ class Sprite (pygame.sprite.Sprite):
 
     ### Update Method
 
-    # Helper method that scales and/or rotates the image if it is dirty    
+    # Helper method that scales and/or rotates the image if it is dirty
     def _clean_image (self, screen=None):
         # If the image is a polygon, scale and rotate the points before drawing it
         if isinstance(self._original, tuple):
@@ -1026,12 +1026,12 @@ class Sprite (pygame.sprite.Sprite):
                         self._horizontal_flip, self._vertical_flip)
                 self._dirty_rotate = True
                 self._dirty_flip = False
-            
+
             if self._dirty_rotate:
                 angle = self._dir + self._tilt if self._rotates else self._tilt
                 self._rotated = tuple([p.rotate(angle) for p in self._scaled])
                 self._dirty_rotate = False
-                self.image = pgputils.polygon_to_surface(self._rotated, 
+                self.image = pgputils.polygon_to_surface(self._rotated,
                                 self._linecolor, self._fillcolor, round(self._scale))
 
         # Otherwise, scale and rotate the surfaces
@@ -1050,7 +1050,7 @@ class Sprite (pygame.sprite.Sprite):
                 self._dirty_scale = False
 
             if self._dirty_flip:
-                self._flipped = pygame.transform.flip(self._scaled, 
+                self._flipped = pygame.transform.flip(self._scaled,
                         self._horizontal_flip, self._vertical_flip)
                 self._dirty_rotate = True
                 self._dirty_flip = False
@@ -1110,7 +1110,7 @@ class Sprite (pygame.sprite.Sprite):
 
     def get_direction_to (self, other):
         '''
-        Return the angle that this sprite must turn toward to be pointing 
+        Return the angle that this sprite must turn toward to be pointing
         directly at another.
         '''
 
@@ -1131,7 +1131,7 @@ class Sprite (pygame.sprite.Sprite):
            centered at the sprite's position.  To use circle collision, you need
            to specify a `.radius` attribute for the sprite or the circle will be the
            smallest circle that encloses the entire image.
-         - The "mask" method will determine if the point is touching a 
+         - The "mask" method will determine if the point is touching a
            non-transparent part of the image.
          - You can pass in a custom function that takes two sprites as arguments
            and returns a Boolean value indicating if they are touching.
@@ -1198,8 +1198,8 @@ class Sprite (pygame.sprite.Sprite):
                 if other in active_screen and bool(method(self, other_sprite)):
                     hit_list.append(other)
             return hit_list
-        
-        # If given a pygame sprite group, use the pygame function for 
+
+        # If given a pygame sprite group, use the pygame function for
         # collision detection with a group
         elif isinstance(other, pygame.sprite.Group):
             other.update()
@@ -1213,18 +1213,18 @@ class Sprite (pygame.sprite.Sprite):
 
     def is_touching (self, other, method="rect"):
         '''
-        Returns whether or not the sprite is touching another sprite (or 
+        Returns whether or not the sprite is touching another sprite (or
         collection of sprites).
 
         The `method` argument can be used to specify which type of collision
         detection to use:
-         - The "rect" method will determine if the rectangles that the images are 
+         - The "rect" method will determine if the rectangles that the images are
            contained in are overlapping.  This is the default.
-         - The "circle" method will determine if circles centered at the sprites' 
-           positions are overlapping.  To use circle collision, you need to 
-           specify a `.radius` attribute for the sprites or the circle will be 
+         - The "circle" method will determine if circles centered at the sprites'
+           positions are overlapping.  To use circle collision, you need to
+           specify a `.radius` attribute for the sprites or the circle will be
            the smallest circle that encloses the entire image.
-         - The "mask" method will determine if the non-transparent parts of the 
+         - The "mask" method will determine if the non-transparent parts of the
            images are overlapping.
          - You can pass in a custom function that takes two sprites as arguments
            and returns a Boolean value indicating if they are touching.
@@ -1263,8 +1263,8 @@ class Sprite (pygame.sprite.Sprite):
                 if other in active_screen and bool(method(self, other_sprite)):
                     return True
             return False
-        
-        # If given a pygame sprite group, use the pygame function for 
+
+        # If given a pygame sprite group, use the pygame function for
         # collision detection with a group
         elif isinstance(other, pygame.sprite.Group):
             other.update()
@@ -1282,7 +1282,7 @@ class Sprite (pygame.sprite.Sprite):
         '''
         Add a custom update function that will be called on every iteration of
         the event loop.
-        
+
         You can provide the following arguments for the function `func`:
          - `sprite` - will provide the sprite object being updated
         '''
@@ -1305,7 +1305,7 @@ class Sprite (pygame.sprite.Sprite):
          - `sprite` - will provide the sprite object involved
 
         You can specify which mouse button needs to be used for the click using
-        the `button` parameter.  It's value needs to be one of "left", "center", 
+        the `button` parameter.  It's value needs to be one of "left", "center",
         "right", "scrollup" or "scrolldown".  The left button is the default.
         '''
 
@@ -1328,7 +1328,7 @@ class Sprite (pygame.sprite.Sprite):
 
     def on_release (self, func, button="left"):
         '''
-        Add a function that will be called when the mouse is released after 
+        Add a function that will be called when the mouse is released after
         clicking on this sprite.
 
         You can provide the following arguments for the function `func`:
@@ -1339,7 +1339,7 @@ class Sprite (pygame.sprite.Sprite):
          - `sprite` - will provide the sprite object involved
 
         You can specify which mouse button needs to be used for the click using
-        the `button` parameter.  It's value needs to be one of "left", "center", 
+        the `button` parameter.  It's value needs to be one of "left", "center",
         "right", "scrollup" or "scrolldown".  The left button is the default.
         '''
 
@@ -1359,7 +1359,7 @@ class Sprite (pygame.sprite.Sprite):
 
     def on_drag (self, func, button="left"):
         '''
-        Add a function that will be called when the mouse dragged while 
+        Add a function that will be called when the mouse dragged while
         clicking on this sprite.
 
         You can provide the following arguments for the function `func`:
@@ -1370,7 +1370,7 @@ class Sprite (pygame.sprite.Sprite):
          - `sprite` - will provide the sprite object involved
 
         You can specify which mouse button needs to be used for the click using
-        the `button` parameter.  It's value needs to be one of "left", "center", 
+        the `button` parameter.  It's value needs to be one of "left", "center",
         "right", "scrollup" or "scrolldown".  The left button is the default.
         '''
 
@@ -1387,7 +1387,7 @@ class Sprite (pygame.sprite.Sprite):
         else:
             raise ValueError("Invalid button!")
 
-        
+
 # What is included when importing *
 __all__ = [
     "Sprite"
