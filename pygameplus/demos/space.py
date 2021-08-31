@@ -13,13 +13,13 @@ def main ():
     screen.open()
 
     # We can use image files that are not GIFs
-    with resources.path("pygameplus.demos", "space.jpg") as image_path:
+    with resources.path("pygameplus.demos.img", "space.jpg") as image_path:
         screen.background_image = image_path
 
     # # Create a "ship" turtle
-    with resources.path("pygameplus.demos", "ship.png") as image_path:
+    with resources.path("pygameplus.demos.img", "ship.png") as image_path:
         ship_still_image = load_picture(image_path)
-    with resources.path("pygameplus.demos", "ship2.png") as image_path:
+    with resources.path("pygameplus.demos.img", "ship2.png") as image_path:
         ship_moving_image = load_picture(image_path)
 
     ship = Painter(ship_still_image)
@@ -112,7 +112,7 @@ def main ():
     ship.on_drag(on_drag)
 
     # Create a "ufo" turtle
-    with resources.path("pygameplus.demos", "ufo.png") as image_path:
+    with resources.path("pygameplus.demos.img", "ufo.png") as image_path:
         ufo = Sprite(image_path)
     screen.add(ufo)
     ufo.smooth = True
@@ -143,7 +143,7 @@ def main ():
     writer.end_fill()
     writer.end_line()
     writer.position = (0, -140)
-    with resources.path("pygameplus.demos", "Freedom.ttf") as font_path:
+    with resources.path("pygameplus.demos.fonts", "Freedom.ttf") as font_path:
         writer.write("Welcome to Space", font=font_path, font_size=36)
 
     screen.update()

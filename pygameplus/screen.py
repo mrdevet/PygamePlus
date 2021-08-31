@@ -115,7 +115,7 @@ class Screen (pygame.sprite.LayeredUpdates):
             # If the object is not a Sprite, then it's probably an iterable, so
             # recursively add it.
             else:
-                self.add(sprite)
+                self.add(*sprite)
 
 
     ### Screen Visibility Methods
