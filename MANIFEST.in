@@ -1,3 +1,3 @@
-include pygameplus/demos/*.png
-include pygameplus/demos/*.jpg
-include pygameplus/demos/*.ttf
+include pygameplus/demos/img/*.png
+include pygameplus/demos/img/*.jpg
+include pygameplus/demos/fonts/*.ttf
