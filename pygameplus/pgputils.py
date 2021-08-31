@@ -47,6 +47,12 @@ mouse_button_reverse_map = {
     5: "scrolldown"
 }
 
+# Flips a polygon
+def flip_polygon (polygon, x_flip, y_flip):
+    def flip_point (point):
+        return point.reflect(pygame.Vector2(bool(y_flip), bool(x_flip)))
+    return tuple([flip_point(p) for p in polygon])
+
 # Takes a polygon and draws it on a fitted pygame.Surface
 def polygon_to_surface (polygon, line_color, fill_color=None, width=1):
     big_x = math.ceil(max([abs(p.x) for p in polygon]))

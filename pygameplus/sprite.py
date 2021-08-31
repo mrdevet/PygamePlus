@@ -103,7 +103,8 @@ class Sprite (pygame.sprite.Sprite):
             self.image = pgputils.polygon_to_surface(self._original, "black", "black")
         else:
             self.image = self._original
-        self._scaled = self._original
+        self._flipped = self._original
+        self._scaled = self._flipped
         self._rotated = self._scaled
         self.rect = self.image.get_rect()
 
@@ -115,6 +116,9 @@ class Sprite (pygame.sprite.Sprite):
         self._move_ratio = pygame.Vector2(1, 0)
 
         # Scale and rotation attributes
+        self._vertical_flip = False
+        self._horizontal_flip = False
+        self._dirty_flip = False
         self._scale = 1
         self._dirty_scale = False
         self._smooth = False
@@ -852,6 +856,64 @@ class Sprite (pygame.sprite.Sprite):
         self._smooth = bool(new_smooth)
 
 
+    @property
+    def flipped_horizontally (self):
+        '''
+        Whether or not the original picture is flipped horizontally.
+        '''
+
+        return self._horizontal_flip
+
+    @flipped_horizontally.setter
+    def flipped_horizontally (self, new_setting):
+
+        self._horizontal_flip = bool(new_setting)
+
+        # Flag that the image may have flipped and needs to be transformed
+        self._dirty_flip
+
+
+    @property
+    def flipped_vertically (self):
+        '''
+        Whether or not the original picture is flipped vertically.
+        '''
+
+        return self._vertical_flip
+
+    @flipped_vertically.setter
+    def flipped_vertically (self, new_setting):
+
+        self._vertical_flip = bool(new_setting)
+
+        # Flag that the image may have flipped and needs to be transformed
+        self._dirty_flip
+
+
+    @property
+    def flipped (self):
+        '''
+        Whether or not the original picture is flipped.
+
+        This property is a 2-tuple of booleans that contains whether 
+        the image is flipped horizontally and vertically, respectively.
+        '''
+
+        return self._horizontal_flip, self._vertical_flip
+
+    @flipped.setter
+    def flipped (self, new_settings):
+
+        try:
+            self._horizontal_flip = bool(new_settings[0])
+            self._vertical_flip = bool(new_settings[1])
+        except:
+            raise ValueError("This setting must be a 2-tuple of boolean values!")
+
+        # Flag that the image may have flipped and needs to be transformed
+        self._dirty_flip
+
+
     ### Color and Width Methods for Polygons
 
     @property
@@ -955,9 +1017,15 @@ class Sprite (pygame.sprite.Sprite):
         # If the image is a polygon, scale and rotate the points before drawing it
         if isinstance(self._original, tuple):
             if self._dirty_scale:
-                self._scaled = tuple([self._scale * p for p in self._original])
-                self._dirty_rotate = True
+                self._scaled = tuple([self._scale * p for p in self._flipped])
+                self._dirty_flip = True
                 self._dirty_scale = False
+
+            if self._dirty_flip:
+                self._flipped = pgputils.flip_polygon(self._original,
+                        self._horizontal_flip, self._vertical_flip)
+                self._dirty_rotate = True
+                self._dirty_flip = False
             
             if self._dirty_rotate:
                 angle = self._dir + self._tilt if self._rotates else self._tilt
@@ -978,16 +1046,22 @@ class Sprite (pygame.sprite.Sprite):
                 else:
                     self._scaled = pygame.transform.scale(
                             self._original, (new_width, new_height))
-                self._dirty_rotate = True
+                self._dirty_flip = True
                 self._dirty_scale = False
+
+            if self._dirty_flip:
+                self._flipped = pygame.transform.flip(self._scaled, 
+                        self._horizontal_flip, self._vertical_flip)
+                self._dirty_rotate = True
+                self._dirty_flip = False
 
             if self._dirty_rotate:
                 angle = self._dir + self._tilt if self._rotates else self._tilt
                 if self._smooth:
                     self._rotated = pygame.transform.rotozoom(
-                            self._scaled, angle, 1)
+                            self._flipped, angle, 1)
                 else:
-                    self._rotated = pygame.transform.rotate(self._scaled, angle)
+                    self._rotated = pygame.transform.rotate(self._flipped, angle)
                 self.image = self._rotated
                 self._dirty_rotate = False
 

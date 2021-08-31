@@ -27,6 +27,7 @@ screen = Screen(640, 360, "PyGame Plus Penguin")
 # Lists to hold the background sprites
 left_backgrounds = []
 right_backgrounds = []
+background_speeds = [0, 0, 0.1, 0.2, 0.1, 0.2, 0.25, 1]
 
 # Dictionary to hold the penguin images
 penguin_images = {}
@@ -40,6 +41,22 @@ def quit ():
 
 screen.on_key_press(quit, "escape")
 
+# Function that moves a left background sprite on update
+def move_left_background (sprite):
+    sprite.x -= sprite.speed
+    if sprite.x <= -640:
+        sprite.x += 640
+    elif sprite.x > 0:
+        sprite.x -= 640
+
+# Function that moves a rightbackground sprite on update
+def move_right_background (sprite):
+    sprite.x -= sprite.speed
+    if sprite.x <= 0:
+        sprite.x += 640
+    elif sprite.x > 640:
+        sprite.x -= 640
+
 # Function to start the program
 def main ():
     # Open the screen
@@ -50,14 +67,22 @@ def main ():
         with resources.path("pygameplus.demos.img", f"snow{i}.png") as image_path:
             picture = load_picture(image_path)
 
+        # Create the left image
         left_background = Sprite(picture)
         left_background.scale_factor = 1 / 3
+        left_background.speed = background_speeds[i - 1]
+        if left_background.speed > 0:
+            left_background.on_update(move_left_background)
         left_backgrounds.append(left_background)
         screen.add(left_background)
 
+        # Create the right image
         right_background = Sprite(picture)
         right_background.scale_factor = 1 / 3
         right_background.x = 640
+        right_background.speed = background_speeds[i - 1]
+        if right_background.speed > 0:
+            right_background.on_update(move_right_background)
         right_backgrounds.append(right_background)
         screen.add(right_background)
 
@@ -79,7 +104,7 @@ def main ():
     screen.update()
 
     # Start the event loop
-    start_event_loop(50)
+    start_event_loop(30)
 
 
 # call the "main" function if running this script
