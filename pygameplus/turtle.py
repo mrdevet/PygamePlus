@@ -319,7 +319,7 @@ class Turtle (Painter, metaclass=RedrawMetaClass):
             return
 
         # Calculate the arc length of the rotation of the turtle's head
-        arc_length = self._scale.x * 5 * (direction - self._dir) / 18
+        arc_length = self._scale * 5 * (direction - self._dir) / 18
 
         # Each iteration of this loop will turn so that it's head moves on an
         # arc that is at most one step
@@ -333,7 +333,7 @@ class Turtle (Painter, metaclass=RedrawMetaClass):
             # Otherwise, just do the rest of the current step and take a break
             # until the next frame
             else:
-                turn_arc_length = 3.6 * self._pixels_remaining / self._scale.x
+                turn_arc_length = 3.6 * self._pixels_remaining / self._scale
                 if arc_length > 0:
                     Painter.direction.fset(self, self._dir + turn_arc_length)
                     arc_length -= self._pixels_remaining
