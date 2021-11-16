@@ -1,5 +1,5 @@
-# Example Package
+# Pygame Plus
 
-This is a simple example package. You can use
-[Github-flavored Markdown](https://guides.github.com/features/mastering-markdown/)
-to write your content.
+Pygame Plus is a supplement library for pygame that provides some classes and methods that make game creation easier for beginners with little coding experience.
+
+This project is a work in progress.  Documentation to come.

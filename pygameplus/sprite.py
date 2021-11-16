@@ -1067,6 +1067,13 @@ class Sprite (pygame.sprite.Sprite):
 
         # Update the enclosing rect
         self.rect.size = self.image.get_size()
+        self.image.set_alpha(int(self._opacity * 255))
+        offset_vec = self._scale * self._anchor_vec
+        offset_vec.rotate_ip(self._dir + self._tilt if self._rotates else self._tilt)
+        if screen is None:
+            self.rect.center = to_pygame_coordinates(self._pos - offset_vec)
+        else:
+            self.rect.center = screen.to_pygame_coordinates(self._pos - offset_vec)
 
     # Helper method that determines the image's mask if it is dirty
     def _clean_mask (self, screen=None):
@@ -1089,13 +1096,6 @@ class Sprite (pygame.sprite.Sprite):
 
         # Update the sprite's .image and .rect attributes needed for drawing
         self._clean_image(screen)
-        self.image.set_alpha(int(self._opacity * 255))
-        offset_vec = self._scale * self._anchor_vec
-        offset_vec.rotate_ip(self._dir + self._tilt if self._rotates else self._tilt)
-        if screen is None:
-            self.rect.center = to_pygame_coordinates(self._pos - offset_vec)
-        else:
-            self.rect.center = screen.to_pygame_coordinates(self._pos - offset_vec)
 
 
     ### Other Sprite Methods
