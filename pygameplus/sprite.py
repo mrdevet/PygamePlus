@@ -202,6 +202,7 @@ class Sprite (pygame.sprite.Sprite):
     def picture (self, new_image):
 
         # Handle the image
+        self._image = new_image
         if new_image is None:
             self._original = pygame.Surface((1, 1), pygame.SRCALPHA)
         elif isinstance(new_image, tuple) or isinstance(new_image, list):
