@@ -144,7 +144,7 @@ def main ():
     writer.end_line()
     writer.position = (0, -140)
     with resources.path("pygameplus.demos.fonts", "Freedom.ttf") as font_path:
-        writer.write("Welcome to Space", font=font_path, font_size=36)
+        writer.write("Welcome to Space", font=font_path, size=36)
 
     screen.update()
 

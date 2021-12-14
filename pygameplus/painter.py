@@ -486,9 +486,9 @@ class Painter (Sprite):
         The `font` parameter can be the name of a font on the system or a
         True Type Font file (.ttf) located in the directory.
 
-        The `font_size` is the height of the text in pixels.
+        The `size` is the height of the text in pixels.
         
-        The `font_style` argument can be "bold", "italic", "underline" or a 
+        The `style` argument can be "bold", "italic", "underline" or a 
         combination separated by space (e.g. "bold italic").
 
         If the `color` is not specified, the line color is used.
@@ -499,8 +499,8 @@ class Painter (Sprite):
             font_obj = font
 
         # If this font and size have been used before, check the _fonts cache
-        elif (font, font_size) in Painter._fonts:
-            font_obj = Painter._fonts[font, font_size]
+        elif (font, size) in Painter._fonts:
+            font_obj = Painter._fonts[font, size]
 
         # Otherwise, the font needs to be a string
         else:
@@ -508,23 +508,23 @@ class Painter (Sprite):
 
             # If the font ends in ".ttf", then load the font from the file
             if font.endswith(".ttf"):
-                font_obj = pygame.font.Font(font, font_size)
+                font_obj = pygame.font.Font(font, size)
 
             # Otherwise, use a system font
             else:
-                font_obj = pygame.font.SysFont(font, font_size)
+                font_obj = pygame.font.SysFont(font, size)
 
             # Add the font to the _fonts cache
-            Painter._fonts[font, font_size] = font_obj
+            Painter._fonts[font, size] = font_obj
 
         # Apply the styles
-        if font_style is not None:
-            if isinstance(font_style, str):
-                font_style = font_style.split()
-            font_style = [style.lower() for style in font_style]
-            font_obj.set_bold("bold" in font_style)
-            font_obj.set_italic("italic" in font_style)
-            font_obj.set_underline("underline" in font_style)
+        if style is not None:
+            if isinstance(style, str):
+                style = style.split()
+            style = [s.lower() for s in style]
+            font_obj.set_bold("bold" in style)
+            font_obj.set_italic("italic" in style)
+            font_obj.set_underline("underline" in style)
 
         # Get the color
         if color is None:
