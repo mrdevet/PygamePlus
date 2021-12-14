@@ -325,12 +325,20 @@ class Screen (pygame.sprite.LayeredUpdates):
         return self._canvas
 
 
-    def clear_canvas (self):
+    def clear_canvas (self, remove_sprites=False):
         '''
         Clear everything that was drawn on the screen.
         '''
 
         self._canvas.fill(0)
+
+        # Remove any sprites that are on the screen.
+        if remove_sprites:
+            width = self.width
+            height = self.height
+            for sprite in self:
+                if - width / 2 <= sprite.x <= width / 2 and - height / 2 <= sprite.y <= height / 2:
+                    self.remove(sprite)
 
 
     def clear_rect (self, corner1, corner2, remove_sprites=False):
@@ -338,22 +346,26 @@ class Screen (pygame.sprite.LayeredUpdates):
         Clear a rectangular part of the screen.
         '''
 
+        # Ensure that the points are actually points
         try:
             corner1 = pygame.Vector2(corner1)
             corner2 = pygame.Vector2(corner2)
         except:
             raise ValueError("Invalid corner position!")
 
+        # Determine the coordinates of the sides
         left = min(corner1.x, corner2.x)
         right = max(corner1.x, corner2.x)
         bottom = min(corner1.y, corner2.y)
         top = max(corner1.y, corner2.y)
 
+        # Create a rect and fill that area with nothing
         top_left = self.to_pygame_coordinates(left, top)
         size = pygame.Vector2(right - left, top - bottom)
         rect = pygame.Rect(top_left, size)
         self._canvas.fill(0, rect)
 
+        # Remove any sprites that are in the rectangle.
         if remove_sprites:
             for sprite in self:
                 if left <= sprite.x <= right and bottom <= sprite.y <= top:
@@ -365,15 +377,18 @@ class Screen (pygame.sprite.LayeredUpdates):
         Clear a circular part of the screen.
         '''
 
+        # Ensure that the center and radius are good
         try:
             center = pygame.Vector2(center)
             radius = float(radius)
         except:
             raise ValueError("Invalid argument!")
 
+        # Draw a circle of nothing
         pygame_center = self.to_pygame_coordinates(center)
         pygame.draw.circle(self._canvas, 0, pygame_center, radius)
 
+        # Remove any sprites that are in the circle
         if remove_sprites:
             for sprite in self:
                 if center.distance_to(sprite._pos) <= radius:
