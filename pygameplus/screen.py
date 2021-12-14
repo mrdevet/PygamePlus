@@ -459,11 +459,20 @@ class Screen (pygame.sprite.LayeredUpdates):
         '''
 
         if key is None:
-            self._key_press_funcs[None] = func
+            if func is None:
+                self._key_press_funcs.pop(None, None)
+            else:
+                self._key_press_funcs[None] = func
         elif isinstance(key, str):
-            self._key_press_funcs[pygame.key.key_code(key)] = func
+            if func is None:
+                self._key_press_funcs.pop(pygame.key.key_code(key), None)
+            else:
+                self._key_press_funcs[pygame.key.key_code(key)] = func
         elif isinstance(key, int):
-            self._key_press_funcs[key] = func
+            if func is None:
+                self._key_press_funcs.pop(key, None)
+            else:
+                self._key_press_funcs[key] = func
         else:
             try:
                 for k in key:
@@ -486,11 +495,20 @@ class Screen (pygame.sprite.LayeredUpdates):
         '''
 
         if key is None:
-            self._key_release_funcs[None] = func
+            if func is None:
+                self._key_release_funcs.pop(None, None)
+            else:
+                self._key_release_funcs[None] = func
         elif isinstance(key, str):
-            self._key_release_funcs[pygame.key.key_code(key)] = func
+            if func is None:
+                self._key_release_funcs.pop(pygame.key.key_code(key), None)
+            else:
+                self._key_release_funcs[pygame.key.key_code(key)] = func
         elif isinstance(key, int):
-            self._key_release_funcs[key] = func
+            if func is None:
+                self._key_release_funcs.pop(key, None)
+            else:
+                self._key_release_funcs[key] = func
         else:
             try:
                 for k in key:
@@ -516,11 +534,20 @@ class Screen (pygame.sprite.LayeredUpdates):
         '''
 
         if key is None:
-            self._key_hold_funcs[None] = func
+            if func is None:
+                self._key_hold_funcs.pop(None, None)
+            else:
+                self._key_hold_funcs[None] = func
         elif isinstance(key, str):
-            self._key_hold_funcs[pygame.key.key_code(key)] = func
+            if func is None:
+                self._key_hold_funcs.pop(pygame.key.key_code(key), None)
+            else:
+                self._key_hold_funcs[pygame.key.key_code(key)] = func
         elif isinstance(key, int):
-            self._key_hold_funcs[key] = func
+            if func is None:
+                self._key_hold_funcs.pop(key, None)
+            else:
+                self._key_hold_funcs[key] = func
         else:
             try:
                 for k in key:
