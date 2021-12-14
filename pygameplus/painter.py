@@ -473,7 +473,8 @@ class Painter (Sprite):
 
     ### Write on the screen
 
-    def write (self, text, align="middle center", font="Arial", font_size=12, font_style=None, color=None):
+    def write (self, text, align="middle center", font="Arial", 
+            size=12, style=None, color=None):
         '''
         Write text to the screen at the turtle's current location using the pen.
 
