@@ -344,10 +344,20 @@ class Screen (pygame.sprite.LayeredUpdates):
         except:
             raise ValueError("Invalid corner position!")
 
-        top_left = self.to_pygame_coordinates(min(corner1.x, corner2.x), max(corner1.y, corner2.y))
-        size = pygame.Vector2(abs(corner1.x - corner2.x), abs(corner1.y - corner2.y))
+        left = min(corner1.x, corner2.x)
+        right = max(corner1.x, corner2.x)
+        bottom = min(corner1.y, corner2.y)
+        top = max(corner1.y, corner2.y)
+
+        top_left = self.to_pygame_coordinates(left, top)
+        size = pygame.Vector2(right - left, top - bottom)
         rect = pygame.Rect(top_left, size)
         self._canvas.fill(0, rect)
+
+        if remove_sprites:
+            for sprite in self:
+                if left <= sprite.x <= right and bottom <= sprite.y <= top:
+                    self.remove(sprite)
 
 
     def clear_circle (self, center, radius, remove_sprites=False):
@@ -355,7 +365,19 @@ class Screen (pygame.sprite.LayeredUpdates):
         Clear a circular part of the screen.
         '''
 
-        raise NotImplementedError()
+        try:
+            center = pygame.Vector2(center)
+            radius = float(radius)
+        except:
+            raise ValueError("Invalid argument!")
+
+        pygame_center = self.to_pygame_coordinates(center)
+        pygame.draw.circle(self._canvas, 0, pygame_center, radius)
+
+        if remove_sprites:
+            for sprite in self:
+                if center.distance_to(sprite._pos) <= radius:
+                    self.remove(sprite)
 
 
     def clear (self):
