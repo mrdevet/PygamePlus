@@ -338,7 +338,16 @@ class Screen (pygame.sprite.LayeredUpdates):
         Clear a rectangular part of the screen.
         '''
 
-        raise NotImplementedError()
+        try:
+            corner1 = pygame.Vector2(corner1)
+            corner2 = pygame.Vector2(corner2)
+        except:
+            raise ValueError("Invalid corner position!")
+
+        top_left = self.to_pygame_coordinates(min(corner1.x, corner2.x), max(corner1.y, corner2.y))
+        size = pygame.Vector2(abs(corner1.x - corner2.x), abs(corner1.y - corner2.y))
+        rect = pygame.Rect(top_left, size)
+        self._canvas.fill(0, rect)
 
 
     def clear_circle (self, center, radius, remove_sprites=False):
