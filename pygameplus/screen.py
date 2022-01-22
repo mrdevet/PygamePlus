@@ -82,6 +82,8 @@ class Screen (pygame.sprite.LayeredUpdates):
         self._key_release_funcs = {}
         self._key_hold_funcs = {}
         self._click_funcs = [None for _ in range(5)]
+        self._release_funcs = [None for _ in range(5)]
+        self._mouse_move_func = None
 
         # The pygame surface that holds any drawing added to the screen
         self._canvas = pygame.Surface((width, height), pygame.SRCALPHA)
@@ -173,6 +175,9 @@ class Screen (pygame.sprite.LayeredUpdates):
     @size.setter
     def size (self, new_dimensions):
 
+        old_width = self._width
+        old_height = self._height
+
         try:
             self._width, self._height = [int(d) for d in new_dimensions]
         except:
@@ -187,7 +192,9 @@ class Screen (pygame.sprite.LayeredUpdates):
         # Create a new canvas with the new size
         old_canvas = self._canvas
         self._canvas = pygame.Surface((self._width, self._height), pygame.SRCALPHA)
-        # TODO: blit the old canvas onto the new canvas
+        x = (self._width - old_width) // 2
+        y = (self._height - old_height) // 2
+        self._canvas.blit(old_canvas, (x, y))
 
         # Change the rect for the background image to keep it centered.
         if self._image_rect is not None:
@@ -459,13 +466,23 @@ class Screen (pygame.sprite.LayeredUpdates):
         if self._image is not None:
             surface.blit(self._image, self._image_rect)
 
-        # Draw any drawings
-        surface.blit(self._canvas, (0, 0))
-        surface.blit(self._update_drawings, (0, 0))
+        # Create a sprite to hold the drawings
+        canvas_sprite = pygame.sprite.Sprite()
+        canvas_sprite.image = pygame.Surface((self._width, self._height), 
+                                             pygame.SRCALPHA)
+        canvas_sprite.image.blit(self._canvas, (0, 0))
+        canvas_sprite.image.blit(self._update_drawings, (0, 0))
+        canvas_sprite.rect = pygame.Rect(0, 0, self._width, self._height)
+        self.add(canvas_sprite, layer=-1)
 
         # Draw the sprites
-        return pygame.sprite.LayeredUpdates.draw(self, surface)
+        ret = pygame.sprite.LayeredUpdates.draw(self, surface)
 
+        # Remove the drawings sprite
+        self.remove(canvas_sprite)
+
+        return ret
+    
     
     def redraw (self):
         '''
@@ -593,7 +610,7 @@ class Screen (pygame.sprite.LayeredUpdates):
                 raise ValueError("Invalid key!") from None
 
 
-    def on_click (self, func, button=1):
+    def on_click (self, func, button="left"):
         '''
         Add a function that will be called when the mouse clicks anywhere on
         this screen while it is active.
@@ -617,6 +634,47 @@ class Screen (pygame.sprite.LayeredUpdates):
             self._click_funcs[button - 1] = func
         else:
             raise ValueError("Invalid button!")
+
+
+    def on_release (self, func, button="left"):
+        '''
+        Add a function that will be called when the mouse releases a button
+        anywhere on this screen while it is active.
+
+        You can provide the following arguments for the function `func`:
+         - `x` - will provide x-coordinate of the click
+         - `y` - will provide y-coordinate of the click
+         - `pos` - will provide a tuple of the coordinates (x and y) of the click
+         - `button` - will provide the name of the mouse button used to click
+        '''
+
+        # Convert the button string to a button number
+        if isinstance(button, str):
+            try:
+                button = pgputils.mouse_button_map[button]
+            except KeyError:
+                raise ValueError("Invalid button!")
+
+        # If a button is valid, add the function to the appropriate button
+        if 1 <= button <= 5:
+            self._release_funcs[button - 1] = func
+        else:
+            raise ValueError("Invalid button!")
+
+
+    def on_mouse_move (self, func):
+        '''
+        Add a function that will be called when the mouse is moved anywhere on
+        this screen while it is active.
+
+        You can provide the following arguments for the function `func`:
+         - `x` - will provide x-coordinate of the click
+         - `y` - will provide y-coordinate of the click
+         - `pos` - will provide a tuple of the coordinates (x and y) of the click
+        '''
+
+        # Add the function
+        self._mouse_move_func = func
 
 
     def on_timer (self, func, delay, repeat=False):

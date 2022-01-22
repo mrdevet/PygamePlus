@@ -1,9 +1,11 @@
 # Replit files
+.replit
 .upm
 .breakpoints
 poetry.lock
 pyproject.toml
 main.py
+*.zip
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

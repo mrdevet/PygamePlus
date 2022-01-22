@@ -177,13 +177,11 @@ class Painter (Sprite):
     # A helper method that draws a line from start to end on the given canvas.
     def _draw_line (self, start, end, canvas=None):
         if canvas is None:
-            # Get the active screen's canvas
-            screen = get_active_screen()
-            if screen is None:
-                raise RuntimeError("Can't draw a line on an inactive screen!")
-            if self not in screen:
-                raise RuntimeError("The painter must be on the active screen to draw!")
-            canvas = screen.canvas
+            canvases = [g.canvas for g in self.groups() if isinstance(g, Screen)]
+            if not canvases:
+                raise RuntimeError("Can't draw!  This sprite isn't on a screen!")
+        else:
+            canvases = [canvas]
 
         # Convert to pygame coordinates
         start = to_pygame_coordinates(start)
@@ -191,7 +189,8 @@ class Painter (Sprite):
 
         # If width is 1, use the pygame function
         if self._linesize == 1:
-            pygame.draw.line(canvas, self._linecolor_obj, start, end)
+            for canvas in canvases:
+                pygame.draw.line(canvas, self._linecolor_obj, start, end)
 
         # Otherwise use dots instead
         else:
@@ -204,7 +203,8 @@ class Painter (Sprite):
             current = start
             delta = pygame.Vector2(self._stepsize, 0).rotate(direction)
             for _ in range(int(distance / self._stepsize) + 1):
-                pygame.draw.circle(canvas, self._linecolor_obj, current, radius)
+                for canvas in canvases:
+                    pygame.draw.circle(canvas, self._linecolor_obj, current, radius)
                 current += delta
                 
     
@@ -257,22 +257,22 @@ class Painter (Sprite):
 
     # A helper method that draws the current filled polygon on the given canvas.
     def _draw_fill (self, canvas=None):
-        # If no canvas is provided, use the active screen's
         if canvas is None:
-            screen = get_active_screen()
-            if screen is None:
-                raise RuntimeError("Can't draw a filled shape on an inactive screen!")
-            if self not in screen:
-                raise RuntimeError("The painter must be on the active screen to draw!")
-            canvas = screen.canvas
+            canvases = [g.canvas for g in self.groups() if isinstance(g, Screen)]
+            if not canvases:
+                raise RuntimeError("Can't draw!  This sprite isn't on a screen!")
+        else:
+            canvases = [canvas]
 
         # Draw the points to the canvas
         points = [to_pygame_coordinates(p) for p in self._fillpoly]
         if len(points) >= 3:
-            pygame.draw.polygon(canvas, self._fillcolor, points)
+            for canvas in canvases:
+                pygame.draw.polygon(canvas, self._fillcolor, points)
 
         # Draw the lines back on top of the canvas
-        canvas.blit(self._drawings_over_fill, (0, 0))
+        for canvas in canvases:
+            canvas.blit(self._drawings_over_fill, (0, 0))
 
 
     @property
@@ -328,11 +328,6 @@ class Painter (Sprite):
         self._fillpoly = [self._pos]
 
         # Create a surface to hold the lines drawn on top of the fill
-        screen = get_active_screen()
-        if screen is None:
-            raise RuntimeError("Can't draw a filled shape on an inactive screen!")
-        if self not in screen:
-            raise RuntimeError("The painter must be on the active screen to draw!")
         self._drawings_over_fill = pygame.Surface(screen.size, pygame.SRCALPHA)
 
 
@@ -370,13 +365,9 @@ class Painter (Sprite):
         If the `color` is not specified, the line color is used.
         '''
 
-        # Get the active screen's canvas
-        screen = get_active_screen()
-        if screen is None:
-            raise RuntimeError("Can't draw a dot on an inactive screen!")
-        if self not in screen:
-            raise RuntimeError("The painter must be on the active screen to draw!")
-        canvas = screen.canvas
+        canvases = [g.canvas for g in self.groups() if isinstance(g, Screen)]
+        if not canvases:
+            raise RuntimeError("Can't draw!  This sprite isn't on a screen!")
 
         # If no size is given, make the dot a bit bigger than the line size
         if size is None:
@@ -388,7 +379,8 @@ class Painter (Sprite):
 
         # Draw the dot
         point = to_pygame_coordinates(self._pos)
-        pygame.draw.circle(canvas, color, point, size / 2)
+        for canvas in canvases:
+            pygame.draw.circle(canvas, color, point, size / 2)
 
         # If the turtle is currently creating a filled shape, draw the dot on 
         # the upper layer to be drawn on top of the fill.
@@ -453,17 +445,14 @@ class Painter (Sprite):
         Stamp a copy of the sprite's image to the screen at the current position.
         '''
 
-        # Get the active screen's canvas
-        screen = get_active_screen()
-        if screen is None:
-            raise RuntimeError("Can't stamp an image on an inactive screen!")
-        if self not in screen:
-            raise RuntimeError("The painter must be on the active screen to draw!")
-        canvas = screen.canvas
+        canvases = [g.canvas for g in self.groups() if isinstance(g, Screen)]
+        if not canvases:
+            raise RuntimeError("Can't draw!  This sprite isn't on a screen!")
 
         # Copy the image to the canvas
         self._clean_image()
-        canvas.blit(self.image, self.rect)
+        for canvas in canvases:
+            canvas.blit(self.image, self.rect)
 
         # If the turtle is currently creating a filled shape, stamp the image on 
         # the upper layer to be drawn on top of the fill.
@@ -531,7 +520,7 @@ class Painter (Sprite):
             color = self._linecolor
 
         # Render an image of the text
-        image = font_obj.render(str(text), True, self._linecolor)
+        image = font_obj.render(str(text), True, color)
         rect = image.get_rect()
 
         # Set the position of the text from the align parameter
@@ -556,13 +545,12 @@ class Painter (Sprite):
                 rect.bottom = y
 
         # Draw the text on the canvas
-        screen = get_active_screen()
-        if screen is None:
-            raise RuntimeError("Can't write text on an inactive screen!")
-        if self not in screen:
-            raise RuntimeError("The painter must be on the active screen to draw!")
-        canvas = screen.canvas
-        canvas.blit(image, rect)
+        canvases = [g.canvas for g in self.groups() if isinstance(g, Screen)]
+        if not canvases:
+            raise RuntimeError("Can't draw!  This sprite isn't on a screen!")
+
+        for canvas in canvases:
+            canvas.blit(image, rect)
 
         # Return a Font object that can be used for future writing
         return font_obj

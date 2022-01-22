@@ -137,6 +137,8 @@ class Sprite (pygame.sprite.Sprite):
         # Attributes that hold any event handlers associated with the sprite
         self._on_update_func = None
         self._click_funcs = [None for _ in range(5)]
+        self._click_methods = [None for _ in range(5)]
+        self._click_bleeds = [None for _ in range(5)]
         self._release_funcs = [None for _ in range(5)]
         self._drag_funcs = [None for _ in range(5)]
 
@@ -872,6 +874,7 @@ class Sprite (pygame.sprite.Sprite):
 
         # Flag that the image may have flipped and needs to be transformed
         self._dirty_flip = True
+        self._dirty_mask = True
 
 
     @property
@@ -889,6 +892,7 @@ class Sprite (pygame.sprite.Sprite):
 
         # Flag that the image may have flipped and needs to be transformed
         self._dirty_flip = True
+        self._dirty_mask = True
 
 
     @property
@@ -1196,7 +1200,7 @@ class Sprite (pygame.sprite.Sprite):
                 other_sprite._clean_image()
                 if method == pygame.sprite.collide_mask:
                     other_sprite._clean_mask()
-                if other in active_screen and bool(method(self, other_sprite)):
+                if other_sprite in active_screen and bool(method(self, other_sprite)):
                     hit_list.append(other)
             return hit_list
 
@@ -1261,7 +1265,7 @@ class Sprite (pygame.sprite.Sprite):
                 other_sprite._clean_image()
                 if method == pygame.sprite.collide_mask:
                     other_sprite._clean_mask()
-                if other in active_screen and bool(method(self, other_sprite)):
+                if other_sprite in active_screen and bool(method(self, other_sprite)):
                     return True
             return False
 
@@ -1274,7 +1278,7 @@ class Sprite (pygame.sprite.Sprite):
 
         # If given an invalid argument, just return False
         else:
-            return ValueError("Invalid argument!")
+            raise ValueError("Invalid argument!")
 
 
     ### Add Custom Update Function
@@ -1293,7 +1297,7 @@ class Sprite (pygame.sprite.Sprite):
 
     ### Click Event Methods
 
-    def on_click (self, func, button="left"):
+    def on_click (self, func, button="left", method="rect", bleeds=False):
         '''
         Add a function that will be called when the mouse is clicked on
         this sprite.
@@ -1308,10 +1312,16 @@ class Sprite (pygame.sprite.Sprite):
         You can specify which mouse button needs to be used for the click using
         the `button` parameter.  It's value needs to be one of "left", "center",
         "right", "scrollup" or "scrolldown".  The left button is the default.
-        '''
 
-        # TODO: Add ability to only have click events when mask clicked on.
-        #   This could make use of the is_touching_point() method
+        The `method` can be used to specify which type of collision detection to
+        use to see if the sprite was clicked on.  See `.is_touching_point()` for
+        more details.
+
+        If multiple sprites are stacked, then the event will be triggered
+        for the highest sprite with a click handler.  If `bleeds` is set to
+        `True`, then if this sprite is clicked, the click event will bleed
+        to sprites underneath it.
+        '''
 
         # Convert the button string to a button number
         if isinstance(button, str):
@@ -1320,9 +1330,17 @@ class Sprite (pygame.sprite.Sprite):
             except KeyError:
                 raise ValueError("Invalid button!")
 
+        # Get the collision detection function for the given method
+        if isinstance(method, str):
+            if method not in pgputils.collision_functions:
+                raise ValueError(f"Invalid collision method: {method}")
+            method = pgputils.collision_functions[method]
+
         # If a button is valid, add the function to the appropriate button
         if 1 <= button <= 5:
             self._click_funcs[button - 1] = func
+            self._click_methods[button - 1] = method
+            self._click_bleeds[button - 1] = bool(bleeds)
         else:
             raise ValueError("Invalid button!")
 

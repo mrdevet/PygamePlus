@@ -200,15 +200,22 @@ class EventLoop (object):
                     button = event.button
                     button_name = pgputils.mouse_button_reverse_map[button]
                     pos = screen.from_pygame_coordinates(event.pos)
-                    for sprite in screen:
-                        if sprite.rect.collidepoint(event.pos):
+                    sprites = screen.sprites()
+                    sprites.reverse()
+                    for sprite in sprites:
+                        func = sprite._click_funcs[button - 1]
+                        if func is None:
+                            continue
+                        method = sprite._click_methods[button - 1]
+                        bleeds = sprite._click_bleeds[button - 1]
+                        if sprite.is_touching_point(pos, method=method):
                             self._clicked_sprites[button - 1] = sprite
-                            # TODO: Make this work with mouse position parameters
                             if sprite._click_funcs[button - 1] is not None:
                                 pgputils.call_with_args(sprite._click_funcs[button - 1],
                                                 pos=pos, x=pos[0], y=pos[1], 
                                                 button=button, sprite=sprite)
-                            break
+                            if not bleeds:
+                                break
                     if screen._click_funcs[button - 1] is not None:
                         pgputils.call_with_args(screen._click_funcs[button - 1],
                                         pos=pos, x=pos[0], y=pos[1], 
@@ -225,6 +232,10 @@ class EventLoop (object):
                                         pos=pos, x=pos[0], y=pos[1], 
                                         button=button_name, sprite=sprite)
                     self._clicked_sprites[button - 1] = None
+                    if screen._release_funcs[button - 1] is not None:
+                        pgputils.call_with_args(screen._release_funcs[button - 1],
+                                        pos=pos, x=pos[0], y=pos[1], 
+                                        button=button_name)
 
                 # If the mouse moves and a button is down, call any associated
                 # drag handlers
@@ -236,6 +247,10 @@ class EventLoop (object):
                             pgputils.call_with_args(sprite._drag_funcs[button - 1],
                                             pos=pos, x=pos[0], y=pos[1], 
                                             button=button_name, sprite=sprite)
+                    if screen._mouse_move_func is not None:
+                        pgputils.call_with_args(screen._mouse_move_func,
+                                        pos=pos, x=pos[0], y=pos[1])
+                    
 
                 # If this event type matches a screen timer, call it's handler.
                 elif event.type in screen._timers:
@@ -254,9 +269,9 @@ class EventLoop (object):
             try:
                 for key_code, func in screen._key_hold_funcs.items():
                     if key_code is None and key_count > 0:
-                        pgputils.call_with_args(func, keys=keys)
+                        pgputils.call_with_args(func)
                     elif key_code is not None and keys[key_code]:
-                        pgputils.call_with_args(func, keys=keys)
+                        pgputils.call_with_args(func, key=pygame.key.name(key_code))
             except RuntimeError:
                 pass
 
