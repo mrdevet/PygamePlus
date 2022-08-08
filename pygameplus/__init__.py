@@ -1,6 +1,7 @@
 
 __version__ = "0.0.1"
 
+# Remove PyGame load message in console
 import os
 os.environ['PYGAME_HIDE_SUPPORT_PROMPT'] = "hide"
 
