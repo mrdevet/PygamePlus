@@ -3,9 +3,9 @@
 .upm
 .breakpoints
 poetry.lock
-pyproject.toml
 main.py
 *.zip
+upload.sh
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
