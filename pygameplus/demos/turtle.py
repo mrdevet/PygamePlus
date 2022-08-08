@@ -3,7 +3,7 @@
 # Purpose: Illustrate new features of the pygameplus.turtle module
 
 import code
-from pygameplus import Screen, start_event_loop
+from pygameplus import Screen, start_game
 from pygameplus.turtle import *
 
 def main ():
@@ -48,7 +48,7 @@ def main ():
 
     screen.on_key_press(interact, "escape")
 
-    start_event_loop()
+    start_game()
 
 
 # call the "main" function if running this script

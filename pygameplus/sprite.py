@@ -345,7 +345,7 @@ class Sprite (pygame.sprite.Sprite):
 
         Unlike changing the position property, this method will also turn the
         sprite in the direction of the given location.  This behaviour can be
-        turned of by setting the `turn` argument to `False`.
+        turned off by setting the `turn` argument to `False`.
         '''
 
         if turn:

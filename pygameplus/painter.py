@@ -328,7 +328,14 @@ class Painter (Sprite):
         self._fillpoly = [self._pos]
 
         # Create a surface to hold the lines drawn on top of the fill
-        self._drawings_over_fill = pygame.Surface(screen.size, pygame.SRCALPHA)
+        canvases = [g.canvas for g in self.groups() if isinstance(g, Screen)]
+        if canvases:
+            width = max([c.get_width() for c in canvases])
+            height = max([c.get_height() for c in canvases])
+        else:
+            width = 1
+            height = 1
+        self._drawings_over_fill = pygame.Surface((width, height), pygame.SRCALPHA)
 
 
     def end_fill (self):

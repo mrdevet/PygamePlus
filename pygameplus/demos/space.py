@@ -149,7 +149,7 @@ def main ():
     screen.update()
 
     # Start the event loop
-    start_event_loop(50)
+    start_game(50)
 
 
 # call the "main" function if running this script

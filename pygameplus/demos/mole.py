@@ -148,7 +148,7 @@ def main ():
     
     
     # Event loop
-    start_event_loop()
+    start_game()
 
 
 # call the "main" function if running this script

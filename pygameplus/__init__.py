@@ -1,6 +1,9 @@
 
 __version__ = "0.0.1"
 
+import os
+os.environ['PYGAME_HIDE_SUPPORT_PROMPT'] = "hide"
+
 import pygame
 
 pygame.init()
@@ -24,10 +27,10 @@ __all__ = [
     'Turtle', 
     'from_pygame_coordinates', 
     'get_active_screen', 
-    'get_event_loop', 
+    'get_game_loop', 
     'load_picture', 
     'music_stream',
-    'start_event_loop', 
-    'stop_event_loop', 
+    'start_game', 
+    'end_game', 
     'to_pygame_coordinates',
 ]

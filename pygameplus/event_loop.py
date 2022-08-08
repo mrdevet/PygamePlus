@@ -30,22 +30,22 @@ from pygameplus.screen import get_active_screen
 
 
 ################################################################################
-#                               EVENTLOOP CLASS
+#                               GAMELOOP CLASS
 ################################################################################
 
-class EventLoopTerminated (Exception):
+class GameLoopTerminated (Exception):
     '''
     Will be raised when the event loop is killed.
     '''
 
     pass
 
-class EventLoop (object):
+class GameLoop (object):
     '''
-    An EventLoop represents the loop that is continuously running in the
+    An GameLoop represents the loop that is continuously running in the
     background of a game and handles any events that occur.
 
-    EventLoop objects store the following information about an event loop:
+    GameLoop objects store the following information about an event loop:
      - Whether or not the event loop is running
      - The frame rate that the loop should try to maintain
 
@@ -56,11 +56,11 @@ class EventLoop (object):
 
     def __init__ (self, frame_rate=40):
         '''
-        Create an EventLoop object.
+        Create an GameLoop object.
 
-        EventLoop objects should generally not be created explicitly using the
-        EventLoop() constructor.  Instead, use the start_event_loop() and
-        end_event_loop() functions.
+        GameLoop objects should generally not be created explicitly using the
+        GameLoop() constructor.  Instead, use the start_game_loop() and
+        end_game_loop() functions.
         '''
 
         # Attributes that store the event loops current state
@@ -174,6 +174,9 @@ class EventLoop (object):
                 # If the close button is clicked, end the loop
                 if event.type == QUIT:
                     self._running = False
+                    screen._close()
+                    pygame.mixer.stop()
+                    pygame.mixer.music.stop()
                     pygame.display.quit()
                     return
 
@@ -297,10 +300,10 @@ class EventLoop (object):
         '''
         Terminate the event loop immediately.
 
-        This will raise an EventLoopTerminated exception.
+        This will raise an GameLoopTerminated exception.
         '''
 
-        raise EventLoopTerminated()
+        raise GameLoopTerminated()
 
 
     def on_timer (self, func, delay, repeat=False):
@@ -338,7 +341,7 @@ class EventLoop (object):
         Stop the timer with the given event ID.
 
         `event_id` must be an event ID that was returned from the `on_timer()`
-        method for this EventLoop.
+        method for this GameLoop.
         '''
 
         # Check that the argument is a valid event type
@@ -354,10 +357,10 @@ class EventLoop (object):
 #                               GLOBAL FUNCTIONS
 ################################################################################
 
-# Creates and EventLoop instance to use with the functions below.
-_event_loop = EventLoop()
+# Creates and GameLoop instance to use with the functions below.
+_game_loop = GameLoop()
 
-def start_event_loop (frame_rate=None):
+def start_game (frame_rate=None):
     '''
     Start the event loop to handle any interactions with the user.
 
@@ -366,11 +369,11 @@ def start_event_loop (frame_rate=None):
     '''
 
     if frame_rate is not None:
-        _event_loop.frame_rate = frame_rate
-    _event_loop.start()
+        _game_loop.frame_rate = frame_rate
+    _game_loop.start()
 
 
-def stop_event_loop ():
+def end_game ():
     '''
     End the event loop.
 
@@ -380,10 +383,10 @@ def stop_event_loop ():
     This will have no effect if the event loop has not started.
     '''
 
-    _event_loop.stop()
+    _game_loop.stop()
 
 
-def get_event_loop ():
+def get_game_loop ():
     '''
     Returns the event loop object.
 
@@ -391,12 +394,12 @@ def get_event_loop ():
     event loop while it is running or it you need to kill the event loop.
     '''
 
-    return _event_loop
+    return _game_loop
 
 
 # What is included when importing *
 __all__ = [
-    "start_event_loop",
-    "stop_event_loop",
-    "get_event_loop"
+    "start_game",
+    "end_game",
+    "get_game_loop"
 ]
