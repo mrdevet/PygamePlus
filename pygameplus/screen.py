@@ -92,6 +92,23 @@ class Screen (pygame.sprite.LayeredUpdates):
         # Attribute to hold timer event handlers
         self._timers = {}
 
+        # Attributes that hold information about the screen's grid
+        self._show_grid = False
+        self._grid = None
+        self._grid_props = {
+            "x_dist": 100, 
+            "y_dist": 100, 
+            "color": "black", 
+            "opacity": 0.5, 
+            "thickness": 3, 
+            "x_minor_dist": None,  # 20% of x_dist
+            "y_minor_dist": None,  # 20% of y_dist
+            "minor_color": None,  # Same as color
+            "minor_opacity": None,  # 50% of opacity
+            "minor_thickness": None   #50% of thickness
+        }
+        self._create_grid()
+
 
     ### Overwritten functions
 
@@ -200,6 +217,10 @@ class Screen (pygame.sprite.LayeredUpdates):
         if self._image_rect is not None:
             self._image_rect.centerx = width / 2
             self._image_rect.centery = height / 2
+
+        # If showing the grid, recreate it
+        if self._show_grid:
+            self._create_grid()
 
 
     @property
@@ -319,6 +340,146 @@ class Screen (pygame.sprite.LayeredUpdates):
             self._image_rect = self._image.get_rect()
             self._image_rect.centerx = self._width / 2
             self._image_rect.centery = self._height / 2
+
+
+    def _create_grid (self):
+
+        width = self._width
+        height = self._height
+        grid = pygame.Surface((width, height), pygame.SRCALPHA)
+
+        font = pygame.font.SysFont("Arial", 12)
+
+        x_dist = self._grid_props["x_dist"]
+        y_dist = self._grid_props["y_dist"]
+        color = self._grid_props["color"]
+        opacity = self._grid_props["opacity"]
+        thickness = self._grid_props["thickness"]
+        x_minor_dist = self._grid_props["x_minor_dist"] 
+        if x_minor_dist is None:
+            x_minor_dist = 0.2 * x_dist
+        y_minor_dist = self._grid_props["y_minor_dist"] 
+        if y_minor_dist is None:
+            y_minor_dist = 0.2 * y_dist
+        minor_color = self._grid_props["minor_color"]
+        if minor_color is None:
+            minor_color = color
+        minor_opacity = self._grid_props["minor_opacity"]
+        if minor_opacity is None:
+            minor_opacity = 0.5 * opacity
+        minor_thickness = self._grid_props["minor_thickness"]
+        if minor_thickness is None:
+            minor_thickness = int(0.5 * thickness)
+
+        # Draw thin vertical lines
+        line_surface = pygame.Surface((minor_thickness, height), pygame.SRCALPHA)
+        line_surface.fill(minor_color)
+        line_surface.set_alpha(int(minor_opacity * 255))
+        x = x_minor_dist
+        while x < width / 2:
+            # Don't draw the line if it coincides with a thick line
+            if x % x_dist != 0:
+                grid.blit(line_surface, (width / 2 + x - minor_thickness // 2, 0))
+                grid.blit(line_surface, (width / 2 - x - minor_thickness // 2, 0))
+            x += x_minor_dist
+
+        # Draw thin horizontal lines
+        line_surface = pygame.Surface((width, minor_thickness), pygame.SRCALPHA)
+        line_surface.fill(minor_color)
+        line_surface.set_alpha(int(minor_opacity * 255))
+        y = y_minor_dist
+        while y < height / 2:
+            # Don't draw the line if it coincides with a thick line
+            if y % y_dist != 0:
+                grid.blit(line_surface, (0, height / 2 + y - minor_thickness // 2))
+                grid.blit(line_surface, (0, height / 2 - y - minor_thickness // 2))
+            y += y_minor_dist
+
+        # Draw thick vertical lines
+        line_surface = pygame.Surface((thickness, height), pygame.SRCALPHA)
+        line_surface.fill(color)
+        line_surface.set_alpha(int(opacity * 255))
+        grid.blit(line_surface, (width / 2 - thickness // 2, 0))
+        x = x_dist
+        while x < width / 2:
+            grid.blit(line_surface, (width / 2 + x - thickness // 2, 0))
+            grid.blit(line_surface, (width / 2 - x - thickness // 2, 0))
+            
+            # Create labels
+            label = font.render(str(x), True, color)
+            grid.blit(label, (width / 2 + x - label.get_width() / 2, height / 2 + thickness // 2 + 3))
+            label = font.render(str(-x), True, color)
+            grid.blit(label, (width / 2 - x - label.get_width() / 2, height / 2 + thickness // 2 + 3))
+            
+            x += x_dist
+
+        # Draw thick horizontal lines
+        line_surface = pygame.Surface((width, thickness), pygame.SRCALPHA)
+        line_surface.fill(color)
+        line_surface.set_alpha(int(opacity * 255))
+        grid.blit(line_surface, (0, height / 2 - thickness // 2))
+        y = y_dist
+        while y < height / 2:
+            grid.blit(line_surface, (0, height / 2 + y - thickness // 2))
+            grid.blit(line_surface, (0, height / 2 - y - thickness // 2))
+            
+            # Create labels
+            label = font.render(str(y), True, color)
+            grid.blit(label, (width / 2 - label.get_width() - thickness // 2 - 3, height / 2 - y - label.get_height() / 2))
+            label = font.render(str(-y), True, color)
+            grid.blit(label, (width / 2 - label.get_width() - thickness // 2 - 3, height / 2 + y - label.get_height() / 2))
+            
+            y += y_dist
+
+        # Label for 0
+        label = font.render("0", True, color)
+        grid.blit(label, (width / 2 - label.get_width() - thickness // 2 - 3, height / 2 + thickness // 2 + 3))
+
+        # Set object attribute
+        self._grid = grid
+    
+    
+    def configure_grid (self, **kwargs):
+        '''
+        Configure the grid that can be drawn on the screen to aid in
+        finding positions.
+
+        Provide the following keyword arguments to change a property:
+         - x_dist (100)
+         - y_dist (100)
+         - color ("black")
+         - opacity (0.5)
+         - thickness (3)
+         - x_minor_dist (20)
+         - y_minor_dist (20)
+         - minor_color (same as color)
+         - minor_opacity (50% of opacity)
+         - minor_thickness (50% of thickness)
+        '''
+
+        for prop in kwargs:
+            if prop not in self._grid_props:
+                raise KeyError(f"Invalid grid property: {prop}")
+
+        self._grid_props.update(kwargs)
+        if self._show_grid:
+            self._create_grid()
+
+
+    @property
+    def show_grid (self):
+        '''
+        Whether or not the screen's grid is shown.
+        '''
+
+        return self._show_grid
+
+    @show_grid.setter
+    def show_grid (self, is_shown):
+
+        self._show_grid = bool(is_shown)
+        if is_shown:
+            self._create_grid()
 
 
     ### Methods for the drawing canvas
@@ -473,13 +634,22 @@ class Screen (pygame.sprite.LayeredUpdates):
         canvas_sprite.image.blit(self._canvas, (0, 0))
         canvas_sprite.image.blit(self._update_drawings, (0, 0))
         canvas_sprite.rect = pygame.Rect(0, 0, self._width, self._height)
-        self.add(canvas_sprite, layer=-1)
+        self.add(canvas_sprite, layer=-2)
+
+        # Create a sprite to hold the grid
+        if self._show_grid:
+            grid_sprite = pygame.sprite.Sprite()
+            grid_sprite.image = self._grid
+            grid_sprite.rect = pygame.Rect(0, 0, self._width, self._height)
+            self.add(grid_sprite, layer=-1)
 
         # Draw the sprites
         ret = pygame.sprite.LayeredUpdates.draw(self, surface)
 
-        # Remove the drawings sprite
+        # Remove the extra sprites
         self.remove(canvas_sprite)
+        if self._show_grid:
+            self.remove(grid_sprite)
 
         return ret
     
