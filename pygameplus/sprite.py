@@ -135,6 +135,7 @@ class Sprite (pygame.sprite.Sprite):
         self._fillcolor_obj = pygame.Color("black")
 
         # Attributes that hold any event handlers associated with the sprite
+        self._disabled = False
         self._on_update_func = None
         self._click_funcs = [None for _ in range(5)]
         self._click_methods = [None for _ in range(5)]
@@ -1296,6 +1297,20 @@ class Sprite (pygame.sprite.Sprite):
 
 
     ### Click Event Methods
+
+    @property
+    def disabled (self):
+        '''
+        Whether or not the sprite is disabled for click events.
+        '''
+
+        return self._disabled
+
+    @disabled.setter
+    def disabled (self, is_disabled):
+
+        self._disabled = bool(is_disabled)
+
 
     def on_click (self, func, button="left", method="rect", bleeds=False):
         '''

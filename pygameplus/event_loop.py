@@ -213,7 +213,7 @@ class GameLoop (object):
                         bleeds = sprite._click_bleeds[button - 1]
                         if sprite.is_touching_point(pos, method=method):
                             self._clicked_sprites[button - 1] = sprite
-                            if sprite._click_funcs[button - 1] is not None:
+                            if sprite._click_funcs[button - 1] is not None and not sprite.disabled:
                                 pgputils.call_with_args(sprite._click_funcs[button - 1],
                                                 pos=pos, x=pos[0], y=pos[1], 
                                                 button=button, sprite=sprite)
@@ -230,7 +230,7 @@ class GameLoop (object):
                     button_name = pgputils.mouse_button_reverse_map[button]
                     pos = screen.from_pygame_coordinates(event.pos)
                     sprite = self._clicked_sprites[button - 1]
-                    if sprite and sprite._release_funcs[button - 1] is not None:
+                    if sprite and sprite._release_funcs[button - 1] is not None and not sprite.disabled:
                         pgputils.call_with_args(sprite._release_funcs[button - 1],
                                         pos=pos, x=pos[0], y=pos[1], 
                                         button=button_name, sprite=sprite)
@@ -246,7 +246,7 @@ class GameLoop (object):
                     pos = screen.from_pygame_coordinates(event.pos)
                     for button, sprite in enumerate(self._clicked_sprites, 1):
                         button_name = pgputils.mouse_button_reverse_map[button]
-                        if sprite and sprite._drag_funcs[button - 1] is not None:
+                        if sprite and sprite._drag_funcs[button - 1] is not None and not sprite.disabled:
                             pgputils.call_with_args(sprite._drag_funcs[button - 1],
                                             pos=pos, x=pos[0], y=pos[1], 
                                             button=button_name, sprite=sprite)
