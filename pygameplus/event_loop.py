@@ -295,6 +295,9 @@ class GameLoop (object):
 
         self._running = False
 
+        for timer_id in list(self._timers.keys()):
+            self.cancel_timer(timer_id)
+
 
     def kill (self):
         '''
