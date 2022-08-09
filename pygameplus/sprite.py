@@ -25,8 +25,8 @@
 import math
 import pygame
 
-from pygameplus import pgputils
-from pygameplus.screen import get_active_screen, to_pygame_coordinates
+from . import pgputils
+from .screen import get_active_screen, to_pygame_coordinates
 
 ################################################################################
 #                               HELPER FUNCTIONS

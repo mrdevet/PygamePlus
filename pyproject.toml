@@ -16,7 +16,7 @@ requires-python = ">=3"
 
 [[project.authors]]
 name = "Casey Devet"
-email = "cjdevet@gmail.com"
+email = "casey@devet.ca"
 
 [project.urls]
 Homepage = "https://github.com/mrdevet/PygamePlus"

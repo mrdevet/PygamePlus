@@ -9,12 +9,12 @@ import pygame
 
 pygame.init()
 
-from pygameplus.screen import *
-from pygameplus.sprite import *
-from pygameplus.painter import *
-from pygameplus.turtle import *
-from pygameplus.event_loop import *
-from pygameplus.pgputils import *
+from .screen import *
+from .sprite import *
+from .painter import *
+from .turtle import *
+from .event_loop import *
+from .pgputils import *
 
 Sound = pygame.mixer.Sound
 music_stream = pygame.mixer.music
