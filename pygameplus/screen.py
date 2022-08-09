@@ -169,6 +169,7 @@ class Screen (pygame.sprite.LayeredUpdates):
         self._timers.clear()
 
 
+    @property
     def is_open (self):
         '''
         Return whether or not this screen is the active screen.
