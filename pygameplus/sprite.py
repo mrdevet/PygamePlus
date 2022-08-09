@@ -350,20 +350,7 @@ class Sprite (pygame.sprite.Sprite):
         '''
 
         if turn:
-            # Get the distance and direction
-            delta = pygame.Vector2(x, y) - self._pos
-            distance, direction = delta.as_polar()
-
-            # Don't turn if the sprite isn't moving
-            if distance > 0:
-                # Adjust direction to turn in closest direction
-                if direction - self._dir > 180:
-                    direction -= 360
-                if direction - self._dir < -180:
-                    direction += 360
-
-                # Do the turn
-                self.direction = direction
+            self.turn_toward(x, y)
 
         # Move the sprite
         self.position = pygame.Vector2(x, y)
@@ -402,6 +389,19 @@ class Sprite (pygame.sprite.Sprite):
             raise ValueError("Invalid y-coordinate!") from None
 
 
+    @property
+    def center (self):
+        '''
+        The coordinates of the center of the sprite's image.
+        '''
+
+        return self._pos
+
+    @center.setter
+    def center (self, new_coordinates):
+
+        self._pos = new_coordinates
+    
     @property
     def center_x (self):
         '''
@@ -665,12 +665,25 @@ class Sprite (pygame.sprite.Sprite):
             self._dirty_rotate = True
 
 
-    def turn_to (self, direction):
+    def turn_toward (self, x, y=None):
         '''
-        Change the direction.
+        Turn the sprite towards the given coordinates.
         '''
 
-        self.direction = direction
+        # Get the distance and direction
+        delta = pygame.Vector2(x, y) - self._pos
+        distance, direction = delta.as_polar()
+
+        # Don't turn if given current location
+        if distance > 0:
+            # Adjust direction to turn in closest direction
+            if direction - self._dir > 180:
+                direction -= 360
+            if direction - self._dir < -180:
+                direction += 360
+
+            # Do the turn
+            self.direction = direction
 
 
     def turn_left (self, angle):
