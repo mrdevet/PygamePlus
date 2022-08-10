@@ -16,6 +16,9 @@ collections:
   classes:
     permalink: "/:collection/:path/"
     output: true
+  api:
+    permalink: "/:collection/:path/"
+    output: true
 
 just_the_docs:
   collections:
@@ -23,3 +26,5 @@ just_the_docs:
       name: "Tutorials"
     classes:
       name: "Classes"
+    api:
+      name: "API Reference"
