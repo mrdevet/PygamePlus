@@ -1,6 +1,5 @@
 ---
 layout: default
-title: Sprite
 nav_order: 2
 ---
 # Sprite
