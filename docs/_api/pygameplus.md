@@ -39,15 +39,11 @@ title: pygameplus
 
 End the event loop.
 
-This does not immediately end the event loop, but will end the loop at the 
-end of the current iteration.
-    
-This will have no effect if the event loop has not started.
+This does not immediately end the event loop, but will end the loop at the <br />end of the current iteration.<br />    <br />This will have no effect if the event loop has not started.
 
 ### `from_pygame_coordinates(pygame_x, pygame_y=None)`
 
-Convert a point in the pygame coordinate space to the same point in 
-the active screen's coordinate space.
+Convert a point in the pygame coordinate space to the same point in <br />the active screen's coordinate space.
 
 ### `get_active_screen()`
 
@@ -59,16 +55,13 @@ This will return None if no screen is active.
 
 Returns the event loop object.
 
-This is really only necessary if you need to change the frame rate of the
-event loop while it is running or it you need to kill the event loop.
+This is really only necessary if you need to change the frame rate of the<br />event loop while it is running or it you need to kill the event loop.
 
 ### `load_picture(picture)`
 
 Load a picture into your program.
 
-This is useful if you will be changing the picture of a Sprite often.
-You can load the picture once and then change the picture to this
-object.
+This is useful if you will be changing the picture of a Sprite often.<br />You can load the picture once and then change the picture to this<br />object.
 
 This function returns a pygame Surface.
 
@@ -76,18 +69,15 @@ This function returns a pygame Surface.
 
 Start the event loop to handle any interactions with the user.
 
-The frame rate is the number of iterations the event loop should try to
-accomplish in a second.
+The frame rate is the number of iterations the event loop should try to<br />accomplish in a second.
 
 ### `to_pygame_coordinates(x, y=None)`
 
-Convert a point in the active screen's coordinate space to the same point 
-in the pygame coordinate space.
+Convert a point in the active screen's coordinate space to the same point <br />in the pygame coordinate space.
 
 ## Other Attributes
 
 | Name | Description |
 | --- | --- |
-| x | int([x]) -> integer
-int(x, base=10) -> integer |
+| x | int([x]) -> integer<br />int(x, base=10) -> integer |
 

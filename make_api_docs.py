@@ -1,4 +1,5 @@
 
+from collections import OrderedDict
 import inspect
 import os
 import pprint
@@ -13,11 +14,14 @@ DOCS_DIR = 'docs/'
 DOCS_SUBDIR = '_api/'
 LINK_FORMATTER = lambda page: f'{{{{ site.baseurl }}}}{{% link {DOCS_SUBDIR}{page} %\}}'
 
+namespace = {}    
+
 def clean_docstring (obj, short=False):
     docstring = inspect.getdoc(obj)
     if docstring is None or docstring.strip() == '':
         return None
     paragraphs = re.split(2 * os.linesep + '+', docstring)
+    paragraphs = [x.replace(os.linesep, '<br />') for x in paragraphs]
     return paragraphs[0] if short else '\n\n'.join(paragraphs)
 
 def filter_members (obj, predicate=None, only_all=True, skip_underscores=True):
@@ -27,6 +31,14 @@ def filter_members (obj, predicate=None, only_all=True, skip_underscores=True):
     elif skip_underscores:
         members = [x for x in members if not x[0].startswith('_')]
     return members
+
+def signature (func):
+    try:
+        return inspect.signature(func)
+    except TypeError:
+        return ''
+    except:
+        return '(...)'
 
 def document_module (mod, name, parent=None, file=sys.stdout, only_all=True, skip_underscores=True):
     # Print Jekyll header
@@ -52,7 +64,7 @@ def document_module (mod, name, parent=None, file=sys.stdout, only_all=True, ski
         print('| Module | Description |', file=file)
         print('| --- | --- |', file=file)
         for attr, value in submods:
-            summary = clean_docstring(value, short=True).replace(os.linesep, '<br />')
+            summary = clean_docstring(value, short=True)
             print(f'| {attr} | {summary} |', file=file)
             new_parent = f'{parent}.{name}' if parent else name
             subfile_name = f'{DOCS_DIR}{DOCS_SUBDIR}{new_parent}.{attr}.md'
@@ -68,7 +80,7 @@ def document_module (mod, name, parent=None, file=sys.stdout, only_all=True, ski
         print('| Class | Description |', file=file)
         print('| --- | --- |', file=file)
         for attr, value in subclasses:
-            summary = clean_docstring(value, short=True).replace(os.linesep, '<br />')
+            summary = clean_docstring(value, short=True)
             print(f'| {attr} | {summary} |', file=file)
             attributes_seen.append(value)
         print(file=file)
@@ -84,11 +96,24 @@ def document_module (mod, name, parent=None, file=sys.stdout, only_all=True, ski
                 signature = inspect.signature(value)
             except:
                 signature = "(...)"
-            summary = clean_docstring(value, short=True).replace(os.linesep, '<br />')
+            summary = clean_docstring(value, short=True)
             print(f'| {attr}{signature} | {summary} |', file=file)
             attributes_seen.append(value)
         print(file=file)
 
+    # Document Others
+    others_predicate = lambda obj: bool(obj not in attributes_seen)
+    others = filter_members(mod, others_predicate, only_all, skip_underscores)
+    if others:
+        print(f'## Other Attributes', file=file, end='\n\n')
+        print('| Name | Value |', file=file)
+        print('| --- | --- |', file=file)
+        for attr, value in others:
+            print(f'| {attr} | {value!r} |', file=file)
+        print(file=file)
+
+    # Document Function Details
+    if funcs:
         print(f'## Function Details', file=file, end='\n\n')
         for attr, value in funcs:
             try:
@@ -100,21 +125,83 @@ def document_module (mod, name, parent=None, file=sys.stdout, only_all=True, ski
             if details:
                 print(details, file=file, end='\n\n')
 
-    # Document Others
-    others_predicate = lambda obj: bool(obj not in attributes_seen)
-    others = filter_members(mod, others_predicate, only_all, skip_underscores)
-    if others:
-        print(f'## Other Attributes', file=file, end='\n\n')
-        print('| Name | Description |', file=file)
-        print('| --- | --- |', file=file)
-        for attr, value in others:
-            summary = clean_docstring(value, short=True)
-            print(f'| {attr} | {summary} |', file=file)
-        print(file=file)
+
+classes = {}
+
+def document_class (cls, name, parent=None, file=sys.stdout, only_all=True, skip_underscores=True):
+    # Print Jekyll header
+    print('---', file=file)
+    print('layout: default', file=file)
+    print(f'title: {name}', file=file)
+    if parent:
+        print(f'parent: {parent}', file=file)
+    print('---', file=file)
+
+    classes[name] = cls
+    
+    # Print name and module docstring
+    print(f'# {name}', file=file, end='\n\n')
+    if cls.__doc__:
+        print(clean_docstring(cls), file=file, end='\n\n')
+
+    attributes = OrderedDict()
+    attributes["Nested Classes"] = []
+    attributes["Methods"] = []
+    attributes["Static Methods"] = []
+    attributes["Class Methods"] = []
+    attributes["Properties"] = []
+    attributes["Other Attributes"] = []
+
+    # Sort attributes by kind
+    methods_defined_here = []
+    for attr, kind, def_cls, value in inspect.classify_class_attrs(cls):
+        if skip_underscores and attr.startswith('_'):
+            continue
+        print(attr, kind, def_cls)
+        if inspect.isclass(value):
+            attributes["Nested Classes"].append((attr, def_cls, value))
+        elif kind == "static method":
+            attributes["Static Methods"].append((attr, def_cls, value))
+        elif kind == "class method":
+            attributes["Class Methods"].append((attr, def_cls, value))
+        elif kind == "method":
+            attributes["Methods"].append((attr, def_cls, value))
+        elif kind == "property":
+            attributes["Properties"].append((attr, def_cls, value))
+        else:
+            attributes["Other Attributes"].append((attr, def_cls, value))
+        if def_cls is cls:
+            methods_defined_here.append((attr, value))
+
+    # 
+    for kind, kind_attributes in attributes.items():
+        if not kind_attributes:
+            continue
+        print(f'## {kind}', file=file, end='\n\n')
+        attributes_by_origin = {}
+        for attr, def_cls, value in kind_attributes:
+            if def_cls in attributes_by_origin:
+                attributes_by_origin[def_cls].append((attr, value))
+            else:
+                attributes_by_origin[def_cls] = [(attr, value)]
+        for current_cls in inspect.getmro(cls):
+            if current_cls in attributes_by_origin:
+                if current_cls is not cls:
+                    print(f'### Inherited from {current_cls.__module__}.{current_cls.__name__}', file=file, end='\n\n')
+                print('| Attribute | Description |', file=file)
+                print('| --- | --- |', file=file)
+                for attr, value in attributes_by_origin[current_cls]:
+                    sig = signature(value)
+                    summary = clean_docstring(value, short=True)
+                    print(f'| `{attr}{sig}` | {summary} |', file=file)
+                print(file=file)
+                
 
 
 if __name__ == '__main__':
     # pprint.pprint(filter_members(pygameplus))
-    # pprint.pprint(filter_members(pygameplus.music_stream))
-    with open(f'{DOCS_DIR}{DOCS_SUBDIR}{MODULE.__name__}.md', 'w') as doc_file:
-        document_module(MODULE, MODULE.__name__, file=doc_file)
+    # with open(f'{DOCS_DIR}{DOCS_SUBDIR}{MODULE.__name__}.md', 'w') as doc_file:
+    #     document_module(MODULE, MODULE.__name__, file=doc_file)
+    pprint.pprint(filter_members(pygameplus.Painter))
+    with open(f'{DOCS_DIR}{DOCS_SUBDIR}pygameplus.Painter.md', 'w') as doc_file:
+        document_class(pygameplus.Painter, 'Painter', 'pygameplus', file=doc_file)
