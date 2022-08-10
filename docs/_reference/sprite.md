@@ -1,3 +1,6 @@
+---
+title: Sprite
+---
 # Sprite
 
 A Sprite represents an image that moves around the screen in a game.

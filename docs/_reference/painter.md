@@ -1,3 +1,6 @@
+---
+title: Painter
+---
 # Painter
 
 A Painter is a special sub-class of a Sprite with extra methods used to draw on the screen.  All methods of a Sprite object can be used on Painter objects.

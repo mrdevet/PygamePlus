@@ -1,3 +1,6 @@
+---
+title: Screen
+---
 # Screen
 
 A Screen represents a single game screen visible in the window.
