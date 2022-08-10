@@ -4,6 +4,15 @@ nav_order: 3
 ---
 # Painter
 
+## Table of contents
+
+{: .no_toc .text-delta }
+
+1. TOC
+   {:toc}
+
+---
+
 A Painter is a special sub-class of a Sprite with extra methods used to draw on the screen.  All methods of a Sprite object can be used on Painter objects.
 
 Some features of Painter objects include:

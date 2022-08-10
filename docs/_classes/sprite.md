@@ -4,6 +4,15 @@ nav_order: 2
 ---
 # Sprite
 
+## Table of contents
+
+{: .no_toc .text-delta }
+
+1. TOC
+   {:toc}
+
+---
+
 A Sprite represents an image that moves around the screen in a game.
 
 Sprite objects store the following information necessary for drawing these images on the screen:

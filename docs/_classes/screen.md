@@ -4,6 +4,15 @@ nav_order: 1
 ---
 # Screen
 
+## Table of contents
+
+{: .no_toc .text-delta }
+
+1. TOC
+   {:toc}
+
+---
+
 A Screen represents a single game screen visible in the window.
 
 At any one time there can be only one "active" screen that is visible.  If a screen is active and another is opened, then the active screen is replaced in the window.
