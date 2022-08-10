@@ -75,7 +75,7 @@ class Painter (Sprite):
 
         # Attributes associates with fills
         self._filling = False
-        self._fill_as_moving = None
+        self._fill_as_moving = False
         self._fillpoly = None
         self._fill_canvas = None
         self._drawings_over_fill = None

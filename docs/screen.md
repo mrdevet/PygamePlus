@@ -1,10 +1,8 @@
-## Screen
+# Screen
 
 A Screen represents a single game screen visible in the window.
 
-At any one time there can be only one "active" screen that is visible.
-If a screen is active and another is opened, then the active screen is 
-replaced in the window.
+At any one time there can be only one "active" screen that is visible.  If a screen is active and another is opened, then the active screen is replaced in the window.
 
 Screen objects store the following information about a screen:
  - Its dimensions and title
@@ -15,10 +13,9 @@ Methods are provided to do the following:
  - Open a screen and make it active
  - Change the dimensions, title or background
  - Clear any images that have been drawn on the screen
- - Add behaviour when the mouse clicks on the screen or when keyboard
-   keys are used when the screen is active
+ - Add behaviour when the mouse clicks on the screen or when keyboard keys are used when the screen is active
 
-### Creation
+## Creation
 
 To create a screen, you must provide a width and height.  You may also provide a title.
 
@@ -29,7 +26,7 @@ my_screen = Screen(540, 360, title='My Game')
 
 Note that creating a screen does not open it.  You must use the `.open()` method to make it appear on the screen.
 
-### Screen Size and State
+## Screen Size and State
 
 Basic properties of the screen, including size, color and open state can be accessed or changed using these properties and methods:
 
@@ -44,7 +41,7 @@ Basic properties of the screen, including size, color and open state can be acce
 | `.width` | The width of the screen, in pixels. |
 | `.size` | The size of the screen, in pixels, as a (width, height) tuple. |
 
-### Sprites on the Screen
+## Sprites on the Screen
 
 The following methods can be used to manage the sprites that appear on the screen:
 
@@ -60,7 +57,7 @@ The following methods can be used to manage the sprites that appear on the scree
 The `Screen` class is a subclass of pygame's group class `pygame.sprite.LayeredUpdates`. 
  More advanced sprite management can be done with that [class' methods](https://www.pygame.org/docs/ref/sprite.html#pygame.sprite.LayeredUpdates).
 
-### Coordinate System
+## Coordinate System
 
 PygamePlus uses a coordinate system that will look familiar to math students.  It has the origin at the center of the screen, positive x-coordinates go to the right and positive y-coordinates go up.  **This is different from pygame's coordinate system.**
 
@@ -73,7 +70,7 @@ The `Screen` class has methods to convert between these coordinate systems.  It 
 | `.from_pygame_coordinates(x, y)` | Convert pygame coordinates into PygamePlus coordinates. |
 | `.to_pygame_coordinates(x, y)` | Convert PygamePlus coordinates into pygame coordinates. |
 
-### Screen Canvas
+## Screen Canvas
 
 A screen can be drawn on using the `Painter` and `Turtle` sprite subclasses.  The following properties and methods can be used to manage this canvas.
 
@@ -84,7 +81,7 @@ A screen can be drawn on using the `Painter` and `Turtle` sprite subclasses.  Th
 | `.clear_circle(center, radius, remove_sprites=False)` | Clears a circular section of the canvas with the given center position and radius. Optionally, you can clear sprites located in this circle.  |
 | `.clear_rect(corner1, corner2, remove_sprites=False)` | Clears a rectangular section of the canvas with the given opposite corner positions. Optionally, you can clear sprites located in this rectangle. |
 
-### Event Handlers
+## Event Handlers
 
 Event handler functions may be bound to the screen to be executed when mouse and keyboard events occur on the active screen.  Timers can also be created to execute a function when they expire.
 
@@ -101,7 +98,7 @@ The methods below are used to bind event handler functions to screen events.  If
 | `.on_timer(func, delay, repeat=False)` | Call a function after a given time delay (in milliseconds).  Optionally, you can set this timer to repeat after it has expired.  The function returns an event ID that can be used to cancel the timer. |
 | `.cancel_timer(event_id)` | Cancel the timer with the given event ID. |
 
-### Updating and Drawing the Screen
+## Updating and Drawing the Screen
 
 The following methods are provided to update sprites and redraw the screen.  **These functions should not be used explicitly, but will be called by the game loop.**
 

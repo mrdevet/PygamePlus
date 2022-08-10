@@ -13,7 +13,7 @@ from .screen import *
 from .sprite import *
 from .painter import *
 from .turtle import *
-from .event_loop import *
+from .gameloop import *
 from .pgputils import *
 
 Sound = pygame.mixer.Sound

@@ -40,6 +40,7 @@ class GameLoopTerminated (Exception):
 
     pass
 
+
 class GameLoop (object):
     '''
     An GameLoop represents the loop that is continuously running in the
