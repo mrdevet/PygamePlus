@@ -1,4 +1,6 @@
 ---
+layout: default
+title: Screen
 nav_order: 1
 ---
 # Screen
