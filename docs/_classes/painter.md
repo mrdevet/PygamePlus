@@ -33,7 +33,7 @@ As with a Sprite, you must use add it to the screen for it to appear.
 
 ## Drawing and Filling
 
-A painter draws on the screen by putting its pen on the canvas at some starting point and them moving around.  The painter moves around using its [Sprite properties and methods]({{ site.baseurl }}{% link _reference/sprite.md %})
+A painter draws on the screen by putting its pen on the canvas at some starting point and them moving around.  The painter moves around using its [Sprite properties and methods]({{ site.baseurl }}{% link _classes/sprite.md %})
 
 | Property/Method | Description |
 | --- | --- |
