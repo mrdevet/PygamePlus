@@ -13,7 +13,7 @@ collections:
   tutorials:
     permalink: "/:collection/:path/"
     output: true
-  ref:
+  reference:
     permalink: "/:collection/:path/"
     output: true
 
@@ -21,5 +21,5 @@ just_the_docs:
   collections:
     tutorials:
       name: "Tutorials"
-    docs:
+    reference:
       name: "Class Information"
