@@ -1,5 +1,5 @@
 ---
-title: Painter
+nav_order: 3
 ---
 # Painter
 
