@@ -1,4 +1,5 @@
 ---
+layout: default
 nav_order: 3
 ---
 # Painter
@@ -16,7 +17,7 @@ nav_order: 3
 
 ---
 
-A Painter is a special sub-class of a Sprite with extra methods used to draw on the screen.  All methods of a Sprite object can be used on Painter objects.
+A Painter is a special sub-class of a [Sprite]({{ site.baseurl }}{% link _classes/sprite.md %}) with extra methods used to draw on the screen.  All methods of a Sprite object can be used on Painter objects.
 
 Some features of Painter objects include:
  - They can draw on the screen when they move.

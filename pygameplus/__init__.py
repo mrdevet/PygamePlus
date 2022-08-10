@@ -19,6 +19,8 @@ from .pgputils import *
 Sound = pygame.mixer.Sound
 music_stream = pygame.mixer.music
 
+x = 5
+
 __all__ = [
     'Color', 
     'Painter', 
@@ -34,4 +36,5 @@ __all__ = [
     'start_game', 
     'end_game', 
     'to_pygame_coordinates',
+    'x'
 ]

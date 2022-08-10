@@ -1,4 +1,5 @@
 ---
+layout: default
 nav_order: 4
 ---
 # Turtle
@@ -15,3 +16,7 @@ nav_order: 4
 </details>
 
 ---
+
+A Turtle is a special sprite that can move around the screen and make drawings.  The turtle's movements will be animated so that you can see it's movements.
+
+A turtle object includes all of the movement methods of a [Sprite]({{ site.baseurl }}{% link _classes/sprite.md %}) and the drawing methods of a [Painter]({{ site.baseurl }}{% link _classes/painter.md %}).
