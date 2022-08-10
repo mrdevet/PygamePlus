@@ -20,6 +20,6 @@ collections:
 just_the_docs:
   collections:
     tutorials:
-      name: Tutorials
+      name: "Tutorials"
     docs:
-      name: Class Information
+      name: "Class Information"
