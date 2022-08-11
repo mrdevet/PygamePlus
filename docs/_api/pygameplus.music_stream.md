@@ -36,5 +36,3 @@ Alias for [`pygame.mixer.music`](https://www.pygame.org/docs/ref/music.html#modu
 
 ---
 
-## Member Details
-

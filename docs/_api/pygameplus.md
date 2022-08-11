@@ -15,15 +15,15 @@ PygamePlus
 
 ### Submodules
 
-| <a href="pygameplus.music_stream">`music_stream`</a> | Pygame module for controlling streamed audio. |
+| <a href="../pygameplus.music_stream">`music_stream`</a> | Pygame module for controlling streamed audio. |
 
 ### Classes
 
-| <a href="pygameplus.Painter">`Painter(image=None)`</a> | A Painter is a special sub-class of a Sprite with extra methods used to  draw on the screen.  All methods of a Sprite object can be used on Painter objects. |
-| <a href="pygameplus.Screen">`Screen(width, height, title='')`</a> | A Screen represents a single game screen visible in the window. |
-| <a href="pygameplus.Sound">`Sound(...)`</a> | Create a new Sound object from a file or buffer object. |
-| <a href="pygameplus.Sprite">`Sprite(image=None)`</a> | A Sprite represents an image that moves around the screen in a game. |
-| <a href="pygameplus.Turtle">`Turtle()`</a> | A Turtle is a special sprite that can move around the screen and make  drawings.  The turtle's movements will be animated so that you can see it's movements. |
+| <a href="../pygameplus.Painter">`Painter(image=None)`</a> | A Painter is a special sub-class of a Sprite with extra methods used to  draw on the screen.  All methods of a Sprite object can be used on Painter objects. |
+| <a href="../pygameplus.Screen">`Screen(width, height, title='')`</a> | A Screen represents a single game screen visible in the window. |
+| <a href="../pygameplus.Sound">`Sound(...)`</a> | Create a new Sound object from a file or buffer object. |
+| <a href="../pygameplus.Sprite">`Sprite(image=None)`</a> | A Sprite represents an image that moves around the screen in a game. |
+| <a href="../pygameplus.Turtle">`Turtle()`</a> | A Turtle is a special sprite that can move around the screen and make  drawings.  The turtle's movements will be animated so that you can see it's movements. |
 
 ### Functions
 

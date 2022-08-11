@@ -102,7 +102,7 @@ def document_module (mod, name, parents=[], file=sys.stdout, only_all=True, skip
                 sig = signature(value)
                 summary = clean_docstring(value, short=True)
                 if kind == 'Submodules' or kind == 'Classes':
-                    href = new_filename = '.'.join(parents) + f'{name}.{attr}'
+                    href = '../' + '.'.join(parents) + f'{name}.{attr}'
                 else:
                     href = f'#{attr}'
                     members_with_details.append((attr, value))
@@ -118,16 +118,17 @@ def document_module (mod, name, parents=[], file=sys.stdout, only_all=True, skip
     print('---', file=file, end='\n\n')
 
     # Document Member Details
-    print('## Member Details', file=file, end='\n\n')
-    members_with_details.sort()
-    for attr, value in members_with_details:
-        if attr in external_docs:
-            continue
-        sig = signature(value)
-        print(f'### `{attr}{sig}` {{#{attr}}}', file=file, end='\n\n')
-        details = clean_docstring(value, blockquote=True)
-        if details:
-            print(details, file=file, end='\n\n')
+    if members_with_details:
+        print('## Member Details', file=file, end='\n\n')
+        members_with_details.sort()
+        for attr, value in members_with_details:
+            if attr in external_docs:
+                continue
+            sig = signature(value)
+            print(f'### `{attr}{sig}` {{#{attr}}}', file=file, end='\n\n')
+            details = clean_docstring(value, blockquote=True)
+            if details:
+                print(details, file=file, end='\n\n')
 
     # Recursively 
     if recursive:
