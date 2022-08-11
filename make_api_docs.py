@@ -45,7 +45,6 @@ def document_module (mod, name, parents=[], file=sys.stdout, only_all=True, skip
     members['Other Attributes'] = []
 
     # Sort attributes by kind
-    members_defined_here = []
     for attr, value in inspect.getmembers(mod):
         if only_all and hasattr(mod, '__all__') and attr not in mod.__all__:
             continue
@@ -59,7 +58,9 @@ def document_module (mod, name, parents=[], file=sys.stdout, only_all=True, skip
             members['Functions'].append((attr, value))
         else:
             members['Other Members'].append((attr, value))
-        members_defined_here.append((attr, value))
+
+    # Get external docs links
+    external_docs = getattr(mod, '_EXTERNAL_DOCS', {})
 
     # Print Jekyll header
     print('---', file=file)
@@ -83,21 +84,45 @@ def document_module (mod, name, parents=[], file=sys.stdout, only_all=True, skip
     print('---', file=file, end='\n\n')
 
     # Print member summaries
+    members_with_details = []
     print('## Member Summary', file=file, end='\n\n')
     for kind, kind_members in members.items():
         if not kind_members:
             continue
         print(f'### {kind}', file=file, end='\n\n')
+        internal_members = []
+        external_members = []
         for attr, value in kind_members:
-            sig = signature(value)
-            summary = clean_docstring(value, short=True)
-            print(f'| <a href="#{attr}">`{attr}{sig}`</a> | {summary} |', file=file)
-        print(file=file)
+            if attr in external_docs:
+                external_members.append((attr, value))
+            else:
+                internal_members.append((attr, value))
+        if internal_members:
+            for attr, value in internal_members:
+                sig = signature(value)
+                summary = clean_docstring(value, short=True)
+                if kind == 'Submodules' or kind == 'Classes':
+                    href = new_filename = '.'.join(parents) + f'{name}.{attr}'
+                else:
+                    href = f'#{attr}'
+                    members_with_details.append((attr, value))
+                print(f'| <a href="{href}">`{attr}{sig}`</a> | {summary} |', file=file)
+            print(file=file)
+        if external_members:
+            print(f'**Defined Externally:**', file=file, end='\n\n')
+            for attr, value in external_members:
+                sig = signature(value)
+                href = external_docs[attr]
+                print(f'- <a href="{href}">`{attr}{sig}`</a>', file=file)
+            print(file=file)
     print('---', file=file, end='\n\n')
 
     # Document Member Details
     print('## Member Details', file=file, end='\n\n')
-    for attr, value in members_defined_here:
+    members_with_details.sort()
+    for attr, value in members_with_details:
+        if attr in external_docs:
+            continue
         sig = signature(value)
         print(f'### `{attr}{sig}` {{#{attr}}}', file=file, end='\n\n')
         details = clean_docstring(value, blockquote=True)
@@ -107,11 +132,15 @@ def document_module (mod, name, parents=[], file=sys.stdout, only_all=True, skip
     # Recursively 
     if recursive:
         for attr, value in members['Submodules']:
+            if attr in external_docs:
+                continue
             new_filename = '.'.join(parents) + f'{name}.{attr}.md'
             with open(f'{DOCS_DIR}{DOCS_SUBDIR}{new_filename}', 'w') as doc_file:
                 document_module(value, attr, [name] + parents, doc_file, only_all, 
                                 skip_underscores, recursive)
         for attr, value in members['Classes']:
+            if attr in external_docs:
+                continue
             new_filename = '.'.join(parents) + f'{name}.{attr}.md'
             with open(f'{DOCS_DIR}{DOCS_SUBDIR}{new_filename}', 'w') as doc_file:
                 document_class(value, attr, [name] + parents, doc_file, only_all, 
