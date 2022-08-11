@@ -1,8 +1,13 @@
 ---
 layout: default
 title: pygameplus
+has_children: true
 ---
 # pygameplus
+
+PygamePlus
+
+**TODO**
 
 ---
 
@@ -54,7 +59,7 @@ title: pygameplus
 
 > Create a new Sound object from a file or buffer object.
 > 
-> Wrapper for [`pygame.mixer.Sound`](https://www.pygame.org/docs/ref/mixer.html#pygame.mixer.Sound).  See the pygame reference for more details.
+> Wrapper class for [`pygame.mixer.Sound`](https://www.pygame.org/docs/ref/mixer.html#pygame.mixer.Sound).  See the pygame reference for more details.
 
 ### `Sprite(image=None)` {#Sprite}
 

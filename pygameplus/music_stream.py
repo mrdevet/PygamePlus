@@ -1,7 +1,7 @@
 '''
-PygamePlus
+Pygame module for controlling streamed audio.
 
-**TODO**
+Alias for [`pygame.mixer.music`](https://www.pygame.org/docs/ref/music.html#module-pygame.mixer.music).  See the pygame reference for more details.
 '''
 
 # Copyright 2022 Casey Devet
@@ -24,48 +24,29 @@ PygamePlus
 # FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER 
 # DEALINGS IN THE SOFTWARE.
 
-__version__ = "0.0.1"
-
-# Remove PyGame load message in console
-import os
-os.environ['PYGAME_HIDE_SUPPORT_PROMPT'] = "hide"
-
 import pygame
-
-pygame.init()
-
-from .screen import *
-from .sprite import *
-from .painter import *
-from .turtle import *
-from .gameloop import *
-from .pgputils import *
-from . import music_stream
-
-class Sound (pygame.mixer.Sound):
-    '''
-    Create a new Sound object from a file or buffer object.
-    
-    Wrapper class for [`pygame.mixer.Sound`](https://www.pygame.org/docs/ref/mixer.html#pygame.mixer.Sound).  See the pygame reference for more details.
-    '''
-
-    _EXTERNAL_DOCS = {}
-    for attr in dir(pygame.mixer.Sound):
-        _EXTERNAL_DOCS = f'https://www.pygame.org/docs/ref/mixer.html#pygame.mixer.Sound.{attr}'
-
+from pygame.mixer_music import *
 
 __all__ = [
-    'Painter', 
-    'Screen', 
-    'Sound',
-    'Sprite', 
-    'Turtle', 
-    'from_pygame_coordinates', 
-    'get_active_screen', 
-    'get_game_loop', 
-    'load_picture', 
-    'music_stream',
-    'start_game', 
-    'end_game', 
-    'to_pygame_coordinates'
+    'fadeout',
+    'get_busy',
+    'get_endevent',
+    'get_pos',
+    'get_volume',
+    'load',
+    'pause',
+    'play',
+    'queue',
+    'rewind',
+    'set_endevent',
+    'set_pos',
+    'set_volume',
+    'stop',
+    'unload',
+    'unpause',
+    'x'
 ]
+
+_EXTERNAL_DOCS = {}
+for attr in __all__:
+    _EXTERNAL_DOCS[attr] = f'https://www.pygame.org/docs/ref/music.html#pygame.mixer.music.{attr}'

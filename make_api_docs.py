@@ -12,6 +12,7 @@ import pygameplus
 MODULE = pygameplus
 DOCS_DIR = 'docs/'
 DOCS_SUBDIR = '_api/'
+    
 LINK_FORMATTER = lambda page: f'{{{{ site.baseurl }}}}{{% link {DOCS_SUBDIR}{page} %\}}'
 
 namespace = {}    
@@ -27,14 +28,6 @@ def clean_docstring (obj, short=False, blockquote=False):
     par_sep = '\n> \n' if blockquote else '\n\n'
     return paragraphs[0] if short else par_sep.join(paragraphs)
 
-def filter_members (obj, predicate=None, only_all=True, skip_underscores=True):
-    members = inspect.getmembers(obj, predicate)
-    if only_all and hasattr(obj, '__all__'):
-        members = [x for x in members if x[0] in obj.__all__]
-    elif skip_underscores:
-        members = [x for x in members if not x[0].startswith('_')]
-    return members
-
 def signature (func):
     try:
         return inspect.signature(func)
@@ -43,13 +36,13 @@ def signature (func):
     except:
         return '(...)'
 
-def document_module (mod, name, parent=None, file=sys.stdout, only_all=True, skip_underscores=True, recursive=True):
+def document_module (mod, name, parents=[], file=sys.stdout, only_all=True, skip_underscores=True, recursive=True):
     # Set up dictionary for sorted attributes
     members = OrderedDict()
-    members["Submodules"] = []
-    members["Classes"] = []
-    members["Functions"] = []
-    members["Other Attributes"] = []
+    members['Submodules'] = []
+    members['Classes'] = []
+    members['Functions'] = []
+    members['Other Attributes'] = []
 
     # Sort attributes by kind
     members_defined_here = []
@@ -59,21 +52,28 @@ def document_module (mod, name, parent=None, file=sys.stdout, only_all=True, ski
         if skip_underscores and attr.startswith('_'):
             continue
         if inspect.ismodule(value):
-            members["Submodules"].append((attr, value))
+            members['Submodules'].append((attr, value))
         elif inspect.isclass(value):
-            members["Classes"].append((attr, value))
+            members['Classes'].append((attr, value))
         elif inspect.isroutine(value):
-            members["Functions"].append((attr, value))
+            members['Functions'].append((attr, value))
         else:
-            members["Other Members"].append((attr, value))
+            members['Other Members'].append((attr, value))
         members_defined_here.append((attr, value))
 
     # Print Jekyll header
     print('---', file=file)
     print('layout: default', file=file)
     print(f'title: {name}', file=file)
-    if parent:
-        print(f'parent: {parent}', file=file)
+    for index, parent in enumerate(parents):
+        if index == 0:
+            print(f'parent: {parent}', file=file)
+        elif index == 1:
+            print(f'grand_parent: {parent}', file=file)
+        else:
+            print('great_' * (index - 1) + f'grand_parent: {parent}', file=file)
+    if members['Classes'] or members['Submodules']:
+        print('has_children: true', file=file)
     print('---', file=file)
     
     # Print name and module docstring
@@ -95,61 +95,6 @@ def document_module (mod, name, parent=None, file=sys.stdout, only_all=True, ski
         print(file=file)
     print('---', file=file, end='\n\n')
 
-    # # Document submodules
-    # submods = filter_members(mod, inspect.ismodule, only_all, skip_underscores)
-    # if submods:
-    #     print(f'## Submodules', file=file, end='\n\n')
-    #     print('| Module | Description |', file=file)
-    #     print('| --- | --- |', file=file)
-    #     for attr, value in submods:
-    #         summary = clean_docstring(value, short=True)
-    #         print(f'| {attr} | {summary} |', file=file)
-    #         new_parent = f'{parent}.{name}' if parent else name
-    #         subfile_name = f'{DOCS_DIR}{DOCS_SUBDIR}{new_parent}.{attr}.md'
-    #         with open(subfile_name, 'w') as fn:
-    #             document_module(value, attr, new_parent, fn, only_all, skip_underscores)
-    #         attributes_seen.append(value)
-    #     print(file=file)
-
-    # # Document subclasses
-    # subclasses = filter_members(mod, inspect.isclass, only_all, skip_underscores)
-    # if subclasses:
-    #     print(f'## Classes', file=file, end='\n\n')
-    #     print('| Class | Description |', file=file)
-    #     print('| --- | --- |', file=file)
-    #     for attr, value in subclasses:
-    #         summary = clean_docstring(value, short=True)
-    #         print(f'| {attr} | {summary} |', file=file)
-    #         attributes_seen.append(value)
-    #     print(file=file)
-
-    # # Document functions
-    # funcs = filter_members(mod, inspect.isroutine, only_all, skip_underscores)
-    # if funcs:
-    #     print(f'## Functions', file=file, end='\n\n')
-    #     print('| Function | Description |', file=file)
-    #     print('| --- | --- |', file=file)
-    #     for attr, value in funcs:
-    #         try:
-    #             signature = inspect.signature(value)
-    #         except:
-    #             signature = "(...)"
-    #         summary = clean_docstring(value, short=True)
-    #         print(f'| {attr}{signature} | {summary} |', file=file)
-    #         attributes_seen.append(value)
-    #     print(file=file)
-
-    # # Document Others
-    # others_predicate = lambda obj: bool(obj not in attributes_seen)
-    # others = filter_members(mod, others_predicate, only_all, skip_underscores)
-    # if others:
-    #     print(f'## Other Attributes', file=file, end='\n\n')
-    #     print('| Name | Value |', file=file)
-    #     print('| --- | --- |', file=file)
-    #     for attr, value in others:
-    #         print(f'| {attr} | {value!r} |', file=file)
-    #     print(file=file)
-
     # Document Member Details
     print('## Member Details', file=file, end='\n\n')
     for attr, value in members_defined_here:
@@ -159,18 +104,30 @@ def document_module (mod, name, parent=None, file=sys.stdout, only_all=True, ski
         if details:
             print(details, file=file, end='\n\n')
 
+    # Recursively 
+    if recursive:
+        for attr, value in members['Submodules']:
+            new_filename = '.'.join(parents) + f'{name}.{attr}.md'
+            with open(f'{DOCS_DIR}{DOCS_SUBDIR}{new_filename}', 'w') as doc_file:
+                document_module(value, attr, [name] + parents, doc_file, only_all, 
+                                skip_underscores, recursive)
+        for attr, value in members['Classes']:
+            new_filename = '.'.join(parents) + f'{name}.{attr}.md'
+            with open(f'{DOCS_DIR}{DOCS_SUBDIR}{new_filename}', 'w') as doc_file:
+                document_class(value, attr, [name] + parents, doc_file, only_all, 
+                               skip_underscores, recursive)
 
 classes = {}
 
-def document_class (cls, name, parent=None, file=sys.stdout, only_all=True, skip_underscores=True, recursive=True):
+def document_class (cls, name, parents=None, file=sys.stdout, only_all=True, skip_underscores=True, recursive=True):
     # Set up dictionary for sorted attributes
     attributes = OrderedDict()
-    attributes["Nested Classes"] = []
-    attributes["Methods"] = []
-    attributes["Static Methods"] = []
-    attributes["Class Methods"] = []
-    attributes["Properties"] = []
-    attributes["Other Attributes"] = []
+    attributes['Nested Classes'] = []
+    attributes['Methods'] = []
+    attributes['Static Methods'] = []
+    attributes['Class Methods'] = []
+    attributes['Properties'] = []
+    attributes['Other Attributes'] = []
 
     # Sort attributes by kind
     attributes_defined_here = []
@@ -178,17 +135,17 @@ def document_class (cls, name, parent=None, file=sys.stdout, only_all=True, skip
         if skip_underscores and attr.startswith('_'):
             continue
         if inspect.isclass(value):
-            attributes["Nested Classes"].append((attr, def_cls, value))
-        elif kind == "static method":
-            attributes["Static Methods"].append((attr, def_cls, value))
-        elif kind == "class method":
-            attributes["Class Methods"].append((attr, def_cls, value))
-        elif kind == "method":
-            attributes["Methods"].append((attr, def_cls, value))
-        elif kind == "property":
-            attributes["Properties"].append((attr, def_cls, value))
+            attributes['Nested Classes'].append((attr, def_cls, value))
+        elif kind == 'static method':
+            attributes['Static Methods'].append((attr, def_cls, value))
+        elif kind == 'class method':
+            attributes['Class Methods'].append((attr, def_cls, value))
+        elif kind == 'method':
+            attributes['Methods'].append((attr, def_cls, value))
+        elif kind == 'property':
+            attributes['Properties'].append((attr, def_cls, value))
         else:
-            attributes["Other Attributes"].append((attr, def_cls, value))
+            attributes['Other Attributes'].append((attr, def_cls, value))
         if def_cls is cls:
             attributes_defined_here.append((attr, value))
             
@@ -196,8 +153,13 @@ def document_class (cls, name, parent=None, file=sys.stdout, only_all=True, skip
     print('---', file=file)
     print('layout: default', file=file)
     print(f'title: {name}', file=file)
-    if parent:
-        print(f'parent: {parent}', file=file)
+    for index, parent in enumerate(parents):
+        if index == 0:
+            print(f'parent: {parent}', file=file)
+        elif index == 1:
+            print(f'grand_parent: {parent}', file=file)
+        else:
+            print('great_' * (index - 1) + f'grand_parent: {parent}', file=file)
     print('---', file=file)
     
     # Print name and module docstring
@@ -221,8 +183,6 @@ def document_class (cls, name, parent=None, file=sys.stdout, only_all=True, skip
         for current_cls in inspect.getmro(cls):
             if current_cls in attributes_by_origin:
                 if current_cls is cls:
-                    print('| Attribute | Description |', file=file)
-                    print('| --- | --- |', file=file)
                     for attr, value in attributes_by_origin[current_cls]:
                         sig = signature(value)
                         sig = re.sub(r'^\(self,? ?', '(', str(sig))
@@ -232,6 +192,7 @@ def document_class (cls, name, parent=None, file=sys.stdout, only_all=True, skip
                     print(f'**Inherited from `{current_cls.__module__}.{current_cls.__name__}`:**', file=file, end='\n\n')
                     for attr, value in attributes_by_origin[current_cls]:
                         sig = signature(value)
+                        sig = re.sub(r'^\(self,? ?', '(', str(sig))
                         print(f'- `{attr}{sig}`', file=file)
                 print(file=file)
     print('---', file=file, end='\n\n')
@@ -245,13 +206,17 @@ def document_class (cls, name, parent=None, file=sys.stdout, only_all=True, skip
         details = clean_docstring(value, blockquote=True)
         if details:
             print(details, file=file, end='\n\n')
+
+    # Recursively 
+    if recursive:
+        for attr, value in attributes['Nested Classes']:
+            new_filename = '.'.join(parents) + f'{name}.{attr}.md'
+            with open(f'{DOCS_DIR}{DOCS_SUBDIR}{new_filename}', 'w') as doc_file:
+                document_class(value, attr, [name] + parents, doc_file, only_all, 
+                               skip_underscores, recursive)
                 
 
 
 if __name__ == '__main__':
-    # pprint.pprint(filter_members(pygameplus))
     with open(f'{DOCS_DIR}{DOCS_SUBDIR}{MODULE.__name__}.md', 'w') as doc_file:
         document_module(MODULE, MODULE.__name__, file=doc_file)
-    # pprint.pprint(filter_members(pygameplus.Painter))
-    with open(f'{DOCS_DIR}{DOCS_SUBDIR}pygameplus.Painter.md', 'w') as doc_file:
-        document_class(pygameplus.Painter, 'Painter', 'pygameplus', file=doc_file)

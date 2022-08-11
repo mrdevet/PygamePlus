@@ -1,4 +1,4 @@
-# Copyright 2021 Casey Devet
+# Copyright 2022 Casey Devet
 #
 # Permission is hereby granted, free of charge, to any person obtaining a 
 # copy of this software and associated documentation files (the "Software"), 

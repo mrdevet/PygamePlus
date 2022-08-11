@@ -15,8 +15,6 @@ Some features of Painter objects include:  - They can draw on the screen when th
 
 ### Methods
 
-| Attribute | Description |
-| --- | --- |
 | <a href="#begin_fill">`begin_fill()`</a> | Start creating a filled shape. |
 | <a href="#begin_line">`begin_line()`</a> | Start drawing a line from the current position. |
 | <a href="#circle">`circle(radius, extent=360)`</a> | Draw a circle counterclockwise. |
@@ -30,38 +28,36 @@ Some features of Painter objects include:  - They can draw on the screen when th
 
 **Inherited from `pygameplus.sprite.Sprite`:**
 
-- `get_direction_to(self, other)`
-- `get_distance_to(self, other)`
-- `get_touching(self, others, method='rect')`
-- `go_to(self, x, y=None, turn=True)`
-- `hide(self)`
-- `is_touching(self, other, method='rect')`
-- `is_touching_point(self, x, y=None, method='rect')`
-- `move_backward(self, distance)`
-- `move_forward(self, distance)`
-- `on_click(self, func, button='left', method='rect', bleeds=False)`
-- `on_drag(self, func, button='left')`
-- `on_release(self, func, button='left')`
-- `on_update(self, func)`
-- `show(self)`
-- `turn_left(self, angle)`
-- `turn_right(self, angle)`
-- `turn_toward(self, x, y=None)`
+- `get_direction_to(other)`
+- `get_distance_to(other)`
+- `get_touching(others, method='rect')`
+- `go_to(x, y=None, turn=True)`
+- `hide()`
+- `is_touching(other, method='rect')`
+- `is_touching_point(x, y=None, method='rect')`
+- `move_backward(distance)`
+- `move_forward(distance)`
+- `on_click(func, button='left', method='rect', bleeds=False)`
+- `on_drag(func, button='left')`
+- `on_release(func, button='left')`
+- `on_update(func)`
+- `show()`
+- `turn_left(angle)`
+- `turn_right(angle)`
+- `turn_toward(x, y=None)`
 
 **Inherited from `pygame.sprite.Sprite`:**
 
-- `add(self, *groups)`
-- `add_internal(self, group)`
-- `alive(self)`
-- `groups(self)`
-- `kill(self)`
-- `remove(self, *groups)`
-- `remove_internal(self, group)`
+- `add(*groups)`
+- `add_internal(group)`
+- `alive()`
+- `groups()`
+- `kill()`
+- `remove(*groups)`
+- `remove_internal(group)`
 
 ### Properties
 
-| Attribute | Description |
-| --- | --- |
 | <a href="#drawing">`drawing`</a> | Whether or not the painter is currently drawing a line. |
 | <a href="#fill_as_moving">`fill_as_moving`</a> | Whether or not a fill will be shown on the screen before it is complete. |
 | <a href="#filling">`filling`</a> | Whether or not the painter is currently creating a filled shape. |

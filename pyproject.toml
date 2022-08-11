@@ -10,7 +10,7 @@ classifiers = [
 ]
 keywords = ["input", "output", "io"]
 dependencies = [
-    "pygame >= 2.0.0"
+    "pygame >= 2.1.2"
 ]
 requires-python = ">=3"
 

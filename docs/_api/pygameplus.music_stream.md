@@ -5,92 +5,98 @@ parent: pygameplus
 ---
 # music_stream
 
-pygame module for controlling streamed audio
+Pygame module for controlling streamed audio.
 
-## Functions
+Alias for [`pygame.mixer.music`](https://www.pygame.org/docs/ref/music.html#module-pygame.mixer.music).  See the pygame reference for more details.
 
-| Function | Description |
-| --- | --- |
-| fadeout(...) | fadeout(time) -> None<br />stop music playback after fading out |
-| get_busy(...) | get_busy() -> bool<br />check if the music stream is playing |
-| get_endevent(...) | get_endevent() -> type<br />get the event a channel sends when playback stops |
-| get_pos(...) | get_pos() -> time<br />get the music play time |
-| get_volume(...) | get_volume() -> value<br />get the music volume |
-| load(...) | load(filename) -> None<br />load(object) -> None<br />Load a music file for playback |
-| pause(...) | pause() -> None<br />temporarily stop music playback |
-| play(...) | play(loops=0, start=0.0, fade_ms = 0) -> None<br />Start the playback of the music stream |
-| queue(...) | queue(filename) -> None<br />queue a sound file to follow the current |
-| rewind(...) | rewind() -> None<br />restart music |
-| set_endevent(...) | set_endevent() -> None<br />set_endevent(type) -> None<br />have the music send an event when playback stops |
-| set_pos(...) | set_pos(pos) -> None<br />set position to play from |
-| set_volume(...) | set_volume(volume) -> None<br />set the music volume |
-| stop(...) | stop() -> None<br />stop the music playback |
-| unload(...) | unload() -> None<br />Unload the currently loaded music to free up resources |
-| unpause(...) | unpause() -> None<br />resume paused music |
+---
 
-## Function Details
+## Member Summary
 
-### `fadeout(...)`
+### Functions
 
-fadeout(time) -> None<br />stop music playback after fading out
+| <a href="#fadeout">`fadeout(...)`</a> | fadeout(time) -> None stop music playback after fading out |
+| <a href="#get_busy">`get_busy(...)`</a> | get_busy() -> bool check if the music stream is playing |
+| <a href="#get_endevent">`get_endevent(...)`</a> | get_endevent() -> type get the event a channel sends when playback stops |
+| <a href="#get_pos">`get_pos(...)`</a> | get_pos() -> time get the music play time |
+| <a href="#get_volume">`get_volume(...)`</a> | get_volume() -> value get the music volume |
+| <a href="#load">`load(...)`</a> | load(filename) -> None load(fileobj, namehint=) -> None Load a music file for playback |
+| <a href="#pause">`pause(...)`</a> | pause() -> None temporarily stop music playback |
+| <a href="#play">`play(...)`</a> | play(loops=0, start=0.0, fade_ms=0) -> None Start the playback of the music stream |
+| <a href="#queue">`queue(...)`</a> | queue(filename) -> None queue(fileobj, namehint=, loops=0) -> None queue a sound file to follow the current |
+| <a href="#rewind">`rewind(...)`</a> | rewind() -> None restart music |
+| <a href="#set_endevent">`set_endevent(...)`</a> | set_endevent() -> None set_endevent(type) -> None have the music send an event when playback stops |
+| <a href="#set_pos">`set_pos(...)`</a> | set_pos(pos) -> None set position to play from |
+| <a href="#set_volume">`set_volume(...)`</a> | set_volume(volume) -> None set the music volume |
+| <a href="#stop">`stop(...)`</a> | stop() -> None stop the music playback |
+| <a href="#unload">`unload(...)`</a> | unload() -> None Unload the currently loaded music to free up resources |
+| <a href="#unpause">`unpause(...)`</a> | unpause() -> None resume paused music |
 
-### `get_busy(...)`
+---
 
-get_busy() -> bool<br />check if the music stream is playing
+## Member Details
 
-### `get_endevent(...)`
+### `fadeout(...)` {#fadeout}
 
-get_endevent() -> type<br />get the event a channel sends when playback stops
+> fadeout(time) -> None stop music playback after fading out
 
-### `get_pos(...)`
+### `get_busy(...)` {#get_busy}
 
-get_pos() -> time<br />get the music play time
+> get_busy() -> bool check if the music stream is playing
 
-### `get_volume(...)`
+### `get_endevent(...)` {#get_endevent}
 
-get_volume() -> value<br />get the music volume
+> get_endevent() -> type get the event a channel sends when playback stops
 
-### `load(...)`
+### `get_pos(...)` {#get_pos}
 
-load(filename) -> None<br />load(object) -> None<br />Load a music file for playback
+> get_pos() -> time get the music play time
 
-### `pause(...)`
+### `get_volume(...)` {#get_volume}
 
-pause() -> None<br />temporarily stop music playback
+> get_volume() -> value get the music volume
 
-### `play(...)`
+### `load(...)` {#load}
 
-play(loops=0, start=0.0, fade_ms = 0) -> None<br />Start the playback of the music stream
+> load(filename) -> None load(fileobj, namehint=) -> None Load a music file for playback
 
-### `queue(...)`
+### `pause(...)` {#pause}
 
-queue(filename) -> None<br />queue a sound file to follow the current
+> pause() -> None temporarily stop music playback
 
-### `rewind(...)`
+### `play(...)` {#play}
 
-rewind() -> None<br />restart music
+> play(loops=0, start=0.0, fade_ms=0) -> None Start the playback of the music stream
 
-### `set_endevent(...)`
+### `queue(...)` {#queue}
 
-set_endevent() -> None<br />set_endevent(type) -> None<br />have the music send an event when playback stops
+> queue(filename) -> None queue(fileobj, namehint=, loops=0) -> None queue a sound file to follow the current
 
-### `set_pos(...)`
+### `rewind(...)` {#rewind}
 
-set_pos(pos) -> None<br />set position to play from
+> rewind() -> None restart music
 
-### `set_volume(...)`
+### `set_endevent(...)` {#set_endevent}
 
-set_volume(volume) -> None<br />set the music volume
+> set_endevent() -> None set_endevent(type) -> None have the music send an event when playback stops
 
-### `stop(...)`
+### `set_pos(...)` {#set_pos}
 
-stop() -> None<br />stop the music playback
+> set_pos(pos) -> None set position to play from
 
-### `unload(...)`
+### `set_volume(...)` {#set_volume}
 
-unload() -> None<br />Unload the currently loaded music to free up resources
+> set_volume(volume) -> None set the music volume
 
-### `unpause(...)`
+### `stop(...)` {#stop}
 
-unpause() -> None<br />resume paused music
+> stop() -> None stop the music playback
+
+### `unload(...)` {#unload}
+
+> unload() -> None Unload the currently loaded music to free up resources
+
+### `unpause(...)` {#unpause}
+
+> unpause() -> None resume paused music
 
