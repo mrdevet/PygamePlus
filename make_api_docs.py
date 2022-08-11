@@ -16,12 +16,13 @@ LINK_FORMATTER = lambda page: f'{{{{ site.baseurl }}}}{{% link {DOCS_SUBDIR}{pag
 
 namespace = {}    
 
-def clean_docstring (obj, short=False):
+def clean_docstring (obj, short=False, replace_newlines=False):
     docstring = inspect.getdoc(obj)
     if docstring is None or docstring.strip() == '':
         return None
     paragraphs = re.split(2 * os.linesep + '+', docstring)
-    paragraphs = [x.replace(os.linesep, '<br />') for x in paragraphs]
+    if replace_newlines:
+        paragraphs = [x.replace(os.linesep, '<br />') for x in paragraphs]
     return paragraphs[0] if short else '\n\n'.join(paragraphs)
 
 def filter_members (obj, predicate=None, only_all=True, skip_underscores=True):
@@ -143,6 +144,7 @@ def document_class (cls, name, parent=None, file=sys.stdout, only_all=True, skip
     print(f'# {name}', file=file, end='\n\n')
     if cls.__doc__:
         print(clean_docstring(cls), file=file, end='\n\n')
+    print('---', file=file, end='\n\n')
 
     attributes = OrderedDict()
     attributes["Nested Classes"] = []
@@ -153,7 +155,7 @@ def document_class (cls, name, parent=None, file=sys.stdout, only_all=True, skip
     attributes["Other Attributes"] = []
 
     # Sort attributes by kind
-    methods_defined_here = []
+    attributes_defined_here = []
     for attr, kind, def_cls, value in inspect.classify_class_attrs(cls):
         if skip_underscores and attr.startswith('_'):
             continue
@@ -171,13 +173,14 @@ def document_class (cls, name, parent=None, file=sys.stdout, only_all=True, skip
         else:
             attributes["Other Attributes"].append((attr, def_cls, value))
         if def_cls is cls:
-            methods_defined_here.append((attr, value))
+            attributes_defined_here.append((attr, value))
 
-    # 
+    # Print attribute summaries
+    print('## Attribute Summary', file=file, end='\n\n')
     for kind, kind_attributes in attributes.items():
         if not kind_attributes:
             continue
-        print(f'## {kind}', file=file, end='\n\n')
+        print(f'### {kind}', file=file, end='\n\n')
         attributes_by_origin = {}
         for attr, def_cls, value in kind_attributes:
             if def_cls in attributes_by_origin:
@@ -186,15 +189,28 @@ def document_class (cls, name, parent=None, file=sys.stdout, only_all=True, skip
                 attributes_by_origin[def_cls] = [(attr, value)]
         for current_cls in inspect.getmro(cls):
             if current_cls in attributes_by_origin:
-                if current_cls is not cls:
-                    print(f'### Inherited from {current_cls.__module__}.{current_cls.__name__}', file=file, end='\n\n')
-                print('| Attribute | Description |', file=file)
-                print('| --- | --- |', file=file)
-                for attr, value in attributes_by_origin[current_cls]:
-                    sig = signature(value)
-                    summary = clean_docstring(value, short=True)
-                    print(f'| `{attr}{sig}` | {summary} |', file=file)
+                if current_cls is cls:
+                    print('| Attribute | Description |', file=file)
+                    print('| --- | --- |', file=file)
+                    for attr, value in attributes_by_origin[current_cls]:
+                        sig = signature(value)
+                        summary = clean_docstring(value, True, True)
+                        print(f'| `{attr}{sig}` | {summary} |', file=file)
+                else:
+                    print(f'**Inherited from `{current_cls.__module__}.{current_cls.__name__}`:**', file=file, end='\n\n')
+                    for attr, value in attributes_by_origin[current_cls]:
+                        sig = signature(value)
+                        print(f'- `{attr}{sig}`', file=file)
                 print(file=file)
+
+    # Print attribute details
+    print('## Attribute Details', file=file, end='\n\n')
+    for attr, value in attributes_defined_here:
+        sig = signature(value)
+        print(f'### `{attr}{sig}`', file=file, end='\n\n')
+        details = clean_docstring(value)
+        if details:
+            print(details, file=file, end='\n\n')
                 
 
 

@@ -1,6 +1,7 @@
 ---
 layout: default
 title: pygameplus
+has_children: true
 ---
 # pygameplus
 
