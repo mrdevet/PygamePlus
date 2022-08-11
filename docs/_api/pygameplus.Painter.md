@@ -17,16 +17,16 @@ Some features of Painter objects include:  - They can draw on the screen when th
 
 | Attribute | Description |
 | --- | --- |
-| `begin_fill(self)` | Start creating a filled shape. |
-| `begin_line(self)` | Start drawing a line from the current position. |
-| `circle(self, radius, extent=360)` | Draw a circle counterclockwise. |
-| `dot(self, size=None, color=None)` | Draw a dot. |
-| `end_fill(self)` | Complete drawing a filled shape. |
-| `end_line(self)` | End the line at the current position. |
-| `stamp(self)` | Stamp a copy of the sprite's image to the screen at the current position. |
-| `update(self, screen=None)` | Update the sprite in preparation to draw the next frame. |
-| `walk_path(self, *path, turn=True)` | Move the Sprite along a path. |
-| `write(self, text, align='middle center', font='Arial', size=12, style=None, color=None)` | Write text to the screen at the turtle's current location using the pen. |
+| <a href="#begin_fill">`begin_fill(self)`</a> | Start creating a filled shape. |
+| <a href="#begin_line">`begin_line(self)`</a> | Start drawing a line from the current position. |
+| <a href="#circle">`circle(self, radius, extent=360)`</a> | Draw a circle counterclockwise. |
+| <a href="#dot">`dot(self, size=None, color=None)`</a> | Draw a dot. |
+| <a href="#end_fill">`end_fill(self)`</a> | Complete drawing a filled shape. |
+| <a href="#end_line">`end_line(self)`</a> | End the line at the current position. |
+| <a href="#stamp">`stamp(self)`</a> | Stamp a copy of the sprite's image to the screen at the current position. |
+| <a href="#update">`update(self, screen=None)`</a> | Update the sprite in preparation to draw the next frame. |
+| <a href="#walk_path">`walk_path(self, *path, turn=True)`</a> | Move the Sprite along a path. |
+| <a href="#write">`write(self, text, align='middle center', font='Arial', size=12, style=None, color=None)`</a> | Write text to the screen at the turtle's current location using the pen. |
 
 **Inherited from `pygameplus.sprite.Sprite`:**
 
@@ -62,12 +62,12 @@ Some features of Painter objects include:  - They can draw on the screen when th
 
 | Attribute | Description |
 | --- | --- |
-| `drawing` | Whether or not the painter is currently drawing a line. |
-| `fill_as_moving` | Whether or not a fill will be shown on the screen before it is complete. |
-| `filling` | Whether or not the painter is currently creating a filled shape. |
-| `line_width` | The current width of the lines drawn. |
-| `position` | The current the position of the sprite on the screen. |
-| `step_size` | The step size between points drawn on a line. |
+| <a href="#drawing">`drawing`</a> | Whether or not the painter is currently drawing a line. |
+| <a href="#fill_as_moving">`fill_as_moving`</a> | Whether or not a fill will be shown on the screen before it is complete. |
+| <a href="#filling">`filling`</a> | Whether or not the painter is currently creating a filled shape. |
+| <a href="#line_width">`line_width`</a> | The current width of the lines drawn. |
+| <a href="#position">`position`</a> | The current the position of the sprite on the screen. |
+| <a href="#step_size">`step_size`</a> | The step size between points drawn on a line. |
 
 **Inherited from `pygameplus.sprite.Sprite`:**
 

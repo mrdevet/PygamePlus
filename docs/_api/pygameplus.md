@@ -10,25 +10,25 @@ title: pygameplus
 
 ### Submodules
 
-| `music_stream` | Pygame module for controlling streamed audio. |
+| <a href="#music_stream">`music_stream`</a> | Pygame module for controlling streamed audio. |
 
 ### Classes
 
-| `Painter(image=None)` | A Painter is a special sub-class of a Sprite with extra methods used to  draw on the screen.  All methods of a Sprite object can be used on Painter objects. |
-| `Screen(width, height, title='')` | A Screen represents a single game screen visible in the window. |
-| `Sound(...)` | Create a new Sound object from a file or buffer object. |
-| `Sprite(image=None)` | A Sprite represents an image that moves around the screen in a game. |
-| `Turtle()` | A Turtle is a special sprite that can move around the screen and make  drawings.  The turtle's movements will be animated so that you can see it's movements. |
+| <a href="#Painter">`Painter(image=None)`</a> | A Painter is a special sub-class of a Sprite with extra methods used to  draw on the screen.  All methods of a Sprite object can be used on Painter objects. |
+| <a href="#Screen">`Screen(width, height, title='')`</a> | A Screen represents a single game screen visible in the window. |
+| <a href="#Sound">`Sound(...)`</a> | Create a new Sound object from a file or buffer object. |
+| <a href="#Sprite">`Sprite(image=None)`</a> | A Sprite represents an image that moves around the screen in a game. |
+| <a href="#Turtle">`Turtle()`</a> | A Turtle is a special sprite that can move around the screen and make  drawings.  The turtle's movements will be animated so that you can see it's movements. |
 
 ### Functions
 
-| `end_game()` | End the event loop. |
-| `from_pygame_coordinates(pygame_x, pygame_y=None)` | Convert a point in the pygame coordinate space to the same point in  the active screen's coordinate space. |
-| `get_active_screen()` | Return the currently active screen. |
-| `get_game_loop()` | Returns the event loop object. |
-| `load_picture(picture)` | Load a picture into your program. |
-| `start_game(frame_rate=None)` | Start the event loop to handle any interactions with the user. |
-| `to_pygame_coordinates(x, y=None)` | Convert a point in the active screen's coordinate space to the same point  in the pygame coordinate space. |
+| <a href="#end_game">`end_game()`</a> | End the event loop. |
+| <a href="#from_pygame_coordinates">`from_pygame_coordinates(pygame_x, pygame_y=None)`</a> | Convert a point in the pygame coordinate space to the same point in  the active screen's coordinate space. |
+| <a href="#get_active_screen">`get_active_screen()`</a> | Return the currently active screen. |
+| <a href="#get_game_loop">`get_game_loop()`</a> | Returns the event loop object. |
+| <a href="#load_picture">`load_picture(picture)`</a> | Load a picture into your program. |
+| <a href="#start_game">`start_game(frame_rate=None)`</a> | Start the event loop to handle any interactions with the user. |
+| <a href="#to_pygame_coordinates">`to_pygame_coordinates(x, y=None)`</a> | Convert a point in the active screen's coordinate space to the same point  in the pygame coordinate space. |
 
 ---
 
@@ -104,7 +104,7 @@ title: pygameplus
 
 > Pygame module for controlling streamed audio.
 > 
-> Alias for `[pygame.mixer.music](https://www.pygame.org/docs/ref/music.html#module-pygame.mixer.music)`  See the pygame reference for more details.
+> Alias for [`pygame.mixer.music`](https://www.pygame.org/docs/ref/music.html#module-pygame.mixer.music).  See the pygame reference for more details.
 
 ### `start_game(frame_rate=None)` {#start_game}
 

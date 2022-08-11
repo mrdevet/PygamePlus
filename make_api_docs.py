@@ -91,7 +91,7 @@ def document_module (mod, name, parent=None, file=sys.stdout, only_all=True, ski
         for attr, value in kind_members:
             sig = signature(value)
             summary = clean_docstring(value, short=True)
-            print(f'| `{attr}{sig}` | {summary} |', file=file)
+            print(f'| <a href="#{attr}">`{attr}{sig}`</a> | {summary} |', file=file)
         print(file=file)
     print('---', file=file, end='\n\n')
 
@@ -226,7 +226,7 @@ def document_class (cls, name, parent=None, file=sys.stdout, only_all=True, skip
                     for attr, value in attributes_by_origin[current_cls]:
                         sig = signature(value)
                         summary = clean_docstring(value, short=True)
-                        print(f'| `{attr}{sig}` | {summary} |', file=file)
+                        print(f'| <a href="#{attr}">`{attr}{sig}`</a> | {summary} |', file=file)
                 else:
                     print(f'**Inherited from `{current_cls.__module__}.{current_cls.__name__}`:**', file=file, end='\n\n')
                     for attr, value in attributes_by_origin[current_cls]:
