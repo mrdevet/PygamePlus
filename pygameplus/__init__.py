@@ -49,9 +49,11 @@ class Sound (pygame.mixer.Sound):
     Wrapper class for [`pygame.mixer.Sound`](https://www.pygame.org/docs/ref/mixer.html#pygame.mixer.Sound).  See the pygame reference for more details.
     '''
 
+    # Set external links for inherited attributes
     _EXTERNAL_DOCS = {}
     for attr in dir(pygame.mixer.Sound):
-        _EXTERNAL_DOCS = f'https://www.pygame.org/docs/ref/mixer.html#pygame.mixer.Sound.{attr}'
+        _EXTERNAL_DOCS[attr] = f'https://www.pygame.org/docs/ref/mixer.html#pygame.mixer.Sound.{attr}'
+    del attr
 
 
 __all__ = [

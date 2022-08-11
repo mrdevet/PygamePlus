@@ -51,6 +51,12 @@ class Screen (pygame.sprite.LayeredUpdates):
        keys are used when the screen is active
     '''
 
+    # Set external links for inherited attributes
+    _EXTERNAL_DOCS = {}
+    for attr in dir(pygame.sprite.LayeredUpdates):
+        _EXTERNAL_DOCS[attr] = f'https://www.pygame.org/docs/ref/sprite.html#pygame.sprite.LayeredUpdates.{attr}'
+    del attr
+
     # Stores the screen that is currently visible on the screen
     _active = None
 

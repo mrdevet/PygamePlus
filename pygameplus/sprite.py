@@ -67,6 +67,12 @@ class Sprite (pygame.sprite.Sprite):
      - Adding behaviour when the mouse interacts with the sprite
     '''
 
+    # Set external links for inherited attributes
+    _EXTERNAL_DOCS = {}
+    for attr in dir(pygame.sprite.Sprite):
+        _EXTERNAL_DOCS[attr] = f'https://www.pygame.org/docs/ref/sprite.html#pygame.sprite.Sprite.{attr}'
+    del attr
+
     def __init__ (self, image=None):
         '''
         Create a Painter object.

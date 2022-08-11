@@ -15,7 +15,22 @@ DOCS_SUBDIR = '_api/'
     
 LINK_FORMATTER = lambda page: f'{{{{ site.baseurl }}}}{{% link {DOCS_SUBDIR}{page} %\}}'
 
-namespace = {}    
+# Stores the name of each local page
+pages = {}
+
+def find_pages (obj, name, parents=[], only_all=True, skip_underscores=True):
+    if name == '__base__' or name == '__class__':
+        return
+    page_name = '.'.join(parents) + '.' + name
+    pages[obj] = page_name
+    for attr, value in inspect.getmembers(obj):
+        if only_all and hasattr(obj, '__all__') and attr not in obj.__all__:
+            continue
+        if skip_underscores and attr.startswith('_'):
+            continue
+        if inspect.isclass(value) or inspect.ismodule(value):
+            find_pages(value, attr, [name] + parents, only_all, skip_underscores)
+
 
 def clean_docstring (obj, short=False, blockquote=False):
     docstring = inspect.getdoc(obj)
@@ -37,6 +52,10 @@ def signature (func):
         return '(...)'
 
 def document_module (mod, name, parents=[], file=sys.stdout, only_all=True, skip_underscores=True, recursive=True):
+    # If necessary, find local pages
+    if mod not in pages:
+        find_pages(mod, name, parents)
+    
     # Set up dictionary for sorted attributes
     members = OrderedDict()
     members['Submodules'] = []
@@ -101,8 +120,8 @@ def document_module (mod, name, parents=[], file=sys.stdout, only_all=True, skip
             for attr, value in internal_members:
                 sig = signature(value)
                 summary = clean_docstring(value, short=True)
-                if kind == 'Submodules' or kind == 'Classes':
-                    href = '../' + '.'.join(parents) + f'{name}.{attr}'
+                if value in pages:
+                    href = '../' + pages[value]
                 else:
                     href = f'#{attr}'
                     members_with_details.append((attr, value))
@@ -135,21 +154,22 @@ def document_module (mod, name, parents=[], file=sys.stdout, only_all=True, skip
         for attr, value in members['Submodules']:
             if attr in external_docs:
                 continue
-            new_filename = '.'.join(parents) + f'{name}.{attr}.md'
-            with open(f'{DOCS_DIR}{DOCS_SUBDIR}{new_filename}', 'w') as doc_file:
+            with open(f'{DOCS_DIR}{DOCS_SUBDIR}{pages[value]}.md', 'w') as doc_file:
                 document_module(value, attr, [name] + parents, doc_file, only_all, 
                                 skip_underscores, recursive)
         for attr, value in members['Classes']:
             if attr in external_docs:
                 continue
-            new_filename = '.'.join(parents) + f'{name}.{attr}.md'
-            with open(f'{DOCS_DIR}{DOCS_SUBDIR}{new_filename}', 'w') as doc_file:
+            with open(f'{DOCS_DIR}{DOCS_SUBDIR}{pages[value]}.md', 'w') as doc_file:
                 document_class(value, attr, [name] + parents, doc_file, only_all, 
                                skip_underscores, recursive)
 
-classes = {}
 
 def document_class (cls, name, parents=None, file=sys.stdout, only_all=True, skip_underscores=True, recursive=True):
+    # If necessary, find local pages
+    if cls not in pages:
+        find_pages(mod, name, parents)
+    
     # Set up dictionary for sorted attributes
     attributes = OrderedDict()
     attributes['Nested Classes'] = []
@@ -160,7 +180,6 @@ def document_class (cls, name, parents=None, file=sys.stdout, only_all=True, ski
     attributes['Other Attributes'] = []
 
     # Sort attributes by kind
-    attributes_defined_here = []
     for attr, kind, def_cls, value in inspect.classify_class_attrs(cls):
         if skip_underscores and attr.startswith('_'):
             continue
@@ -176,8 +195,10 @@ def document_class (cls, name, parents=None, file=sys.stdout, only_all=True, ski
             attributes['Properties'].append((attr, def_cls, value))
         else:
             attributes['Other Attributes'].append((attr, def_cls, value))
-        if def_cls is cls:
-            attributes_defined_here.append((attr, value))
+            print(attr, def_cls, value)
+
+    # Get external docs links
+    external_docs = getattr(cls, '_EXTERNAL_DOCS', {})
             
     # Print Jekyll header
     print('---', file=file)
@@ -200,6 +221,7 @@ def document_class (cls, name, parents=None, file=sys.stdout, only_all=True, ski
 
     # Print attribute summaries
     print('## Attribute Summary', file=file, end='\n\n')
+    attributes_with_details = []
     for kind, kind_attributes in attributes.items():
         if not kind_attributes:
             continue
@@ -217,35 +239,50 @@ def document_class (cls, name, parents=None, file=sys.stdout, only_all=True, ski
                         sig = signature(value)
                         sig = re.sub(r'^\(self,? ?', '(', str(sig))
                         summary = clean_docstring(value, short=True)
-                        print(f'| <a href="#{attr}">`{attr}{sig}`</a> | {summary} |', file=file)
+                        if value in pages:
+                            href = '../' + pages[value]
+                        else:
+                            href = f'#{attr}'
+                            attributes_with_details.append((attr, value))
+                        print(f'| <a href="{href}">`.{attr}{sig}`</a> | {summary} |', file=file)
                 else:
-                    print(f'**Inherited from `{current_cls.__module__}.{current_cls.__name__}`:**', file=file, end='\n\n')
+                    if current_cls in pages:
+                        page_name = pages[current_cls]
+                        print(f'**Inherited from <a href="../{page_name}">`{pages[current_cls]}`<a/>:**', file=file, end='\n\n')
+                    else:
+                        print(f'**Inherited from {current_cls.__module__}.{current_cls.__name__}`:**', file=file, end='\n\n')
                     for attr, value in attributes_by_origin[current_cls]:
                         sig = signature(value)
                         sig = re.sub(r'^\(self,? ?', '(', str(sig))
-                        print(f'- `{attr}{sig}`', file=file)
+                        if attr in external_docs:
+                            href = external_docs[attr]
+                            print(f'- <a href="{href}">`.{attr}{sig}`</a>', file=file)
+                        elif current_cls in pages:
+                            href = f'../{page_name}#{attr}'
+                            print(f'- <a href="{href}">`.{attr}{sig}`</a>', file=file)
+                        else:
+                            print(f'- `.{attr}{sig}`', file=file)
                 print(file=file)
     print('---', file=file, end='\n\n')
 
     # Print attribute details
-    print('## Attribute Details', file=file, end='\n\n')
-    for attr, value in attributes_defined_here:
-        sig = signature(value)
-        sig = re.sub(r'^\(self,? ?', '(', str(sig))
-        print(f'### `{attr}{sig}` {{#{attr}}}', file=file, end='\n\n')
-        details = clean_docstring(value, blockquote=True)
-        if details:
-            print(details, file=file, end='\n\n')
+    if attributes_with_details:
+        print('## Attribute Details', file=file, end='\n\n')
+        for attr, value in attributes_with_details:
+            sig = signature(value)
+            sig = re.sub(r'^\(self,? ?', '(', str(sig))
+            print(f'### `.{attr}{sig}` {{#{attr}}}', file=file, end='\n\n')
+            details = clean_docstring(value, blockquote=True)
+            if details:
+                print(details, file=file, end='\n\n')
 
     # Recursively 
     if recursive:
         for attr, value in attributes['Nested Classes']:
-            new_filename = '.'.join(parents) + f'{name}.{attr}.md'
-            with open(f'{DOCS_DIR}{DOCS_SUBDIR}{new_filename}', 'w') as doc_file:
+            with open(f'{DOCS_DIR}{DOCS_SUBDIR}{pages[value]}.md', 'w') as doc_file:
                 document_class(value, attr, [name] + parents, doc_file, only_all, 
                                skip_underscores, recursive)
                 
-
 
 if __name__ == '__main__':
     with open(f'{DOCS_DIR}{DOCS_SUBDIR}{MODULE.__name__}.md', 'w') as doc_file:
