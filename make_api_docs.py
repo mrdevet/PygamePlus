@@ -225,6 +225,7 @@ def document_class (cls, name, parent=None, file=sys.stdout, only_all=True, skip
                     print('| --- | --- |', file=file)
                     for attr, value in attributes_by_origin[current_cls]:
                         sig = signature(value)
+                        sig = re.sub(r'^\(self,? ?', '(', str(sig))
                         summary = clean_docstring(value, short=True)
                         print(f'| <a href="#{attr}">`{attr}{sig}`</a> | {summary} |', file=file)
                 else:
@@ -239,6 +240,7 @@ def document_class (cls, name, parent=None, file=sys.stdout, only_all=True, skip
     print('## Attribute Details', file=file, end='\n\n')
     for attr, value in attributes_defined_here:
         sig = signature(value)
+        sig = re.sub(r'^\(self,? ?', '(', str(sig))
         print(f'### `{attr}{sig}` {{#{attr}}}', file=file, end='\n\n')
         details = clean_docstring(value, blockquote=True)
         if details:

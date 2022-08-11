@@ -17,16 +17,16 @@ Some features of Painter objects include:  - They can draw on the screen when th
 
 | Attribute | Description |
 | --- | --- |
-| <a href="#begin_fill">`begin_fill(self)`</a> | Start creating a filled shape. |
-| <a href="#begin_line">`begin_line(self)`</a> | Start drawing a line from the current position. |
-| <a href="#circle">`circle(self, radius, extent=360)`</a> | Draw a circle counterclockwise. |
-| <a href="#dot">`dot(self, size=None, color=None)`</a> | Draw a dot. |
-| <a href="#end_fill">`end_fill(self)`</a> | Complete drawing a filled shape. |
-| <a href="#end_line">`end_line(self)`</a> | End the line at the current position. |
-| <a href="#stamp">`stamp(self)`</a> | Stamp a copy of the sprite's image to the screen at the current position. |
-| <a href="#update">`update(self, screen=None)`</a> | Update the sprite in preparation to draw the next frame. |
-| <a href="#walk_path">`walk_path(self, *path, turn=True)`</a> | Move the Sprite along a path. |
-| <a href="#write">`write(self, text, align='middle center', font='Arial', size=12, style=None, color=None)`</a> | Write text to the screen at the turtle's current location using the pen. |
+| <a href="#begin_fill">`begin_fill()`</a> | Start creating a filled shape. |
+| <a href="#begin_line">`begin_line()`</a> | Start drawing a line from the current position. |
+| <a href="#circle">`circle(radius, extent=360)`</a> | Draw a circle counterclockwise. |
+| <a href="#dot">`dot(size=None, color=None)`</a> | Draw a dot. |
+| <a href="#end_fill">`end_fill()`</a> | Complete drawing a filled shape. |
+| <a href="#end_line">`end_line()`</a> | End the line at the current position. |
+| <a href="#stamp">`stamp()`</a> | Stamp a copy of the sprite's image to the screen at the current position. |
+| <a href="#update">`update(screen=None)`</a> | Update the sprite in preparation to draw the next frame. |
+| <a href="#walk_path">`walk_path(*path, turn=True)`</a> | Move the Sprite along a path. |
+| <a href="#write">`write(text, align='middle center', font='Arial', size=12, style=None, color=None)`</a> | Write text to the screen at the turtle's current location using the pen. |
 
 **Inherited from `pygameplus.sprite.Sprite`:**
 
@@ -116,7 +116,7 @@ Some features of Painter objects include:  - They can draw on the screen when th
 
 ## Attribute Details
 
-### `begin_fill(self)` {#begin_fill}
+### `begin_fill()` {#begin_fill}
 
 > Start creating a filled shape.
 > 
@@ -124,11 +124,11 @@ Some features of Painter objects include:  - They can draw on the screen when th
 > 
 > If `as_moving` is set to `True`, then the filled shape will be redrawn after each move of the sprite.
 
-### `begin_line(self)` {#begin_line}
+### `begin_line()` {#begin_line}
 
 > Start drawing a line from the current position.
 
-### `circle(self, radius, extent=360)` {#circle}
+### `circle(radius, extent=360)` {#circle}
 
 > Draw a circle counterclockwise.
 > 
@@ -138,7 +138,7 @@ Some features of Painter objects include:  - They can draw on the screen when th
 > 
 > The circle will actually be an approximation.  The turtle will really draw a regular polygon with 360 sides.
 
-### `dot(self, size=None, color=None)` {#dot}
+### `dot(size=None, color=None)` {#dot}
 
 > Draw a dot.
 > 
@@ -150,13 +150,13 @@ Some features of Painter objects include:  - They can draw on the screen when th
 
 > Whether or not the painter is currently drawing a line.
 
-### `end_fill(self)` {#end_fill}
+### `end_fill()` {#end_fill}
 
 > Complete drawing a filled shape.
 > 
 > This function must be preceded by a call to begin_fill().  When this method is called, a filled shape will be drawn using all of the points visited since begin_fill() was called.
 
-### `end_line(self)` {#end_line}
+### `end_line()` {#end_line}
 
 > End the line at the current position.
 
@@ -178,7 +178,7 @@ Some features of Painter objects include:  - They can draw on the screen when th
 > 
 > The position is a pair of coordinates (x and y) which represent the distance that the sprite is from the center of the screen.  That is, the center of the screen is (0, 0) and the x-coordinate and y-coordinate represent respectively how far horizontally and vertically the sprite is from there.  Think of the screen as the traditional 2D coordinate plane used in mathematics.
 
-### `stamp(self)` {#stamp}
+### `stamp()` {#stamp}
 
 > Stamp a copy of the sprite's image to the screen at the current position.
 
@@ -186,13 +186,13 @@ Some features of Painter objects include:  - They can draw on the screen when th
 
 > The step size between points drawn on a line.
 
-### `update(self, screen=None)` {#update}
+### `update(screen=None)` {#update}
 
 > Update the sprite in preparation to draw the next frame.
 > 
 > This method should generally not be called explicitly, but will be called by the event loop if the sprite is on the active screen.
 
-### `walk_path(self, *path, turn=True)` {#walk_path}
+### `walk_path(*path, turn=True)` {#walk_path}
 
 > Move the Sprite along a path.
 > 
@@ -202,7 +202,7 @@ Some features of Painter objects include:  - They can draw on the screen when th
 > 
 > By default, this method will also turn the turtle in the direction  of each of the given positions.  This behaviour can be turned of by setting the `turn` argument to `False`.
 
-### `write(self, text, align='middle center', font='Arial', size=12, style=None, color=None)` {#write}
+### `write(text, align='middle center', font='Arial', size=12, style=None, color=None)` {#write}
 
 > Write text to the screen at the turtle's current location using the pen.
 > 
