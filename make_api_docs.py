@@ -16,14 +16,17 @@ LINK_FORMATTER = lambda page: f'{{{{ site.baseurl }}}}{{% link {DOCS_SUBDIR}{pag
 
 namespace = {}    
 
-def clean_docstring (obj, short=False, replace_newlines=False):
+def clean_docstring (obj, short=False, replace_newlines=False, blockquote=False):
     docstring = inspect.getdoc(obj)
     if docstring is None or docstring.strip() == '':
         return None
     paragraphs = re.split(2 * os.linesep + '+', docstring)
     if replace_newlines:
         paragraphs = [x.replace(os.linesep, '<br />') for x in paragraphs]
-    return paragraphs[0] if short else '\n\n'.join(paragraphs)
+    if blockquote:
+        paragraphs = ['> ' + x for x in paragraphs]
+    par_sep = '\n> \n' if blockquote else '\n\n'
+    return paragraphs[0] if short else par_sep.join(paragraphs)
 
 def filter_members (obj, predicate=None, only_all=True, skip_underscores=True):
     members = inspect.getmembers(obj, predicate)
@@ -159,7 +162,6 @@ def document_class (cls, name, parent=None, file=sys.stdout, only_all=True, skip
     for attr, kind, def_cls, value in inspect.classify_class_attrs(cls):
         if skip_underscores and attr.startswith('_'):
             continue
-        print(attr, kind, def_cls)
         if inspect.isclass(value):
             attributes["Nested Classes"].append((attr, def_cls, value))
         elif kind == "static method":
@@ -202,13 +204,14 @@ def document_class (cls, name, parent=None, file=sys.stdout, only_all=True, skip
                         sig = signature(value)
                         print(f'- `{attr}{sig}`', file=file)
                 print(file=file)
+    print('---', file=file, end='\n\n')
 
     # Print attribute details
     print('## Attribute Details', file=file, end='\n\n')
     for attr, value in attributes_defined_here:
         sig = signature(value)
         print(f'### `{attr}{sig}`', file=file, end='\n\n')
-        details = clean_docstring(value)
+        details = clean_docstring(value, blockquote=True)
         if details:
             print(details, file=file, end='\n\n')
                 
@@ -218,6 +221,6 @@ if __name__ == '__main__':
     # pprint.pprint(filter_members(pygameplus))
     # with open(f'{DOCS_DIR}{DOCS_SUBDIR}{MODULE.__name__}.md', 'w') as doc_file:
     #     document_module(MODULE, MODULE.__name__, file=doc_file)
-    pprint.pprint(filter_members(pygameplus.Painter))
+    # pprint.pprint(filter_members(pygameplus.Painter))
     with open(f'{DOCS_DIR}{DOCS_SUBDIR}pygameplus.Painter.md', 'w') as doc_file:
         document_class(pygameplus.Painter, 'Painter', 'pygameplus', file=doc_file)

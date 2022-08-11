@@ -35,7 +35,7 @@ Some features of Painter objects include:
 | `walk_path(self, *path, turn=True)` | Move the Sprite along a path. |
 | `write(self, text, align='middle center', font='Arial', size=12, style=None, color=None)` | Write text to the screen at the turtle's current location using the pen. |
 
-#### Inherited from `pygameplus.sprite.Sprite`
+**Inherited from `pygameplus.sprite.Sprite`:**
 
 - `get_direction_to(self, other)`
 - `get_distance_to(self, other)`
@@ -55,7 +55,7 @@ Some features of Painter objects include:
 - `turn_right(self, angle)`
 - `turn_toward(self, x, y=None)`
 
-#### Inherited from `pygame.sprite.Sprite`
+**Inherited from `pygame.sprite.Sprite`:**
 
 - `add(self, *groups)`
 - `add_internal(self, group)`
@@ -76,7 +76,7 @@ Some features of Painter objects include:
 | `position` | The current the position of the sprite on the screen. |
 | `step_size` | The step size between points drawn on a line. |
 
-#### Inherited from `pygameplus.sprite.Sprite`
+**Inherited from `pygameplus.sprite.Sprite`:**
 
 - `anchor`
 - `bottom_edge`
@@ -115,38 +115,40 @@ Some features of Painter objects include:
 - `x`
 - `y`
 
-#### Inherited from `pygame.sprite.Sprite`
+**Inherited from `pygame.sprite.Sprite`:**
 
 - `layer`
+
+---
 
 ## Attribute Details
 
 ### `begin_fill(self)`
 
-Start creating a filled shape.
-
-This function must be followed with a call to end_fill() which
+> Start creating a filled shape.
+> 
+> This function must be followed with a call to end_fill() which
 will draw the filled shape using all of the points visited
 from the call of this method.
-
-If `as_moving` is set to `True`, then the filled shape will be redrawn
+> 
+> If `as_moving` is set to `True`, then the filled shape will be redrawn
 after each move of the sprite.
 
 ### `begin_line(self)`
 
-Start drawing a line from the current position.
+> Start drawing a line from the current position.
 
 ### `circle(self, radius, extent=360)`
 
-Draw a circle counterclockwise.
-
-The circle will have the given `radius`.  If `radius` is negative, then
+> Draw a circle counterclockwise.
+> 
+> The circle will have the given `radius`.  If `radius` is negative, then
 the circle is draw clockwise.
-
-The `extent` is used to draw an arc around a portion of a circle.  If 
+> 
+> The `extent` is used to draw an arc around a portion of a circle.  If 
 `extent` is negative, draw the circle clockwise.
-
-The circle will actually be an approximation.  The turtle will really
+> 
+> The circle will actually be an approximation.  The turtle will really
 draw a regular polygon with 360 sides.
 
 ### `dot(self, size=None, color=None)`
@@ -156,7 +158,7 @@ draw a regular polygon with 360 sides.
 > The dot will be centered at the current position and have diameter
 `size`.  If no size is given a dot slightly larger than the line width
 will be drawn.
->
+> 
 > If the `color` is not specified, the line color is used.
 
 ### `drawing`
@@ -168,8 +170,8 @@ will be drawn.
 > Complete drawing a filled shape.
 > 
 > This function must be preceded by a call to begin_fill().  When
-> this method is called, a filled shape will be drawn using all of the
-> points visited since begin_fill() was called.
+this method is called, a filled shape will be drawn using all of the
+points visited since begin_fill() was called.
 
 ### `end_line(self)`
 
@@ -185,13 +187,13 @@ will be drawn.
 
 ### `line_width`
 
-The current width of the lines drawn.
+> The current width of the lines drawn.
 
 ### `position`
 
-The current the position of the sprite on the screen.
-
-The position is a pair of coordinates (x and y) which represent the
+> The current the position of the sprite on the screen.
+> 
+> The position is a pair of coordinates (x and y) which represent the
 distance that the sprite is from the center of the screen.  That is,
 the center of the screen is (0, 0) and the x-coordinate and y-coordinate
 represent respectively how far horizontally and vertically the sprite is
@@ -200,49 +202,49 @@ used in mathematics.
 
 ### `stamp(self)`
 
-Stamp a copy of the sprite's image to the screen at the current position.
+> Stamp a copy of the sprite's image to the screen at the current position.
 
 ### `step_size`
 
-The step size between points drawn on a line.
+> The step size between points drawn on a line.
 
 ### `update(self, screen=None)`
 
-Update the sprite in preparation to draw the next frame.
-
-This method should generally not be called explicitly, but will be called
+> Update the sprite in preparation to draw the next frame.
+> 
+> This method should generally not be called explicitly, but will be called
 by the event loop if the sprite is on the active screen.
 
 ### `walk_path(self, *path, turn=True)`
 
-Move the Sprite along a path.
-
-If a line is currently being drawn, then it will continue from the 
+> Move the Sprite along a path.
+> 
+> If a line is currently being drawn, then it will continue from the 
 current position and be drawn along the path.
-
-The path should be a list of coordinate pairs
+> 
+> The path should be a list of coordinate pairs
 (e.g. `[(100, 0), (-200, 100), (200, -50)]`)
-
-By default, this method will also turn the turtle in the direction 
+> 
+> By default, this method will also turn the turtle in the direction 
 of each of the given positions.  This behaviour can be turned of by
 setting the `turn` argument to `False`.
 
 ### `write(self, text, align='middle center', font='Arial', size=12, style=None, color=None)`
 
-Write text to the screen at the turtle's current location using the pen.
-
-The `align` parameter sets where the turtle aligns with the text being
+> Write text to the screen at the turtle's current location using the pen.
+> 
+> The `align` parameter sets where the turtle aligns with the text being
 written.  It is a string containing "left", "right", "center", "top",
 "bottom", "middle" or a combination separated by space (e.g. 
 "bottom center")
-
-The `font` parameter can be the name of a font on the system or a
+> 
+> The `font` parameter can be the name of a font on the system or a
 True Type Font file (.ttf) located in the directory.
-
-The `size` is the height of the text in pixels.
-
-The `style` argument can be "bold", "italic", "underline" or a 
+> 
+> The `size` is the height of the text in pixels.
+> 
+> The `style` argument can be "bold", "italic", "underline" or a 
 combination separated by space (e.g. "bold italic").
-
-If the `color` is not specified, the line color is used.
+> 
+> If the `color` is not specified, the line color is used.
 
