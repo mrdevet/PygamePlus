@@ -26,7 +26,7 @@ Some features of Painter objects include:  - They can draw on the screen when th
 | <a href="#walk_path">`.walk_path(*path, turn=True)`</a> | Move the Sprite along a path. |
 | <a href="#write">`.write(text, align='middle center', font='Arial', size=12, style=None, color=None)`</a> | Write text to the screen at the turtle's current location using the pen. |
 
-<b>Inherited from <a href="../pygameplus.Sprite">`pygameplus.Sprite`<a/>:</b>
+**Inherited from <a href="../pygameplus.Sprite">`pygameplus.Sprite`</a>:**
 
 - <a href="../pygameplus.Sprite#get_direction_to">`.get_direction_to(other)`</a>
 - <a href="../pygameplus.Sprite#get_distance_to">`.get_distance_to(other)`</a>
@@ -65,7 +65,7 @@ Some features of Painter objects include:  - They can draw on the screen when th
 | <a href="#position">`.position`</a> | The current the position of the sprite on the screen. |
 | <a href="#step_size">`.step_size`</a> | The step size between points drawn on a line. |
 
-<b>Inherited from <a href="../pygameplus.Sprite">`pygameplus.Sprite`<a/>:</b>
+**Inherited from <a href="../pygameplus.Sprite">`pygameplus.Sprite`</a>:**
 
 - <a href="../pygameplus.Sprite#anchor">`.anchor`</a>
 - <a href="../pygameplus.Sprite#bottom_edge">`.bottom_edge`</a>

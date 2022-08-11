@@ -248,7 +248,7 @@ def document_class (cls, name, parents=None, file=sys.stdout, only_all=True, ski
                 else:
                     if current_cls in pages:
                         page_name = pages[current_cls]
-                        print(f'<b>Inherited from <a href="../{page_name}">`{pages[current_cls]}`<a/>:</b>', file=file, end='\n\n')
+                        print(f'**Inherited from <a href="../{page_name}">`{pages[current_cls]}`</a>:**', file=file, end='\n\n')
                     else:
                         print(f'**Inherited from `{current_cls.__module__}.{current_cls.__name__}`:**', file=file, end='\n\n')
                     for attr, value in attributes_by_origin[current_cls]:
