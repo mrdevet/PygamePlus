@@ -35,7 +35,7 @@ Some features of Painter objects include:
 | `walk_path(self, *path, turn=True)` | Move the Sprite along a path. |
 | `write(self, text, align='middle center', font='Arial', size=12, style=None, color=None)` | Write text to the screen at the turtle's current location using the pen. |
 
-**Inherited from `pygameplus.sprite.Sprite`:**
+#### Inherited from `pygameplus.sprite.Sprite`
 
 - `get_direction_to(self, other)`
 - `get_distance_to(self, other)`
@@ -55,7 +55,7 @@ Some features of Painter objects include:
 - `turn_right(self, angle)`
 - `turn_toward(self, x, y=None)`
 
-**Inherited from `pygame.sprite.Sprite`:**
+#### Inherited from `pygame.sprite.Sprite`
 
 - `add(self, *groups)`
 - `add_internal(self, group)`
@@ -76,7 +76,7 @@ Some features of Painter objects include:
 | `position` | The current the position of the sprite on the screen. |
 | `step_size` | The step size between points drawn on a line. |
 
-**Inherited from `pygameplus.sprite.Sprite`:**
+#### Inherited from `pygameplus.sprite.Sprite`
 
 - `anchor`
 - `bottom_edge`
@@ -115,7 +115,7 @@ Some features of Painter objects include:
 - `x`
 - `y`
 
-**Inherited from `pygame.sprite.Sprite`:**
+#### Inherited from `pygame.sprite.Sprite`
 
 - `layer`
 
@@ -151,37 +151,37 @@ draw a regular polygon with 360 sides.
 
 ### `dot(self, size=None, color=None)`
 
-Draw a dot.
-
-The dot will be centered at the current position and have diameter
+> Draw a dot.
+> 
+> The dot will be centered at the current position and have diameter
 `size`.  If no size is given a dot slightly larger than the line width
 will be drawn.
-
-If the `color` is not specified, the line color is used.
+>
+> If the `color` is not specified, the line color is used.
 
 ### `drawing`
 
-Whether or not the painter is currently drawing a line.
+> Whether or not the painter is currently drawing a line.
 
 ### `end_fill(self)`
 
-Complete drawing a filled shape.
-
-This function must be preceded by a call to begin_fill().  When
-this method is called, a filled shape will be drawn using all of the
-points visited since begin_fill() was called.
+> Complete drawing a filled shape.
+> 
+> This function must be preceded by a call to begin_fill().  When
+> this method is called, a filled shape will be drawn using all of the
+> points visited since begin_fill() was called.
 
 ### `end_line(self)`
 
-End the line at the current position.
+> End the line at the current position.
 
 ### `fill_as_moving`
 
-Whether or not a fill will be shown on the screen before it is complete.
+> Whether or not a fill will be shown on the screen before it is complete.
 
 ### `filling`
 
-Whether or not the painter is currently creating a filled shape.
+> Whether or not the painter is currently creating a filled shape.
 
 ### `line_width`
 
