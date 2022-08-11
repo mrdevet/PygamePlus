@@ -26,14 +26,14 @@ A turtle object includes all of the movement methods of a Sprite and the drawing
 | <a href="#walk_path">`.walk_path(*path, turn=True)`</a> | Move the Sprite along a path. |
 | <a href="#write">`.write(text, align='middle center', font='Arial', size=12, style=None, color=None)`</a> | Write text to the screen at the turtle's current location using the pen. |
 
-**Inherited from <a href="../pygameplus.Painter">`pygameplus.Painter`<a/>:**
+<b>Inherited from <a href="../pygameplus.Painter">`pygameplus.Painter`<a/>:</b>
 
 - <a href="../pygameplus.Painter#begin_fill">`.begin_fill()`</a>
 - <a href="../pygameplus.Painter#begin_line">`.begin_line()`</a>
 - <a href="../pygameplus.Painter#end_line">`.end_line()`</a>
 - <a href="https://www.pygame.org/docs/ref/sprite.html#pygame.sprite.Sprite.update">`.update(screen=None)`</a>
 
-**Inherited from <a href="../pygameplus.Sprite">`pygameplus.Sprite`<a/>:**
+<b>Inherited from <a href="../pygameplus.Sprite">`pygameplus.Sprite`<a/>:</b>
 
 - <a href="../pygameplus.Sprite#get_direction_to">`.get_direction_to(other)`</a>
 - <a href="../pygameplus.Sprite#get_distance_to">`.get_distance_to(other)`</a>
@@ -50,7 +50,7 @@ A turtle object includes all of the movement methods of a Sprite and the drawing
 - <a href="../pygameplus.Sprite#turn_right">`.turn_right(angle)`</a>
 - <a href="../pygameplus.Sprite#turn_toward">`.turn_toward(x, y=None)`</a>
 
-**Inherited from pygame.sprite.Sprite`:**
+**Inherited from `pygame.sprite.Sprite`:**
 
 - <a href="https://www.pygame.org/docs/ref/sprite.html#pygame.sprite.Sprite.add_internal">`.add_internal(group)`</a>
 - <a href="https://www.pygame.org/docs/ref/sprite.html#pygame.sprite.Sprite.alive">`.alive()`</a>
@@ -92,14 +92,14 @@ A turtle object includes all of the movement methods of a Sprite and the drawing
 | <a href="#x">`.x`</a> | The current x-coordinate of the sprite's position on the screen. |
 | <a href="#y">`.y`</a> | The current y-coordinate of the sprite's position on the screen. |
 
-**Inherited from <a href="../pygameplus.Painter">`pygameplus.Painter`<a/>:**
+<b>Inherited from <a href="../pygameplus.Painter">`pygameplus.Painter`<a/>:</b>
 
 - <a href="../pygameplus.Painter#drawing">`.drawing`</a>
 - <a href="../pygameplus.Painter#filling">`.filling`</a>
 - <a href="../pygameplus.Painter#line_width">`.line_width`</a>
 - <a href="../pygameplus.Painter#step_size">`.step_size`</a>
 
-**Inherited from <a href="../pygameplus.Sprite">`pygameplus.Sprite`<a/>:**
+<b>Inherited from <a href="../pygameplus.Sprite">`pygameplus.Sprite`<a/>:</b>
 
 - <a href="../pygameplus.Sprite#anchor">`.anchor`</a>
 - <a href="../pygameplus.Sprite#center">`.center`</a>
@@ -113,7 +113,7 @@ A turtle object includes all of the movement methods of a Sprite and the drawing
 - <a href="../pygameplus.Sprite#picture">`.picture`</a>
 - <a href="../pygameplus.Sprite#size">`.size`</a>
 
-**Inherited from pygame.sprite.Sprite`:**
+**Inherited from `pygame.sprite.Sprite`:**
 
 - <a href="https://www.pygame.org/docs/ref/sprite.html#pygame.sprite.Sprite.layer">`.layer`</a>
 

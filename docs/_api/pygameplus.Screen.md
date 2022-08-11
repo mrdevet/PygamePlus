@@ -40,7 +40,7 @@ Methods are provided to do the following:  - Open a screen and make it active  -
 | <a href="#to_pygame_coordinates">`.to_pygame_coordinates(x, y=None)`</a> | Convert a point in this screen's coordinate space to the same point  in the pygame coordinate space. |
 | <a href="#update">`.update(*args, **kwargs)`</a> | Calls the update() method on all Sprites on the screen. |
 
-**Inherited from pygame.sprite.LayeredUpdates`:**
+**Inherited from `pygame.sprite.LayeredUpdates`:**
 
 - <a href="https://www.pygame.org/docs/ref/sprite.html#pygame.sprite.LayeredUpdates.add_internal">`.add_internal(sprite, layer=None)`</a>
 - <a href="https://www.pygame.org/docs/ref/sprite.html#pygame.sprite.LayeredUpdates.change_layer">`.change_layer(sprite, new_layer)`</a>
@@ -59,7 +59,7 @@ Methods are provided to do the following:  - Open a screen and make it active  -
 - <a href="https://www.pygame.org/docs/ref/sprite.html#pygame.sprite.LayeredUpdates.sprites">`.sprites()`</a>
 - <a href="https://www.pygame.org/docs/ref/sprite.html#pygame.sprite.LayeredUpdates.switch_layer">`.switch_layer(layer1_nr, layer2_nr)`</a>
 
-**Inherited from pygame.sprite.AbstractGroup`:**
+**Inherited from `pygame.sprite.AbstractGroup`:**
 
 - <a href="https://www.pygame.org/docs/ref/sprite.html#pygame.sprite.LayeredUpdates.copy">`.copy()`</a>
 - <a href="https://www.pygame.org/docs/ref/sprite.html#pygame.sprite.LayeredUpdates.empty">`.empty()`</a>

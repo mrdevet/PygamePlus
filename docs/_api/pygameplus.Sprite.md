@@ -36,7 +36,7 @@ Methods are provided for the following:  - Moving and turning the sprite  - Dete
 | <a href="#turn_toward">`.turn_toward(x, y=None)`</a> | Turn the sprite towards the given coordinates. |
 | <a href="#update">`.update(screen=None)`</a> | Update the sprite in preparation to draw the next frame. |
 
-**Inherited from pygame.sprite.Sprite`:**
+**Inherited from `pygame.sprite.Sprite`:**
 
 - <a href="https://www.pygame.org/docs/ref/sprite.html#pygame.sprite.Sprite.add">`.add(*groups)`</a>
 - <a href="https://www.pygame.org/docs/ref/sprite.html#pygame.sprite.Sprite.add_internal">`.add_internal(group)`</a>
@@ -86,7 +86,7 @@ Methods are provided for the following:  - Moving and turning the sprite  - Dete
 | <a href="#x">`.x`</a> | The current x-coordinate of the sprite's position on the screen. |
 | <a href="#y">`.y`</a> | The current y-coordinate of the sprite's position on the screen. |
 
-**Inherited from pygame.sprite.Sprite`:**
+**Inherited from `pygame.sprite.Sprite`:**
 
 - <a href="https://www.pygame.org/docs/ref/sprite.html#pygame.sprite.Sprite.layer">`.layer`</a>
 

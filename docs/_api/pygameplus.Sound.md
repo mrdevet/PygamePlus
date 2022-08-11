@@ -15,7 +15,7 @@ Wrapper class for [`pygame.mixer.Sound`](https://www.pygame.org/docs/ref/mixer.h
 
 ### Methods
 
-**Inherited from builtins.Sound`:**
+**Inherited from `builtins.Sound`:**
 
 - <a href="https://www.pygame.org/docs/ref/mixer.html#pygame.mixer.Sound.fadeout">`.fadeout(...)`</a>
 - <a href="https://www.pygame.org/docs/ref/mixer.html#pygame.mixer.Sound.get_length">`.get_length(...)`</a>
