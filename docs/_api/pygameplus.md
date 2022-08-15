@@ -23,7 +23,7 @@ PygamePlus
 | <a href="../pygameplus.Screen">`Screen(width, height, title='')`</a> | A Screen represents a single game screen visible in the window. |
 | <a href="../pygameplus.Sound">`Sound(...)`</a> | Create a new Sound object from a file or buffer object. |
 | <a href="../pygameplus.Sprite">`Sprite(image=None)`</a> | A Sprite represents an image that moves around the screen in a game. |
-| <a href="../pygameplus.Turtle">`Turtle()`</a> | A Turtle is a special sprite that can move around the screen and make  drawings.  The turtle's movements will be animated so that you can see it's movements. |
+| <a href="../pygameplus.Turtle">`Turtle()`</a> | A Turtle is a special sprite that can move around the screen and make  drawings.  When you move the turtle using any of its methods, it will be automatically animated. |
 
 ### Functions
 

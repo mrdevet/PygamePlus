@@ -116,33 +116,6 @@ class Screen (pygame.sprite.LayeredUpdates):
         self._create_grid()
 
 
-    ### Overwritten functions
-
-    def add (self, *sprites, layer=0):
-        '''
-        Add the sprites to this screen.
-
-        The arguments can be individual sprite objects or a list of sprites.
-        '''
-
-        # The add() method is overwritten so that it calls the add() method
-        # of each sprite that is added.  This allows special functionality to
-        # happen immediately when a sprite is added (e.g. a Turtle will appear
-        # on the screen immediately)
-
-        # Loop through the sprites and if they are pygame Sprite objects, 
-        # call the sprite's add() method
-        for sprite in sprites:
-            if isinstance(sprite, pygame.sprite.Sprite):
-                sprite._layer = layer
-                sprite.add(self)
-
-            # If the object is not a Sprite, then it's probably an iterable, so
-            # recursively add it.
-            else:
-                self.add(*sprite)
-
-
     ### Screen Visibility Methods
 
     def open (self):

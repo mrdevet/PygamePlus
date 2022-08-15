@@ -23,15 +23,16 @@ Some features of Painter objects include:  - They can draw on the screen when th
 | <a href="#end_line">`.end_line()`</a> | End the line at the current position. |
 | <a href="#stamp">`.stamp()`</a> | Stamp a copy of the sprite's image to the screen at the current position. |
 | <a href="#update">`.update(screen=None)`</a> | Update the sprite in preparation to draw the next frame. |
-| <a href="#walk_path">`.walk_path(*path, turn=True)`</a> | Move the Sprite along a path. |
+| <a href="#walk_path">`.walk_path(*path, turn=True, reverse=False)`</a> | Move the Sprite along a path. |
 | <a href="#write">`.write(text, align='middle center', font='Arial', size=12, style=None, color=None)`</a> | Write text to the screen at the turtle's current location using the pen. |
 
 **Inherited from <a href="../pygameplus.Sprite">`pygameplus.Sprite`</a>:**
 
+- <a href="https://www.pygame.org/docs/ref/sprite.html#pygame.sprite.Sprite.add_internal">`.add_internal(group)`</a>
 - <a href="../pygameplus.Sprite#get_direction_to">`.get_direction_to(other)`</a>
 - <a href="../pygameplus.Sprite#get_distance_to">`.get_distance_to(other)`</a>
 - <a href="../pygameplus.Sprite#get_touching">`.get_touching(others, method='rect')`</a>
-- <a href="../pygameplus.Sprite#go_to">`.go_to(x, y=None, turn=True)`</a>
+- <a href="../pygameplus.Sprite#go_to">`.go_to(x, y=None, turn=True, reverse=False)`</a>
 - <a href="../pygameplus.Sprite#hide">`.hide()`</a>
 - <a href="../pygameplus.Sprite#is_touching">`.is_touching(other, method='rect')`</a>
 - <a href="../pygameplus.Sprite#is_touching_point">`.is_touching_point(x, y=None, method='rect')`</a>
@@ -44,12 +45,12 @@ Some features of Painter objects include:  - They can draw on the screen when th
 - <a href="../pygameplus.Sprite#show">`.show()`</a>
 - <a href="../pygameplus.Sprite#turn_left">`.turn_left(angle)`</a>
 - <a href="../pygameplus.Sprite#turn_right">`.turn_right(angle)`</a>
-- <a href="../pygameplus.Sprite#turn_toward">`.turn_toward(x, y=None)`</a>
+- <a href="../pygameplus.Sprite#turn_to">`.turn_to(direction, reverse=False)`</a>
+- <a href="../pygameplus.Sprite#turn_toward">`.turn_toward(x, y=None, reverse=False)`</a>
 
 **Inherited from `pygame.sprite.Sprite`:**
 
 - <a href="https://www.pygame.org/docs/ref/sprite.html#pygame.sprite.Sprite.add">`.add(*groups)`</a>
-- <a href="https://www.pygame.org/docs/ref/sprite.html#pygame.sprite.Sprite.add_internal">`.add_internal(group)`</a>
 - <a href="https://www.pygame.org/docs/ref/sprite.html#pygame.sprite.Sprite.alive">`.alive()`</a>
 - <a href="https://www.pygame.org/docs/ref/sprite.html#pygame.sprite.Sprite.groups">`.groups()`</a>
 - <a href="https://www.pygame.org/docs/ref/sprite.html#pygame.sprite.Sprite.kill">`.kill()`</a>
@@ -162,7 +163,7 @@ Some features of Painter objects include:  - They can draw on the screen when th
 > 
 > This method should generally not be called explicitly, but will be called by the event loop if the sprite is on the active screen.
 
-### `.walk_path(*path, turn=True)` {#walk_path}
+### `.walk_path(*path, turn=True, reverse=False)` {#walk_path}
 
 > Move the Sprite along a path.
 > 

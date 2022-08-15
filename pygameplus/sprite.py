@@ -26,7 +26,7 @@ import math
 import pygame
 
 from . import pgputils
-from .screen import get_active_screen, to_pygame_coordinates
+from .screen import Screen, get_active_screen, to_pygame_coordinates
 
 ################################################################################
 #                               HELPER FUNCTIONS
@@ -101,6 +101,7 @@ class Sprite (pygame.sprite.Sprite):
             else:
                 self._original = pygame.image.load(image).convert_alpha()
         self._opacity = 1
+        self._dirty_visible = False
 
 
         # The .image and .rect attributes are needed for drawing sprites
@@ -119,7 +120,6 @@ class Sprite (pygame.sprite.Sprite):
         self._anchor = ("center", "center")
         self._anchor_vec = pygame.Vector2(0, 0)
         self._dir = 0
-        self._move_ratio = pygame.Vector2(1, 0)
 
         # Scale and rotation attributes
         self._vertical_flip = False
@@ -152,6 +152,21 @@ class Sprite (pygame.sprite.Sprite):
 
     ### Visibility Methods
 
+    def add_internal (self, group):
+        '''
+        Do not use this method directly.
+        
+        It is used by the group to add a sprite internally.
+        '''
+        
+        active_screen = get_active_screen()
+        if isinstance(group, Screen):
+            self._clean_image(active_screen)
+            if group == active_screen:
+                self._dirty_visible = True
+        super().add_internal(group)
+        
+
     @property
     def visible (self):
         '''
@@ -178,6 +193,7 @@ class Sprite (pygame.sprite.Sprite):
         active_screen = get_active_screen()
         if active_screen is not None:
             self.add(active_screen)
+            self._dirty_visible = True
 
 
     def hide (self):
@@ -188,6 +204,7 @@ class Sprite (pygame.sprite.Sprite):
         active_screen = get_active_screen()
         if active_screen is not None:
             self.remove(active_screen)
+            self._dirty_visible = True
 
 
     ### Image property
@@ -346,7 +363,7 @@ class Sprite (pygame.sprite.Sprite):
             raise ValueError("Invalid position!") from None
 
 
-    def go_to (self, x, y=None, turn=True):
+    def go_to (self, x, y=None, turn=True, reverse=False):
         '''
         Turn the sprite and move the sprite to the given coordinates.
 
@@ -356,7 +373,7 @@ class Sprite (pygame.sprite.Sprite):
         '''
 
         if turn:
-            self.turn_toward(x, y)
+            self.turn_toward(x, y, reverse=reverse)
 
         # Move the sprite
         self.position = pygame.Vector2(x, y)
@@ -661,17 +678,46 @@ class Sprite (pygame.sprite.Sprite):
         # Ensure that the direction is between 0 and 360
         self._dir %= 360
 
-        # Create a 2D vector that contains the amount that the x-coordinate
-        # and y-coordinate change if the sprite moves forward 1 pixel in this
-        # direction
-        self._move_ratio = pygame.Vector2(1, 0).rotate(self._dir)
-
         # If the image rotates, then flag that we need to update the image
         if self._rotates:
             self._dirty_rotate = True
 
 
-    def turn_toward (self, x, y=None):
+    def turn_to (self, direction, reverse=False):
+        '''
+        Turn the sprite to the point at the given `direction`.
+
+        The direction is an angle (in degrees) counterclockwise from the
+        positive x-axis.  Here are some important directions:
+         - 0 degrees is directly to the right
+         - 90 degrees is directly up
+         - 180 degrees is directly to the left
+         - 270 degrees is directly down
+        '''
+
+        if reverse:
+            self.direction = direction + 180
+        else:
+            self.direction = direction
+
+
+    def turn_left (self, angle):
+        '''
+        Turn the sprite left (counterclockwise) by the given `angle`.
+        '''
+
+        self.turn_to(self._dir + angle)
+
+
+    def turn_right (self, angle):
+        '''
+        Turn the sprite right (clockwise) by the given `angle`.
+        '''
+
+        self.turn_to(self._dir - angle)
+
+
+    def turn_toward (self, x, y=None, reverse=False):
         '''
         Turn the sprite towards the given coordinates.
         '''
@@ -682,30 +728,7 @@ class Sprite (pygame.sprite.Sprite):
 
         # Don't turn if given current location
         if distance > 0:
-            # Adjust direction to turn in closest direction
-            if direction - self._dir > 180:
-                direction -= 360
-            if direction - self._dir < -180:
-                direction += 360
-
-            # Do the turn
-            self.direction = direction
-
-
-    def turn_left (self, angle):
-        '''
-        Turn the sprite left (counterclockwise) by the given `angle`.
-        '''
-
-        self.direction += angle
-
-
-    def turn_right (self, angle):
-        '''
-        Turn the sprite right (clockwise) by the given `angle`.
-        '''
-
-        self.direction -= angle
+            self.turn_to(direction, reverse=reverse)
 
 
     ### Movement Methods
@@ -716,7 +739,7 @@ class Sprite (pygame.sprite.Sprite):
         pointing.
         '''
 
-        self.position = self._pos + distance * self._move_ratio
+        self.go_to(self._pos + pygame.Vector2(distance, 0).rotate(self._dir))
 
 
     def move_backward (self, distance):
@@ -725,7 +748,7 @@ class Sprite (pygame.sprite.Sprite):
         direction it is currently pointing.
         '''
 
-        self.position = self._pos - distance * self._move_ratio
+        self.go_to(self._pos + pygame.Vector2(-distance, 0).rotate(self._dir))
 
 
     ### Scaling and Rotating Image Methods
@@ -1121,6 +1144,7 @@ class Sprite (pygame.sprite.Sprite):
 
         # Update the sprite's .image and .rect attributes needed for drawing
         self._clean_image(screen)
+        self._dirty_visible = False
 
 
     ### Other Sprite Methods
