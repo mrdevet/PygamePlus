@@ -19,7 +19,6 @@ Methods are provided to do the following:  - Open a screen and make it active  -
 
 ### Methods
 
-| <a href="#add">`.add(*sprites, layer=0)`</a> | Add the sprites to this screen. |
 | <a href="#cancel_timer">`.cancel_timer(event_id)`</a> | Stop the timer with the given event ID. |
 | <a href="#clear">`.clear()`</a> | Clears the screen of all contents, including background images, drawings and sprites. |
 | <a href="#clear_canvas">`.clear_canvas(remove_sprites=False)`</a> | Clear everything that was drawn on the screen. |
@@ -42,6 +41,7 @@ Methods are provided to do the following:  - Open a screen and make it active  -
 
 **Inherited from `pygame.sprite.LayeredUpdates`:**
 
+- <a href="https://www.pygame.org/docs/ref/sprite.html#pygame.sprite.LayeredUpdates.add">`.add(*sprites, **kwargs)`</a>
 - <a href="https://www.pygame.org/docs/ref/sprite.html#pygame.sprite.LayeredUpdates.add_internal">`.add_internal(sprite, layer=None)`</a>
 - <a href="https://www.pygame.org/docs/ref/sprite.html#pygame.sprite.LayeredUpdates.change_layer">`.change_layer(sprite, new_layer)`</a>
 - <a href="https://www.pygame.org/docs/ref/sprite.html#pygame.sprite.LayeredUpdates.get_bottom_layer">`.get_bottom_layer()`</a>
@@ -82,12 +82,6 @@ Methods are provided to do the following:  - Open a screen and make it active  -
 ---
 
 ## Attribute Details
-
-### `.add(*sprites, layer=0)` {#add}
-
-> Add the sprites to this screen.
-> 
-> The arguments can be individual sprite objects or a list of sprites.
 
 ### `.cancel_timer(event_id)` {#cancel_timer}
 

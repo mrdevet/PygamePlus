@@ -79,6 +79,7 @@ class Painter (Sprite):
         self._fillpoly = None
         self._fill_canvas = None
         self._drawings_over_fill = None
+        self._dirty_canvas = False
 
 
     ### Drawing Line Methods
@@ -230,7 +231,7 @@ class Painter (Sprite):
     position = property(Sprite.position.fget, _set_position)
 
 
-    def walk_path (self, *path, turn=True):
+    def walk_path (self, *path, turn=True, reverse=False):
         '''
         Move the Sprite along a path.
 
@@ -248,9 +249,9 @@ class Painter (Sprite):
         # Call .go_to() on each point in the path
         for point in path:
             if isinstance(point, list):
-                self.walk_path(*point)
+                self.walk_path(*point, turn=turn, reverse=reverse)
             else:
-                self.go_to(point, turn=turn)
+                self.go_to(point, turn=turn, reverse=reverse)
 
 
     ### Creating Filled Shapes
@@ -357,6 +358,7 @@ class Painter (Sprite):
         # Reset the filling attributes
         self._filling = False
         self._fillpoly = None
+        self._dirty_canvas = True
 
 
     ### Draw circles
@@ -394,6 +396,8 @@ class Painter (Sprite):
         if self._filling:
             pygame.draw.circle(self._drawings_over_fill, color, point, size / 2)
 
+        self._dirty_canvas = True
+
 
     def circle (self, radius, extent=360):
         '''
@@ -411,39 +415,63 @@ class Painter (Sprite):
 
         # Because the circle is an approximation, we will calculate the
         # final position and set it after the circle is drawn.
-        if extent % 360 == 0:
-            end = self._pos
+        # if extent % 360 == 0:
+        #     end = self._pos
+        # else:
+        #     delta = pygame.Vector2(0, -radius)
+        #     delta.rotate_ip(extent if radius >= 0 else -extent)
+        #     delta += pygame.Vector2(0, radius)
+        #     delta.rotate_ip(self._dir)
+        #     end = self._pos + delta
+
+        # # Sanitize extent argument
+        # if extent is None:
+        #     extent = 360
+        # else:
+        #     extent = int(extent)
+
+        # # Set up the number of steps and the turn angle needed between
+        # # steps.
+        # step_size = abs(radius) * 2 * math.pi / 360
+        # turn_size = 1 if radius >= 0 else -1
+
+        # # Repeatedly move and turn to approximate the circle
+        # if extent > 0:
+        #     for _ in range(extent):
+        #         self.move_forward(step_size)
+        #         self.turn_left(turn_size)
+        # else:
+        #     for _ in range(-extent):
+        #         self.turn_right(turn_size)
+        #         self.move_backward(step_size)
+
+        # # Set the position to the one calculated above
+        # self._pos = end
+
+        if radius == 0:
+            raise ValueError("The radius of a circle can't be zero!")
+        if extent == 0:
+            raise ValueError("You can't make an arc with subtended angle of 0 degrees!")
+
+        if radius > 0:
+            if extent > 0:
+                steps = list(range(1, int(extent)))
+            else:
+                steps = list(range(-1, int(extent), -1))
+            steps.append(extent)
         else:
-            delta = pygame.Vector2(0, -radius)
-            delta.rotate_ip(extent if radius >= 0 else -extent)
-            delta += pygame.Vector2(0, radius)
-            delta.rotate_ip(self._dir)
-            end = self._pos + delta
+            if extent > 0:
+                steps = list(range(-1, int(-extent), -1))
+            else:
+                steps = list(range(1, int(-extent)))
+            steps.append(-extent)
 
-        # Sanitize extent argument
-        if extent is None:
-            extent = 360
-        else:
-            extent = int(extent)
+        center = self._pos + pygame.Vector2(0, radius).rotate(self._dir)
+        path = [center + pygame.Vector2(0, -radius).rotate(self._dir + step) for step in steps]
+        end_dir = (self._dir + extent) % 360
 
-        # Set up the number of steps and the turn angle needed between
-        # steps.
-        step_size = abs(radius) * 2 * math.pi / 360
-        turn_size = 1 if radius >= 0 else -1
-
-        # Repeatedly move and turn to approximate the circle
-        if extent > 0:
-            for _ in range(extent):
-                self.move_forward(step_size)
-                self.turn_left(turn_size)
-        else:
-            for _ in range(-extent):
-                self.turn_right(turn_size)
-                self.move_backward(step_size)
-
-        # Set the position to the one calculated above
-        self._pos = end
-
+        self.walk_path(path, reverse=extent < 0)
+        self._dir = end_dir
 
     ### Draw a stamp
 
@@ -465,6 +493,8 @@ class Painter (Sprite):
         # the upper layer to be drawn on top of the fill.
         if self._filling:
             self._drawings_over_fill.blit(self.image, self.rect)
+
+        self._dirty_canvas
 
 
     ### Write on the screen
@@ -558,6 +588,8 @@ class Painter (Sprite):
 
         for canvas in canvases:
             canvas.blit(image, rect)
+            
+        self._dirty_canvas = True
 
         # Return a Font object that can be used for future writing
         return font_obj
@@ -581,6 +613,8 @@ class Painter (Sprite):
         if (screen is not None and self in screen and self._filling and
                 self._fill_as_moving):
             self._draw_fill(screen._update_drawings)
+
+        self._dirty_canvas = False
 
 
 # What is included when importing *

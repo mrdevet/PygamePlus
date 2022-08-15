@@ -17,10 +17,11 @@ Methods are provided for the following:  - Moving and turning the sprite  - Dete
 
 ### Methods
 
+| <a href="#add_internal">`.add_internal(group)`</a> | Do not use this method directly. |
 | <a href="#get_direction_to">`.get_direction_to(other)`</a> | Return the angle that this sprite must turn toward to be pointing directly at another. |
 | <a href="#get_distance_to">`.get_distance_to(other)`</a> | Return the distance this sprite is away from another. |
 | <a href="#get_touching">`.get_touching(others, method='rect')`</a> | Takes a collection of sprites and returns the subset that the sprite is touching. |
-| <a href="#go_to">`.go_to(x, y=None, turn=True)`</a> | Turn the sprite and move the sprite to the given coordinates. |
+| <a href="#go_to">`.go_to(x, y=None, turn=True, reverse=False)`</a> | Turn the sprite and move the sprite to the given coordinates. |
 | <a href="#hide">`.hide()`</a> | Remove the sprite from the active screen. |
 | <a href="#is_touching">`.is_touching(other, method='rect')`</a> | Returns whether or not the sprite is touching another sprite (or collection of sprites). |
 | <a href="#is_touching_point">`.is_touching_point(x, y=None, method='rect')`</a> | Returns whether or not the sprite is touching a given point. |
@@ -33,13 +34,13 @@ Methods are provided for the following:  - Moving and turning the sprite  - Dete
 | <a href="#show">`.show()`</a> | Add the sprite to the active screen. |
 | <a href="#turn_left">`.turn_left(angle)`</a> | Turn the sprite left (counterclockwise) by the given `angle`. |
 | <a href="#turn_right">`.turn_right(angle)`</a> | Turn the sprite right (clockwise) by the given `angle`. |
-| <a href="#turn_toward">`.turn_toward(x, y=None)`</a> | Turn the sprite towards the given coordinates. |
+| <a href="#turn_to">`.turn_to(direction, reverse=False)`</a> | Turn the sprite to the point at the given `direction`. |
+| <a href="#turn_toward">`.turn_toward(x, y=None, reverse=False)`</a> | Turn the sprite towards the given coordinates. |
 | <a href="#update">`.update(screen=None)`</a> | Update the sprite in preparation to draw the next frame. |
 
 **Inherited from `pygame.sprite.Sprite`:**
 
 - <a href="https://www.pygame.org/docs/ref/sprite.html#pygame.sprite.Sprite.add">`.add(*groups)`</a>
-- <a href="https://www.pygame.org/docs/ref/sprite.html#pygame.sprite.Sprite.add_internal">`.add_internal(group)`</a>
 - <a href="https://www.pygame.org/docs/ref/sprite.html#pygame.sprite.Sprite.alive">`.alive()`</a>
 - <a href="https://www.pygame.org/docs/ref/sprite.html#pygame.sprite.Sprite.groups">`.groups()`</a>
 - <a href="https://www.pygame.org/docs/ref/sprite.html#pygame.sprite.Sprite.kill">`.kill()`</a>
@@ -94,6 +95,12 @@ Methods are provided for the following:  - Moving and turning the sprite  - Dete
 
 ## Attribute Details
 
+### `.add_internal(group)` {#add_internal}
+
+> Do not use this method directly.
+> 
+> It is used by the group to add a sprite internally.
+
 ### `.get_direction_to(other)` {#get_direction_to}
 
 > Return the angle that this sprite must turn toward to be pointing directly at another.
@@ -108,7 +115,7 @@ Methods are provided for the following:  - Moving and turning the sprite  - Dete
 > 
 > See the Sprite.is_touching() method for details on the `method` parameter.
 
-### `.go_to(x, y=None, turn=True)` {#go_to}
+### `.go_to(x, y=None, turn=True, reverse=False)` {#go_to}
 
 > Turn the sprite and move the sprite to the given coordinates.
 > 
@@ -184,7 +191,13 @@ Methods are provided for the following:  - Moving and turning the sprite  - Dete
 
 > Turn the sprite right (clockwise) by the given `angle`.
 
-### `.turn_toward(x, y=None)` {#turn_toward}
+### `.turn_to(direction, reverse=False)` {#turn_to}
+
+> Turn the sprite to the point at the given `direction`.
+> 
+> The direction is an angle (in degrees) counterclockwise from the positive x-axis.  Here are some important directions:  - 0 degrees is directly to the right  - 90 degrees is directly up  - 180 degrees is directly to the left  - 270 degrees is directly down
+
+### `.turn_toward(x, y=None, reverse=False)` {#turn_toward}
 
 > Turn the sprite towards the given coordinates.
 

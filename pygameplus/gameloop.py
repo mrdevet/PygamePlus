@@ -64,6 +64,9 @@ class GameLoop (object):
         end_game_loop() functions.
         '''
 
+        # The pygame clock to control the frame rate
+        self._clock = pygame.time.Clock()
+
         # Attributes that store the event loops current state
         self._running = False
         self._frame_rate = frame_rate
@@ -153,17 +156,20 @@ class GameLoop (object):
         raise AttributeError("This property is read-only!  Use start() and stop() to control the event loop.")
 
 
+    def _tick_clock (self):
+        return self._clock.tick(self._frame_rate)
+
+
     def start (self):
         '''
         Start the event loop.
         '''
 
         self._running = True
-        clock = pygame.time.Clock()
         while self._running:
             # Force the loop to wait if the entire frame delay has not passed 
             # since the start of the last iteration
-            clock.tick(self._frame_rate)
+            self._tick_clock()
 
             # Get the active screen
             screen = get_active_screen()
