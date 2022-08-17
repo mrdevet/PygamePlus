@@ -40,7 +40,7 @@ from .painter import *
 from .turtle import *
 from .gameloop import *
 from .pgputils import *
-from . import music_stream
+from .music import *
 
 class Sound (pygame.mixer.Sound):
     '''
@@ -57,6 +57,7 @@ class Sound (pygame.mixer.Sound):
 
 
 __all__ = [
+    'MusicStream',
     'Painter', 
     'Screen', 
     'Sound',

@@ -27,6 +27,7 @@ from pygame.locals import *
 
 from . import pgputils
 from .screen import get_active_screen
+from .music import MUSIC_END, music_stream
 
 
 ################################################################################
@@ -260,7 +261,10 @@ class GameLoop (object):
                     if screen._mouse_move_func is not None:
                         pgputils.call_with_args(screen._mouse_move_func,
                                         pos=pos, x=pos[0], y=pos[1])
-                    
+
+                # If this event is a music end, manage the music stream
+                elif event.type == MUSIC_END:
+                    music_stream._handle_end_event()         
 
                 # If this event type matches a screen timer, call it's handler.
                 elif event.type in screen._timers:

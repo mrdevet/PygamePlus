@@ -24,7 +24,7 @@ def main ():
     
     def open_main_screen ():
         screen.open()
-        music_stream.play(loops=-1)
+        music_stream.play()
     
     start_screen.on_key_press(open_main_screen)
     
@@ -37,7 +37,8 @@ def main ():
 
     # Load the background music
     with resources.path("pygameplus.demos.audio", "hampster-march.mp3") as audio_path:
-        music_stream.load(audio_path)
+        music_stream.add_tracks(audio_path)
+    music_stream.repeat_one = True
     
     # Create a POW sprite
     with resources.path("pygameplus.demos.img", "pow.png") as image_path:
@@ -132,7 +133,7 @@ def main ():
 
     def resume_game ():
         screen.open()
-        music_stream.unpause()
+        music_stream.play()
         move_mole()
         screen.on_timer(move_mole, 2000, repeat=True)
     
