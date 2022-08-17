@@ -61,7 +61,7 @@ def document_module (mod, name, parents=[], file=sys.stdout, only_all=True, skip
     members['Submodules'] = []
     members['Classes'] = []
     members['Functions'] = []
-    members['Other Attributes'] = []
+    members['Other Members'] = []
 
     # Sort attributes by kind
     for attr, value in inspect.getmembers(mod):

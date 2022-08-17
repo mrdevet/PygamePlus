@@ -9,13 +9,16 @@ def main ():
     screen = Screen(640, 360, "PyGame Plus")
     screen.open()
     
+    music_stream.suppress_errors = True
+    music_stream.repeat = False
+    music_stream.repeat_one = False
+    
     # Populate the music stream
     for x in range(3, 16, 3):
         with resources.path("pygameplus.demos.audio", f"sample-{x}s.mp3") as audio_path:
+            music_stream.add_track(f'bad-{x}.mp3')
             music_stream.add_tracks(audio_path)
-
-    music_stream.repeat = False
-    music_stream.repeat_one = False
+            music_stream.add_track(f'worse-{x}.mp3')
 
     def play_music ():
         music_stream.play()
